@@ -1,4 +1,12 @@
-# 💤 LazyVim
+# 💤 LazyVim for 0xc1
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+我的 LazyVim 配置，基于 [LazyVim](https://www.lazyvim.org/)。
+
+## External Binaries
+
+Required by installed plugins/features:
+
+- `git` (gitsigns.nvim, diffview.nvim, snacks.nvim git features)
+- `gh` (snacks.nvim GitHub/PR pickers)
+- `node` (github/copilot.vim)
+- `deno` (toppair/peek.nvim build/runtime)
