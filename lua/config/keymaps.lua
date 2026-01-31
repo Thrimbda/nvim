@@ -25,3 +25,8 @@ end, { desc = "Snacks Terminal (Bottom)" })
 vim.keymap.set("n", "<leader>tl", function()
   require("snacks").terminal.toggle(nil, { win = { position = "right" } })
 end, { desc = "Snacks Terminal (Right)" })
+
+-- Snacks LazyGit
+vim.keymap.set("n", "<leader>gg", function()
+  require("snacks").lazygit()
+end, { desc = "Snacks LazyGit" })
