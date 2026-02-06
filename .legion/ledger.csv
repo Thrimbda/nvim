@@ -1,0 +1,25 @@
+﻿timestamp,action,task_id,task_name,user,params_summary,result
+2026-02-06T05:56:19.221Z,legion_init,,,Claude,,success
+2026-02-06T05:56:30.769Z,legion_create_task,,,Claude,"goal: Add a Norang-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",failed
+2026-02-06T05:56:43.733Z,legion_propose_task,,,Claude,name: nvim-orgmode-norang-workflow,success
+2026-02-06T05:56:47.729Z,legion_approve_proposal,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,proposalId: proposal-mlah377y-a8b914,success
+2026-02-06T05:56:57.878Z,legion_get_status,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
+2026-02-06T05:57:33.770Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 1,success
+2026-02-06T05:57:38.537Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Risk level set to Low for orgmode workflow changes.,success
+2026-02-06T05:57:50.665Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Implement punch in/out via explicit Lua wrapper commands instead of hook-based clock-out automation.,success
+2026-02-06T05:57:53.480Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 1,success
+2026-02-06T06:00:04.677Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Expose default Organization task ID via vim.g.org_organization_task_id.,success
+2026-02-06T06:00:07.929Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: lua/org_punch.lua,success
+2026-02-06T06:00:10.992Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: docs/orgmode-norang-workflow.md,success
+2026-02-06T06:00:14.751Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:00:14.768Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:00:14.793Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:02:21.650Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 3,success
+2026-02-06T06:02:24.575Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 3,success
+2026-02-06T06:02:29.678Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/test-report.md,success
+2026-02-06T06:02:32.824Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/review-code.md,success
+2026-02-06T06:03:09.149Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 4,success
+2026-02-06T06:03:12.454Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/report-walkthrough.md,success
+2026-02-06T06:03:16.534Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/pr-body.md,success
+2026-02-06T08:15:07.708Z,legion_get_status,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
+2026-02-06T08:15:40.773Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Keep a single canonical usage doc at docs/orgmode-norang-workflow.md.,success
