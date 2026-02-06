@@ -1,0 +1,162 @@
+{
+  "version": "1.0.0",
+  "currentTask": "nvim-orgmode-norang-plugin",
+  "settings": {
+    "autoRemind": true,
+    "remindBeforeReset": true,
+    "taskCreationPolicy": "agent-with-approval"
+  },
+  "tasks": [
+    {
+      "id": "nvim-orgmode-norang-workflow",
+      "name": "nvim-orgmode-norang-workflow",
+      "status": "paused",
+      "createdAt": "2026-02-06T05:56:47.725Z",
+      "updatedAt": "2026-02-07T14:12:30.417Z"
+    },
+    {
+      "id": "nvim-orgmode-norang-plugin",
+      "name": "nvim-orgmode-norang-plugin",
+      "status": "active",
+      "createdAt": "2026-02-07T14:12:30.417Z",
+      "updatedAt": "2026-02-07T14:25:25.157Z"
+    }
+  ],
+  "pendingProposals": [
+    {
+      "id": "proposal-mlah377y-a8b914",
+      "name": "nvim-orgmode-norang-workflow",
+      "goal": "Add a Norang-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",
+      "rationale": "User explicitly requested an end-to-end delivery that generates .legion artifacts and a PR-ready body for a Norang-style orgmode workflow in this repo.",
+      "points": [
+        "Define custom agenda views (block/NEXT/REFILE) in orgmode config",
+        "Implement punch in/out glue to keep clocks running with default task/parent fallback",
+        "Update orgmode config and keymaps while preserving existing paths",
+        "Document setup and daily usage for the workflow"
+      ],
+      "scope": [
+        "lua/plugins/orgmode.lua",
+        "lua/org_punch.lua",
+        "docs/orgmode-norang-workflow.md"
+      ],
+      "phases": [
+        {
+          "name": "Design-lite",
+          "tasks": [
+            {
+              "description": "Capture requirements, assumptions, risks, verification in task-brief",
+              "acceptance": "docs/task-brief.md includes problem, acceptance criteria, assumptions, risk level, verification plan"
+            },
+            {
+              "description": "Summarize design approach for agenda and punch flow",
+              "acceptance": "Design notes captured in plan/context"
+            }
+          ]
+        },
+        {
+          "name": "Implementation",
+          "tasks": [
+            {
+              "description": "Extend orgmode plugin config with TODO workflow, logging, custom agenda, and keymaps",
+              "acceptance": "lua/plugins/orgmode.lua updated and loads without errors"
+            },
+            {
+              "description": "Add org_punch Lua module for punch in/out and keep-running clock out",
+              "acceptance": "lua/org_punch.lua provides setup, punch_in, punch_out, clock_out_keep_running"
+            },
+            {
+              "description": "Write workflow usage documentation",
+              "acceptance": "docs/orgmode-norang-workflow.md added with setup and daily usage"
+            }
+          ]
+        },
+        {
+          "name": "Verification & Review",
+          "tasks": [
+            {
+              "description": "Run tests or document no automated tests",
+              "acceptance": "docs/test-report.md generated"
+            },
+            {
+              "description": "Code review pass for maintainability/correctness",
+              "acceptance": "docs/review-code.md generated"
+            }
+          ]
+        },
+        {
+          "name": "Reporting",
+          "tasks": [
+            {
+              "description": "Generate walkthrough and PR body",
+              "acceptance": "docs/report-walkthrough.md and docs/pr-body.md generated"
+            }
+          ]
+        }
+      ],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-02-06T05:56:43.731Z",
+      "status": "approved",
+      "decidedAt": "2026-02-06T05:56:47.725Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "nvim-orgmode-norang-workflow"
+    },
+    {
+      "id": "proposal-mlce8jfh-2fae3d",
+      "name": "nvim-orgmode-norang-plugin",
+      "goal": "在现有 nvim-orgmode 配置基础上新增 org_norang 插件，补齐 Norang 工作流中项目识别、卡住项目识别、归档候选与 block agenda 自动化能力。",
+      "rationale": "当前实现仅覆盖 Norang-lite（基础 block agenda + punch），缺少 suggestion 中定义的核心能力（PROJECT/STUCK/ARCHIVE_CANDIDATE 派生标签、自动刷新命令与保存触发、归档候选规则）。该任务需要跨文件设计与决策记录，属于复杂任务，必须进入 Legion 流程并通过设计门禁后再编码。",
+      "points": [
+        "对比 suggestion 与当前实现，明确能力缺口与兼容边界",
+        "输出可落地 RFC（数据模型、匹配规则、更新触发、失败回退）",
+        "通过 review-rfc 对抗审查并收敛",
+        "更新 plan/context/tasks 并完成设计门禁，等待用户确认再实现"
+      ],
+      "scope": [
+        "lua/plugins/orgmode.lua",
+        "lua/org_punch.lua",
+        "lua/org_norang/**",
+        "docs/orgmode-norang-workflow.md",
+        ".legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md"
+      ],
+      "phases": [
+        {
+          "name": "阶段 1: 调查与范围确认",
+          "tasks": [
+            {
+              "description": "梳理当前 orgmode/punch 配置与 suggestion 差异，形成约束与风险清单",
+              "acceptance": "context.md 记录差异、约束、风险与 Scope"
+            }
+          ]
+        },
+        {
+          "name": "阶段 2: 设计循环（RFC + 审查）",
+          "tasks": [
+            {
+              "description": "产出 RFC 初稿（架构、规则、接口、迁移与验证）",
+              "acceptance": "docs/rfc.md 生成且覆盖核心设计维度"
+            },
+            {
+              "description": "执行 review-rfc 审查并按意见迭代至收敛",
+              "acceptance": "docs/rfc-review.md 生成且无未处理 blocking 项"
+            }
+          ]
+        },
+        {
+          "name": "阶段 3: 设计门禁",
+          "tasks": [
+            {
+              "description": "将 RFC 路径写入 plan.md 并给出下一步与阻塞项",
+              "acceptance": "plan/context/tasks 更新完成，等待用户确认实现"
+            }
+          ]
+        }
+      ],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-02-07T14:12:26.336Z",
+      "status": "approved",
+      "decidedAt": "2026-02-07T14:12:30.417Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "nvim-orgmode-norang-plugin"
+    }
+  ]
+}
