@@ -40,3 +40,57 @@
 2026-02-07T14:25:15.066Z,legion_list_reviews,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,"status: open, type: all",success
 2026-02-07T14:25:20.245Z,legion_update_plan,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
 2026-02-07T14:25:25.160Z,legion_update_context,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,handoff: 请用户确认 RFC 设计（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md）与复审结论（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc-review.md）。,success
+2026-02-08T15:16:01.727Z,legion_init,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
+2026-02-08T15:16:04.389Z,legion_get_status,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
+2026-02-08T15:16:04.405Z,legion_list_tasks,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
+2026-02-08T15:16:35.990Z,legion_propose_task,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,name: nvim-orgmode-norang-implementation,success
+2026-02-08T15:16:42.366Z,legion_approve_proposal,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,proposalId: proposal-mldvywic-58900f,success
+2026-02-08T15:16:46.546Z,legion_switch_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,taskId: nvim-orgmode-norang-implementation,success
+2026-02-08T15:16:46.546Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-02-08T15:17:06.410Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 实现阶段严格以已通过复审的 RFC 为唯一设计真源，不在实现过程中扩展规范口径。,success
+2026-02-08T15:17:33.649Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-02-08T15:39:35.254Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: V1 refresh_all 严格遵守 memory_only：仅处理已加载 buffer，对未加载 agenda 文件统计为 skipped_unloaded,success
+2026-02-08T15:39:42.952Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/org_norang/init.lua,success
+2026-02-08T15:39:42.981Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/org_norang/refresh.lua,success
+2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/plugins/orgmode.lua,success
+2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: docs/orgmode-norang-workflow.md,success
+2026-02-08T15:39:45.939Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: phase 1,success
+2026-02-08T15:39:54.774Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addConstraint: Justification: 按执行规范需同步回写 .legion 任务上下文（context.md/tasks.md）记录实现进展；该改动不属于业务功能代码，仅用于任务追踪与交接。,success
+2026-02-11T15:19:19.375Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 本轮验证采用“最小必选自动化 + RFC T1-T16 手工步骤清单”作为交付口径。,success
+2026-02-11T15:19:19.375Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-02-11T15:22:18.650Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:22:22.133Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-11T15:22:25.067Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:22:28.793Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/review-code.md,success
+2026-02-11T15:22:34.008Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 优先修复审查 blocking/high，再进行最终复审与报告。,success
+2026-02-11T15:24:42.283Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在保持 RFC 口径不变前提下，优先关闭审查 blocking/high，再进行最终报告输出。,success
+2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:28:09.676Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
+2026-02-11T15:28:14.457Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
+2026-02-11T15:28:18.633Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 已修复安全复审 FAIL：setup 先校验后注册自动刷新，非法配置路径不再触发字段下钻崩溃。,success
+2026-02-12T03:42:59.043Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 2026-02-12 重新执行最小校验：对 7 个改动 Lua 文件逐个运行 `nvim --headless -u NONE '+set rtp+=.' '+luafile <FILE>' '+qa'`，结果 7/7 PASS；已覆盖写回 docs/test-report.md。,success
+2026-02-12T03:43:02.640Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-02-12T03:44:06.325Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-12T03:44:12.432Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/report-walkthrough.md,success
+2026-02-12T03:44:20.926Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 生成 walkthrough 报告与变更说明,success
+2026-02-12T03:44:28.600Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 生成 walkthrough 报告与变更说明,success
+2026-02-12T03:44:49.851Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-02-12T11:54:02.065Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 根据用户新增需求调整刷新策略：支持全量识别并刷新 org_agenda_files 中未加载文件，并提供开关 refresh.refresh_unloaded_files（默认 true）。,success
+2026-02-12T11:54:06.826Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
+2026-02-12T11:54:10.157Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
+2026-02-13T16:13:48.358Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 norang 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
+2026-02-13T16:13:52.797Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 norang 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
+2026-02-13T16:13:57.612Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"addDecision: 在 block agenda 中新增 Standalone Tasks 块，匹配 `+TODO=""TODO""-PROJECT-REFILE`。",success
+2026-02-13T16:19:17.809Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Norang 流程单独查看卡住项目,success
+2026-02-13T16:19:22.847Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Norang 流程单独查看卡住项目,success
+2026-02-13T16:19:27.531Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在保留 block agenda 的前提下增加独立 Stuck Projects 入口。,success
+2026-02-13T16:24:06.038Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
+2026-02-13T16:24:09.724Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
+2026-02-13T16:24:16.646Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将项目判定从“有活动子任务”改为“有任意 TODO 关键字子任务”，并将 WAITING+NEXT 视为不可解除 stuck。,success
+2026-02-13T16:31:30.774Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
+2026-02-13T16:31:33.422Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
+2026-02-13T16:31:39.645Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 避免在 agenda 文件发现阶段对通配模式调用 `vim.fn.expand`，改为仅 `~` 展开后交由 `vim.fn.glob` 处理。,success
+2026-02-14T04:22:22.702Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
+2026-02-14T04:22:25.482Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
+2026-02-14T04:22:31.839Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。,success

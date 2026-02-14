@@ -8,6 +8,7 @@ M.cfg = {
 
 M.state = {
   keep_clock_running = false,
+  warned_norang_mismatch = false,
 }
 
 local function escape_pattern(text)
@@ -26,6 +27,50 @@ local function uniq(list)
     end
   end
   return out
+end
+
+local function same_items(a, b)
+  local sa, sb = {}, {}
+  for _, item in ipairs(a or {}) do
+    sa[item] = true
+  end
+  for _, item in ipairs(b or {}) do
+    sb[item] = true
+  end
+  for k, _ in pairs(sa) do
+    if not sb[k] then
+      return false
+    end
+  end
+  for k, _ in pairs(sb) do
+    if not sa[k] then
+      return false
+    end
+  end
+  return true
+end
+
+local function maybe_warn_norang_todo_mismatch()
+  if M.state.warned_norang_mismatch then
+    return
+  end
+  local ok, norang = pcall(require, "org_norang")
+  if not ok or type(norang.get_config) ~= "function" then
+    return
+  end
+  local cfg = norang.get_config()
+  if not cfg or not cfg.todo or not cfg.todo.active then
+    return
+  end
+  if same_items(M.cfg.project_todo_keywords, cfg.todo.active) then
+    return
+  end
+
+  M.state.warned_norang_mismatch = true
+  vim.notify(
+    "org_punch: TODO keywords differ from org_norang.todo.active; punch keeps running unchanged",
+    vim.log.levels.WARN
+  )
 end
 
 local function expand_org_files()
@@ -183,6 +228,7 @@ end
 
 function M.setup(opts)
   M.cfg = vim.tbl_deep_extend("force", M.cfg, opts or {})
+  maybe_warn_norang_todo_mismatch()
 end
 
 function M.clock_in_default()
@@ -205,12 +251,14 @@ function M.clock_in_default()
 end
 
 function M.punch_in()
+  maybe_warn_norang_todo_mismatch()
   M.state.keep_clock_running = true
   M.clock_in_default()
   vim.notify("Org Punch In: keep clock running = true")
 end
 
 function M.punch_out()
+  maybe_warn_norang_todo_mismatch()
   M.state.keep_clock_running = false
 
   with_view_restored(function()
@@ -222,6 +270,7 @@ function M.punch_out()
 end
 
 function M.clock_out_keep_running()
+  maybe_warn_norang_todo_mismatch()
   with_view_restored(function()
     org_clock_goto()
 

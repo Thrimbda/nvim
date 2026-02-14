@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "currentTask": "nvim-orgmode-norang-plugin",
+  "currentTask": "nvim-orgmode-norang-implementation",
   "settings": {
     "autoRemind": true,
     "remindBeforeReset": true,
@@ -17,9 +17,16 @@
     {
       "id": "nvim-orgmode-norang-plugin",
       "name": "nvim-orgmode-norang-plugin",
-      "status": "active",
+      "status": "paused",
       "createdAt": "2026-02-07T14:12:30.417Z",
-      "updatedAt": "2026-02-07T14:25:25.157Z"
+      "updatedAt": "2026-02-08T15:16:42.358Z"
+    },
+    {
+      "id": "nvim-orgmode-norang-implementation",
+      "name": "nvim-orgmode-norang-implementation",
+      "status": "active",
+      "createdAt": "2026-02-08T15:16:42.358Z",
+      "updatedAt": "2026-02-14T04:22:31.838Z"
     }
   ],
   "pendingProposals": [
@@ -157,6 +164,73 @@
       "decidedAt": "2026-02-07T14:12:30.417Z",
       "decidedBy": "Claude",
       "createdTaskId": "nvim-orgmode-norang-plugin"
+    },
+    {
+      "id": "proposal-mldvywic-58900f",
+      "name": "nvim-orgmode-norang-implementation",
+      "goal": "基于已通过设计门禁的 RFC 实现 org_norang 插件并完成验证、代码审查、安全审查与交付报告。",
+      "rationale": "设计阶段任务 nvim-orgmode-norang-plugin 已完成并通过最终复审（PASS）。当前进入实现阶段，涉及多文件编码、验证与审查闭环，需独立任务跟踪实施进度与产物。",
+      "points": [
+        "严格按 RFC（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md）实现，避免口径漂移",
+        "Scope 限定在 orgmode 配置、org_punch 协同点、新增 org_norang 模块与使用文档",
+        "实现后执行验证、review-code、review-security，并生成 walkthrough 报告",
+        "任何偏离 RFC 的变更需先回写 context 决策"
+      ],
+      "scope": [
+        "lua/plugins/orgmode.lua",
+        "lua/org_punch.lua",
+        "lua/org_norang/**",
+        "docs/orgmode-norang-workflow.md",
+        ".legion/tasks/nvim-orgmode-norang-implementation/docs/*",
+        ".legion/tasks/nvim-orgmode-norang-implementation/reports/*"
+      ],
+      "phases": [
+        {
+          "name": "阶段 1: 实现",
+          "tasks": [
+            {
+              "description": "新增 org_norang 模块（init/parser/rules/refresh/cleanup）并接入命令与自动刷新",
+              "acceptance": "模块可加载，命令可注册，核心路径无语法错误"
+            },
+            {
+              "description": "更新 orgmode 配置接入 org_norang 与扩展 agenda blocks",
+              "acceptance": "保持 b/n/r 兼容并新增 PROJECT/STUCK/ARCHIVE_CANDIDATE 视图"
+            },
+            {
+              "description": "更新 org_punch 协同校验与文档说明",
+              "acceptance": "punch 行为不回归，文档覆盖新命令与回滚路径"
+            }
+          ]
+        },
+        {
+          "name": "阶段 2: 验证与审查",
+          "tasks": [
+            {
+              "description": "执行测试/校验并记录结果",
+              "acceptance": "生成 docs/test-report.md，覆盖关键手工断言"
+            },
+            {
+              "description": "执行代码审查与安全审查",
+              "acceptance": "生成 docs/review-code.md 与 docs/review-security.md"
+            }
+          ]
+        },
+        {
+          "name": "阶段 3: 报告",
+          "tasks": [
+            {
+              "description": "生成 walkthrough 报告与变更说明",
+              "acceptance": "生成 docs/report-walkthrough.md，包含下一步与风险备注"
+            }
+          ]
+        }
+      ],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-02-08T15:16:35.989Z",
+      "status": "approved",
+      "decidedAt": "2026-02-08T15:16:42.358Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "nvim-orgmode-norang-implementation"
     }
   ]
 }
