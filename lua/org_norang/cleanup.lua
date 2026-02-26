@@ -19,6 +19,17 @@ local function normalize_path(path)
   return vim.fn.fnamemodify(path, ":p")
 end
 
+local function expand_home(path)
+  local home = vim.env.HOME or ""
+  if path == "~" then
+    return home ~= "" and home or path
+  end
+  if path:sub(1, 2) == "~/" and home ~= "" then
+    return home .. path:sub(2)
+  end
+  return path
+end
+
 local function expand_agenda_files(cfg)
   local patterns = cfg.org_agenda_files
   if type(patterns) == "string" then
@@ -27,8 +38,17 @@ local function expand_agenda_files(cfg)
 
   local files = {}
   for _, pattern in ipairs(patterns or {}) do
-    local expanded = vim.fn.expand(pattern)
+    local expanded = expand_home(pattern)
     local matches = vim.fn.glob(expanded, true, true)
+
+    if #matches == 0 and expanded:sub(-5) == "/**/*" then
+      matches = vim.fn.glob(expanded:sub(1, -2) .. ".org", true, true)
+    end
+
+    if #matches == 0 and vim.fn.isdirectory(expanded) == 1 then
+      matches = vim.fn.glob(expanded .. "/**/*.org", true, true)
+    end
+
     for _, file in ipairs(matches) do
       if file:match("%.org$") and vim.fn.filereadable(file) == 1 then
         table.insert(files, normalize_path(file))

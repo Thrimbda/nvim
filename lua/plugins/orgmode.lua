@@ -6,7 +6,7 @@ return {
     config = function()
       local org_agenda_files = "~/OneDrive/cone/**/*.org"
       local org_default_notes_file = "~/OneDrive/cone/refile.org"
-      local organization_task_id = vim.g.org_organization_task_id or ""
+      local organization_task_id = vim.g.org_organization_task_id
       require("orgmode").setup({
         org_agenda_files = org_agenda_files,
         org_default_notes_file = org_default_notes_file,
@@ -159,11 +159,14 @@ return {
         end,
       })
 
-      require("org_punch").setup({
+      local punch_cfg = {
         org_agenda_files = org_agenda_files,
-        organization_task_id = organization_task_id,
         project_todo_keywords = { "TODO", "NEXT", "WAITING", "HOLD" },
-      })
+      }
+      if type(organization_task_id) == "string" and organization_task_id ~= "" then
+        punch_cfg.organization_task_id = organization_task_id
+      end
+      require("org_punch").setup(punch_cfg)
 
       require("org_norang").setup({
         org_agenda_files = org_agenda_files,

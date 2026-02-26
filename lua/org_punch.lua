@@ -1,8 +1,8 @@
 local M = {}
 
 M.cfg = {
-  org_agenda_files = { "~/OneDrive/cone/**/*" },
-  organization_task_id = "3CA66213-50ED-48B9-8E24-310B0959DA75",
+  org_agenda_files = { "~/OneDrive/cone/**/*.org" },
+  organization_task_id = "",
   project_todo_keywords = { "TODO", "NEXT", "WAITING", "HOLD" },
 }
 
@@ -16,6 +16,21 @@ local function escape_pattern(text)
     return vim.pesc(text)
   end
   return (text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1"))
+end
+
+local function expand_home(path)
+  local home = vim.env.HOME or ""
+  if path == "~" then
+    return home ~= "" and home or path
+  end
+  if path:sub(1, 2) == "~/" and home ~= "" then
+    return home .. path:sub(2)
+  end
+  return path
+end
+
+local function normalize_path(path)
+  return vim.fn.fnamemodify(path, ":p")
 end
 
 local function uniq(list)
@@ -81,11 +96,20 @@ local function expand_org_files()
 
   local files = {}
   for _, pattern in ipairs(patterns or {}) do
-    pattern = vim.fn.expand(pattern)
-    local matches = vim.fn.glob(pattern, true, true)
+    local expanded = expand_home(pattern)
+    local matches = vim.fn.glob(expanded, true, true)
+
+    if #matches == 0 and expanded:sub(-5) == "/**/*" then
+      matches = vim.fn.glob(expanded:sub(1, -2) .. ".org", true, true)
+    end
+
+    if #matches == 0 and vim.fn.isdirectory(expanded) == 1 then
+      matches = vim.fn.glob(expanded .. "/**/*.org", true, true)
+    end
+
     for _, file in ipairs(matches) do
       if vim.fn.filereadable(file) == 1 and file:match("%.org$") then
-        table.insert(files, file)
+        table.insert(files, normalize_path(file))
       end
     end
   end
@@ -233,7 +257,7 @@ end
 
 function M.clock_in_default()
   if not M.cfg.organization_task_id or M.cfg.organization_task_id == "" then
-    vim.notify("org_punch: organization_task_id is required", vim.log.levels.ERROR)
+    vim.notify("org_punch: organization_task_id is required (set vim.g.org_organization_task_id)", vim.log.levels.ERROR)
     return
   end
 

@@ -94,3 +94,22 @@
 2026-02-14T04:22:22.702Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
 2026-02-14T04:22:25.482Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
 2026-02-14T04:22:31.839Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。,success
+2026-02-26T15:07:46.095Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-02-26T15:07:46.127Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-02-26T15:09:34.441Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
+2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:09:41.799Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 先输出审查结论与优化建议，再由用户决定是否进入补丁修复。,success
+2026-02-26T15:12:54.236Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-02-26T15:12:54.236Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 修复 org_punch/org_norang cleanup 的 agenda 文件发现 + 统一 organization_task_id 单一来源,success
+2026-02-26T15:13:18.903Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:14:42.349Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: organization_task_id 统一由 `vim.g.org_organization_task_id` 作为唯一指定入口，插件层只在非空时透传给 org_punch。,success
+2026-02-26T15:15:37.502Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:15:46.822Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:15:51.133Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:15:57.736Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success

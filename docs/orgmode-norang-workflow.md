@@ -2,7 +2,7 @@
 
 本文档说明本仓库当前的 Norang 工作流：
 
-- 自定义 agenda 视图（`b/n/r`）
+- 自定义 agenda 视图（`b/n/t/s/r`）
 - Punch in/out 连续记时（不中断 clock）
 - `org_norang` 派生标签刷新与清理
 
@@ -24,7 +24,7 @@
 vim.g.org_organization_task_id = "01234567-89ab-cdef-0123-456789abcdef"
 ```
 
-`lua/org_punch.lua` 会用这个 ID 作为兜底任务。
+这是默认任务 ID 的唯一配置入口（`org_punch` 不再内置硬编码兜底 ID）。
 
 ## 2. 已配置能力
 

@@ -41,8 +41,12 @@
 - [x] 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK | 来源: 用户反馈 ~/OneDrive/cone/course.org 误判
 - [x] 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别 | 来源: 用户反馈 stuck project 仍未识别
 - [x] 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口 | 来源: 用户需求 2026-02-12
+- [x] 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败） | 来源: review 2026-02-12
+- [x] 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值 | 来源: review 2026-02-12
+- [x] 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容 | 来源: 用户请求 bugfix 2026-02-12
 
 
 ---
 
-*最后更新: 2026-02-14 12:22*
+*最后更新: 2026-02-26 23:15*
+6-02-26 23:09*

@@ -46,6 +46,12 @@
 - 已新增独立时间线命令 `:Org agenda t` 与快捷键 `<Leader>oat`。
 - 已更新使用文档并补充“无具体时间戳不会占时间槽”的行为说明。
 - 已完成语法校验（luafile lua/plugins/orgmode.lua 通过）。
+- 完成 org-mode 相关代码整体审查（orgmode 配置、org_punch、org_norang refresh/cleanup/rules、文档）。
+- 已修复 org_punch agenda 文件发现：改为仅 HOME 展开 + 通配兼容，不再因 expand+glob 组合导致匹配为空。
+- 已修复 org_norang cleanup agenda 文件发现：与 refresh 逻辑统一（HOME 展开 + `/**/*` 兼容 + 目录回退）。
+- 已收敛 organization_task_id 为单一入口：仅通过 `vim.g.org_organization_task_id` 传入，避免空字符串覆盖模块默认。
+- 已更新文档：agenda 命令列表与默认任务 ID 配置语义同步。
+- 已完成回归验证：语法校验通过；org_punch 默认任务 ID 查找通过；cleanup 文件发现总数恢复。
 
 
 ### 🟡 进行中
@@ -81,6 +87,8 @@
 | 将项目判定从“有活动子任务”改为“有任意 TODO 关键字子任务”，并将 WAITING+NEXT 视为不可解除 stuck。 | 与 Norang 原始定义保持一致，修复用户样例 course.org 被漏判问题。 | 继续仅统计 active 子任务；会把仅含 DONE 子任务的项目误判为非项目。 | 2026-02-12 |
 | 避免在 agenda 文件发现阶段对通配模式调用 `vim.fn.expand`，改为仅 `~` 展开后交由 `vim.fn.glob` 处理。 | `expand` 会提前展开通配，破坏 glob 输入语义，导致匹配集错误。 | 继续使用 `expand` 并尝试后处理字符串；复杂且不稳定。 | 2026-02-12 |
 | 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。 | 用户需要类似 Emacs 的固定时间线展示，不应依赖当天是否存在 timed 条目。 | 保留默认 `require-timed`；会在无 timed 条目时隐藏时间线，体验不符合需求。 | 2026-02-12 |
+| 先输出审查结论与优化建议，再由用户决定是否进入补丁修复。 | 当前用户请求是“整体 review”，优先提供可执行问题清单与优先级。 | 直接落地修复；可能超出本次 review 请求边界。 | 2026-02-12 |
+| organization_task_id 统一由 `vim.g.org_organization_task_id` 作为唯一指定入口，插件层只在非空时透传给 org_punch。 | 消除双来源覆盖冲突，避免未配置时空字符串覆盖导致 punch in 失败。 | 保留 org_punch 硬编码默认 ID；会造成环境耦合与多用户配置冲突。 | 2026-02-12 |
 
 ---
 
@@ -98,4 +106,4 @@
 
 ---
 
-*最后更新: 2026-02-14 12:22 by Claude*
+*最后更新: 2026-02-26 23:14 by Claude*
