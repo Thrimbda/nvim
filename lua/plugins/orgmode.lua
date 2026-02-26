@@ -12,6 +12,14 @@ return {
         org_default_notes_file = org_default_notes_file,
         org_startup_indented = true,
         org_agenda_use_time_grid = true,
+        mappings = {
+          global = {
+            org_capture = "<Leader>X",
+          },
+          org = {
+            org_toggle_checkbox = "<C-Space>",
+          },
+        },
         org_agenda_time_grid = {
           type = { "daily" },
           times = { 800, 1000, 1200, 1400, 1600, 1800, 2000 },
