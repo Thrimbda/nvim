@@ -5,3 +5,4 @@ vim.opt.guifont = "FiraCode Nerd Font Mono:h12"
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.g.org_organization_task_id = "3CA66213-50ED-48B9-8E24-310B0959DA75"
+vim.g.org_diary_file = "~/OneDrive/cone/diary.org"

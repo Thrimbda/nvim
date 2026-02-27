@@ -26,6 +26,14 @@ vim.g.org_organization_task_id = "01234567-89ab-cdef-0123-456789abcdef"
 
 本仓库当前放在 `lua/config/options.lua`，这是默认任务 ID 的唯一配置入口（`org_punch` 不再内置硬编码兜底 ID）。
 
+Journal 目标文件也支持在配置里显式指定：
+
+```lua
+vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
+```
+
+`lua/plugins/orgmode.lua` 顶部会读取该值（未设置时回退到同一路径默认值）。
+
 ## 2. 已配置能力
 
 来自 `lua/plugins/orgmode.lua`：
@@ -34,6 +42,14 @@ vim.g.org_organization_task_id = "01234567-89ab-cdef-0123-456789abcdef"
 - Clock in 状态切换（Norang）：普通 `TODO` 任务在 clock in 后自动变 `NEXT`；若对 `NEXT` 项目节点 clock in 会回到 `TODO`
 - 完成日志：写入 `LOGBOOK`
 - Agenda 打开后自动移动到右侧
+- Capture 模板（`<Leader>X`）已扩展为多类型：
+  - `t` Todo（inbox 到 `refile.org`）
+  - `r` Respond（NEXT + 当日 SCHEDULED）
+  - `n` Note
+  - `m` Meeting
+  - `p` Phone call
+  - `j` Journal（写入 `diary.org` datetree）
+  - Capture 期间会执行 clock handoff：打开模板时暂停当前 clock，完成/取消 capture 后恢复之前 clock
 - 自定义 agenda：
   - `:Org agenda b`：Block agenda（保留 Refile/Today/Next/Waiting/Hold，并新增派生视图）
   - `:Org agenda n`：NEXT 列表
@@ -83,7 +99,7 @@ Punch 相关：
 - `<Leader>opo`：Clock out 但保持连续（自动回父任务或默认任务）
 - `<Leader>opO`：Punch Out（停止连续记时，并 clock out）
 - `<Leader>oxi`：对当前条目 clock in（带 Norang TODO/NEXT 自动切换）
-- `<Leader>oxo`：对当前条目 clock out（若时长为 `0:00` 自动删除该 CLOCK 行）
+- `<Leader>oxo`：对当前条目 clock out（若时长为 `0:00` 自动删除该 CLOCK 行；在 punch 模式下会自动回到父任务或默认任务）
 
 原生 clock（orgmode.nvim）：
 
@@ -138,6 +154,10 @@ Punch 相关：
 
 - clock 数据会写入 `LOGBOOK`；可在 agenda 中按 `R` 切换 clock report 查看汇总
 - 若希望在时间线占位，请给任务设置带时间的 `SCHEDULED`/timestamp
+
+### 7.7 capture 的 CLOCK 记录时长与预期不一致
+
+capture 的时长按“分钟粒度”记录：不足 1 分钟不会写 CLOCK 条目，跨分钟边界会按分钟差写入（例如 `21:32 -> 21:33` 记为 `0:01`）。
 
 ## 8. 相关文件
 

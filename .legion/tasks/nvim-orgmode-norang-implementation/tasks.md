@@ -55,9 +55,17 @@
 - [x] 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext | 来源: 用户反馈 punch in 后所有标题折叠
 - [x] 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转 | 来源: 用户反馈 punch 后 fold/高亮异常
 - [x] 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染 | 来源: 回归防护 2026-02-27
+- [x] 补齐 org_capture_templates 多类型模板（todo/respond/note/meeting/phone/journal），修复 capture 只显示 task 问题 | 来源: 用户反馈 capture 类型异常 2026-02-27
+- [x] 修正 journal capture 目标路径到 diary.org datetree，并补齐 Norang capture clock handoff（开始 capture 暂停当前 clock，结束后恢复） | 来源: 用户反馈 journal 位置与 clock 行为不符原文
+- [x] 将 journal 目标路径参数化：在 orgmode 配置顶端增加 org_diary_file 并支持 vim.g.org_diary_file 覆盖 | 来源: 用户反馈 diary path 应在顶端可配置
+- [x] 修复 capture 条目未 clock-in：在 capture on_pre_refile 注入 LOGBOOK/CLOCK 记录，并保留 clock-resume 语义 | 来源: 用户反馈 journal/meeting/其他 capture 未 clock in
+- [x] 增强冒烟测试覆盖 capture 语义：新增 handoff 恢复和 pre-refile CLOCK 注入用例 | 来源: 回归防护 2026-02-27
+- [x] 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK | 来源: 用户反馈 diary 末尾 1 分钟被记为 0 + 0:00 条目残留
+- [x] 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义 | 来源: 用户反馈 todo.org 残留 0:00 条目
+- [x] 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支 | 来源: 用户反馈 punch in 状态 clock out 未回 default task
 
 
 ---
 
-*最后更新: 2026-02-27 13:04*
+*最后更新: 2026-02-27 21:46*
 6-02-26 23:09*

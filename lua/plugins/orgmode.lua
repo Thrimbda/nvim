@@ -6,6 +6,7 @@ return {
     config = function()
       local org_agenda_files = "~/OneDrive/cone/**/*.org"
       local org_default_notes_file = "~/OneDrive/cone/refile.org"
+      local org_diary_file = vim.g.org_diary_file or "~/OneDrive/cone/diary.org"
       local organization_task_id = vim.g.org_organization_task_id
       require("orgmode").setup({
         org_agenda_files = org_agenda_files,
@@ -14,7 +15,7 @@ return {
         org_agenda_use_time_grid = true,
         mappings = {
           global = {
-            org_capture = "<Leader>X",
+            org_capture = false,
           },
           agenda = {
             org_agenda_clock_in = false,
@@ -44,6 +45,39 @@ return {
         },
         org_log_into_drawer = "LOGBOOK",
         org_log_done = "note",
+        org_capture_templates = {
+          t = {
+            description = "Todo",
+            template = "* TODO %? :REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          r = {
+            description = "Respond",
+            template = "* NEXT Respond to %^{from} on %^{subject} :REFILE:\nSCHEDULED: %t\n%U\n",
+            target = org_default_notes_file,
+          },
+          n = {
+            description = "Note",
+            template = "* %? :NOTE:REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          m = {
+            description = "Meeting",
+            template = "* MEETING with %? :MEETING:REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          p = {
+            description = "Phone call",
+            template = "* PHONE %? :PHONE:REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          j = {
+            description = "Journal",
+            template = "* %U %?",
+            target = org_diary_file,
+            datetree = true,
+          },
+        },
         org_agenda_custom_commands = {
           b = {
             description = "Block agenda (Norang-style)",
@@ -207,11 +241,14 @@ return {
       })
 
       local punch = require("org_punch")
+      local capture = require("org_capture_norang")
+      capture.setup()
       vim.keymap.set("n", "<Leader>opI", punch.punch_in, { desc = "Org Punch In" })
       vim.keymap.set("n", "<Leader>opO", punch.punch_out, { desc = "Org Punch Out" })
       vim.keymap.set("n", "<Leader>opo", punch.clock_out_keep_running, { desc = "Clock out (keep running)" })
       vim.keymap.set("n", "<Leader>oxi", punch.clock_in_current_task, { desc = "Org Clock In (Norang NEXT transition)" })
       vim.keymap.set("n", "<Leader>oxo", punch.clock_out_current_task, { desc = "Org Clock Out (remove 0:00 entry)" })
+      vim.keymap.set("n", "<Leader>X", capture.capture_prompt, { desc = "Org Capture (Norang clock handoff)" })
 
       vim.keymap.set("n", "<F12>", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
       vim.keymap.set("n", "<Leader>oab", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })

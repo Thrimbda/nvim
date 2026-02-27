@@ -508,8 +508,17 @@ function M.clock_in_current_task()
   return org_clock_in()
 end
 
-function M.clock_out_current_task()
-  maybe_warn_norang_todo_mismatch()
+function M.clock_out_current_task(opts)
+  opts = opts or {}
+
+  if not opts.silent then
+    maybe_warn_norang_todo_mismatch()
+  end
+
+  if M.state.keep_clock_running and not opts.ignore_keep_running then
+    return M.clock_out_keep_running()
+  end
+
   return org_clock_out()
 end
 
@@ -528,22 +537,30 @@ end
 
 function M.clock_out_keep_running()
   maybe_warn_norang_todo_mismatch()
-  with_view_restored(function()
-    org_clock_goto()
+
+  local ok, result = with_view_restored(function()
+    if not org_clock_goto() then
+      return false
+    end
 
     local parent_line = find_parent_project_line_in_current_buffer()
 
-    org_clock_out()
+    if not org_clock_out() then
+      return false
+    end
 
     if M.state.keep_clock_running then
       if parent_line then
         vim.api.nvim_win_set_cursor(0, { parent_line, 0 })
-        org_clock_in()
-      else
-        M.clock_in_default()
+        return org_clock_in()
       end
+      return M.clock_in_default()
     end
+
+    return true
   end)
+
+  return ok and result == true
 end
 
 return M

@@ -21,8 +21,11 @@ CASES=(
 	clock_in_todo_task_switches_to_next
 	clock_in_next_project_switches_to_todo
 	clock_out_removes_zero_duration_clock
+	clock_out_in_punch_mode_returns_to_default
 	norang_refresh_marks_stuck_project
 	norang_cleanup_apply_removes_derived_tags
+	capture_clock_handoff_resumes_previous
+	capture_pre_refile_injects_clock_line
 )
 
 for case_name in "${CASES[@]}"; do

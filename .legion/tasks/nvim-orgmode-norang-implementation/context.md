@@ -76,6 +76,29 @@
 - punch_out 去除了 `org_clock_goto` 跳转，直接对活动时钟执行 clock_out，避免窗口切换带来的语法/折叠异常。
 - 补充回归用例：新增 `punch_in_preserves_current_buffer`、`punch_out_preserves_current_buffer` 两个 smoke case。
 - 扩展后的 smoke 套件（9 个 case）已全部通过。
+- 已在 orgmode 配置补齐 capture 模板集合，覆盖 `t/r/n/m/p/j` 六类输入，不再仅显示 task。
+- 模板目标统一落地 inbox（`refile.org`）与 journal datetree（`journal.org`），与现有 Norang 流程兼容。
+- 已更新工作流文档，补充 capture 类型与快捷入口说明。
+- 已完成配置语法校验（luafile lua/plugins/orgmode.lua 通过）。
+- 已将 Journal capture 目标从 `journal.org` 调整为 `diary.org` datetree，与 Norang 原文对齐。
+- 新增 `org_capture_norang` 模块并接入：在选择 capture 模板时执行 clock handoff（暂停当前 clock），在完成/取消 capture 后恢复之前 clock。
+- 已将 `<Leader>X` 切换为 Norang capture 包装入口，并保持模板快捷键使用不变。
+- 已完成语法校验与 smoke 回归（全部通过）。
+- 已将 journal 目标路径上提到 `lua/plugins/orgmode.lua` 顶部变量 `org_diary_file`，满足“顶端可配置”要求。
+- 已增加全局覆盖入口 `vim.g.org_diary_file`（默认回退 `~/OneDrive/cone/diary.org`）。
+- 已更新 options 与文档，明确 diary 路径配置方式。
+- 已完成语法校验（options.lua + orgmode.lua）。
+- 已修复 capture 条目不产生 clock 记录的问题：在 capture `on_pre_refile` 钩子向 source headline 注入 `LOGBOOK/CLOCK`（起止时间=捕获开始到提交时刻）。
+- 保留 Norang clock handoff 语义：打开 capture 时暂停当前 clock，完成/取消后恢复之前 clock。
+- 已将 journal 目标路径参数化并支持 `vim.g.org_diary_file` 顶端配置；当前默认 `~/OneDrive/cone/diary.org`。
+- 已扩展冒烟测试到 11 个 case，新增 capture handoff 恢复与 pre-refile CLOCK 注入验证。
+- 已执行全量 smoke 脚本并全部通过。
+- 已修复 capture 时长计算：按分钟粒度计算（`floor(end/60)-floor(start/60)`），跨分钟边界记为 1 分钟，不再出现 `21:32--21:33 => 0:00`。
+- 已修复 capture 0 分钟记录：capture 时长 <= 0 分钟时不注入 CLOCK 行，避免残留无效 `0:00`。
+- 已修复 capture handoff 暂停路径：不再直接调用 orgmode `org_clock_out`，改为走 `org_punch.clock_out_current_task({ignore_keep_running=true})`，继承 0:00 清理逻辑。
+- 已修复 punch 模式下普通 clock_out 行为：`clock_out_current_task` 在 `keep_clock_running=true` 时自动走 keep-running 回退路径（父任务/默认任务）。
+- 已新增并通过回归用例：`clock_out_in_punch_mode_returns_to_default`、capture handoff/clock 注入相关用例。
+- 已执行扩展后 smoke 套件（12 个 case）并全部通过。
 
 
 ### 🟡 进行中
@@ -119,6 +142,11 @@
 | CI 依赖不走完整 LazyVim 启动链，改为 headless + `-u NONE` + 显式 runtimepath 注入（repo + orgmode）。 | 显著降低依赖体积与不确定性，确保 smoke 测试稳定、快速、可复现。 | 在 CI 启动完整 nvim 配置并同步全部插件；更慢且外部依赖更多。 | 2026-02-12 |
 | 保持“切到默认任务 clock-in 再切回”的流程不变，仅补充窗口选项恢复层，避免改动 orgmode 行为边界。 | 最小改动即可消除 fold 副作用，风险低且兼容现有 punch 逻辑。 | 改为不切窗直接操作底层文件对象；实现复杂且更容易引入新竞态。 | 2026-02-12 |
 | 将 punch 默认任务路径从“切窗 + 光标定位 + clock_in”改为“数据层定位 + clock_in”，并保持用户当前窗口不变。 | 从源头消除窗口局部状态污染（fold/highlight/layout）风险。 | 继续使用切窗方案并修补更多窗口选项恢复；复杂且脆弱。 | 2026-02-12 |
+| Capture 类型不通过扩展 TODO 关键字实现，而是通过 `org_capture_templates` 多模板显式建模。 | meeting/phone/journal 本质是输入类型而非状态机节点，避免污染 TODO 状态流。 | 将 PHONE/MEETING 加入 TODO 关键词；会干扰 NEXT/PROJECT/STUCK 判定与 agenda 过滤。 | 2026-02-12 |
+| 不改动 orgmode 上游 capture 内核，采用轻量包装模块对 open_template 与 capture hooks 做时钟接力。 | 最小侵入地补齐 Norang 习惯（capture 时钟切换与恢复），同时保持升级兼容性。 | 直接 patch orgmode capture 代码；维护成本高且容易与上游冲突。 | 2026-02-12 |
+| Diary 路径采用“顶端局部变量 + 全局覆盖”双层配置：`org_diary_file = vim.g.org_diary_file or <default>`。 | 既满足快速就地修改（顶端可见），又支持集中式用户配置。 | 仅硬编码在 capture template；不可配置且难维护。 | 2026-02-12 |
+| capture clock-in 不通过驱动 orgmode 全局 active clock 实现，而是在 refile 前将闭合 CLOCK 记录写入 capture 条目。 | 既满足“capture 条目有 clock 记录”，又避免在 capture 期间污染当前窗口/时钟状态机。 | 在 capture 窗口真正 clock-in/clock-out 条目；实现复杂且容易与 capture 生命周期竞态冲突。 | 2026-02-12 |
+| capture clock 记录采用分钟边界差值而非秒级 floor 时长；并在 0 分钟时跳过记录。 | 与用户感知和 Norang 流程一致，避免“跨分钟却记 0:00”与无效 0 分钟污染。 | 继续使用秒级 floor；会重复触发 `0:00` 争议。 | 2026-02-12 |
 
 ---
 
@@ -136,4 +164,4 @@
 
 ---
 
-*最后更新: 2026-02-27 13:04 by Claude*
+*最后更新: 2026-02-27 21:46 by Claude*

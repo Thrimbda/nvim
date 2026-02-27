@@ -243,6 +243,36 @@ local function test_clock_out_removes_zero_duration_clock()
   end
 end
 
+local function test_clock_out_in_punch_mode_returns_to_default()
+  local default_path = write_temp_org({
+    "* Tasks",
+    "** TODO Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local task_path = write_temp_org({
+    "* TODO Focus task",
+  })
+
+  setup_orgmode({ task_path, default_path })
+  local punch = setup_punch({ task_path, default_path }, DEFAULT_TASK_ID)
+  local orgmode = require("orgmode")
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(task_path))
+  assert_true(punch.punch_in() == true, "punch_in should succeed")
+
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
+  assert_true(punch.clock_out_current_task() == true, "clock_out_current_task should succeed in punch mode")
+
+  orgmode.clock:update_clocked_headline()
+  assert_true(orgmode.clock.clocked_headline ~= nil, "clock should continue running in punch mode")
+  assert_true(orgmode.clock.clocked_headline:get_title() == "Organization", "clock should return to default task")
+
+  punch.punch_out()
+end
+
 local function test_norang_refresh_marks_stuck_project()
   local path = write_temp_org({
     "* TODO Dist Systems",
@@ -274,6 +304,81 @@ local function test_norang_cleanup_apply_removes_derived_tags()
   assert_true(line:match("ARCHIVE_CANDIDATE") == nil, "cleanup should remove ARCHIVE_CANDIDATE tag")
 end
 
+local function test_capture_clock_handoff_resumes_previous()
+  local path = write_temp_org({
+    "* TODO Focus task",
+  })
+
+  setup_orgmode({ path })
+  local orgmode = require("orgmode")
+  local capture = require("org_capture_norang")
+  capture.setup()
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(path))
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  orgmode.clock:org_clock_in():wait(2000)
+
+  orgmode.clock:update_clocked_headline()
+  assert_true(orgmode.clock.clocked_headline ~= nil, "precondition: clock should be active")
+  assert_true(orgmode.clock.clocked_headline:get_title() == "Focus task", "precondition: active clock title mismatch")
+
+  capture.begin_capture_clock_handoff()
+  orgmode.clock:update_clocked_headline()
+  assert_true(orgmode.clock.clocked_headline == nil, "capture handoff should pause current clock")
+
+  capture.finish_capture_clock_handoff()
+  orgmode.clock:update_clocked_headline()
+  assert_true(orgmode.clock.clocked_headline ~= nil, "capture handoff should resume previous clock")
+  assert_true(orgmode.clock.clocked_headline:get_title() == "Focus task", "resumed clock should return to original task")
+
+  require("org_punch").clock_out_current_task({ ignore_keep_running = true, silent = true })
+
+  local lines = read_lines(path)
+  for _, line in ipairs(lines) do
+    assert_true(not line:match("=>%s*0:00%s*$"), "capture handoff should not leave 0:00 clock entries")
+  end
+end
+
+local function test_capture_pre_refile_injects_clock_line()
+  local path = write_temp_org({
+    "* TODO Captured task",
+  })
+
+  setup_orgmode({ path })
+  local orgmode = require("orgmode")
+  local capture = require("org_capture_norang")
+  capture.setup()
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(path))
+  local source_file = orgmode.files:get_current_file()
+  local source_headline = source_file:get_headlines()[1]
+  assert_true(source_headline ~= nil, "precondition: source headline missing")
+
+  capture.begin_capture_clock_handoff()
+  capture._state.capture_started_at = os.time() - 61
+  orgmode.capture.on_pre_refile(orgmode.capture, {
+    source_file = source_file,
+    source_headline = source_headline,
+    template = { whole_file = false },
+  })
+
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local has_logbook = false
+  local has_clock = false
+  for _, line in ipairs(lines) do
+    if line:match("^%s*:LOGBOOK:%s*$") then
+      has_logbook = true
+    end
+    if line:match("^%s*CLOCK:%s*%[") and line:match("=>%s*%d+:%d%d%s*$") and not line:match("=>%s*0:00%s*$") then
+      has_clock = true
+    end
+  end
+  assert_true(has_logbook, "capture pre-refile should inject LOGBOOK drawer")
+  assert_true(has_clock, "capture pre-refile should inject CLOCK line")
+
+  capture.finish_capture_clock_handoff()
+end
+
 local CASES = {
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
@@ -282,8 +387,11 @@ local CASES = {
   clock_in_todo_task_switches_to_next = test_clock_in_todo_task_switches_to_next,
   clock_in_next_project_switches_to_todo = test_clock_in_next_project_switches_to_todo,
   clock_out_removes_zero_duration_clock = test_clock_out_removes_zero_duration_clock,
+  clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
   norang_refresh_marks_stuck_project = test_norang_refresh_marks_stuck_project,
   norang_cleanup_apply_removes_derived_tags = test_norang_cleanup_apply_removes_derived_tags,
+  capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
+  capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
 }
 
 function M.run(case_name)
