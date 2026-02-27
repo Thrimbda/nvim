@@ -1,0 +1,39 @@
+name: org-smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Clone orgmode dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .tests/deps
+          ORG_COMMIT="$(python3 -c 'import json;print(json.load(open("lazy-lock.json", "r", encoding="utf-8"))["orgmode"]["commit"])')"
+
+          git clone --filter=blob:none https://github.com/nvim-orgmode/orgmode .tests/deps/orgmode
+          git -C .tests/deps/orgmode checkout "$ORG_COMMIT"
+
+      - name: Run org smoke tests
+        shell: bash
+        run: |
+          chmod +x tests/smoke/run.sh
+          ORGMODE_RTP="$PWD/.tests/deps/orgmode" tests/smoke/run.sh

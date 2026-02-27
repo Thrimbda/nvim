@@ -24,13 +24,14 @@
 vim.g.org_organization_task_id = "01234567-89ab-cdef-0123-456789abcdef"
 ```
 
-这是默认任务 ID 的唯一配置入口（`org_punch` 不再内置硬编码兜底 ID）。
+本仓库当前放在 `lua/config/options.lua`，这是默认任务 ID 的唯一配置入口（`org_punch` 不再内置硬编码兜底 ID）。
 
 ## 2. 已配置能力
 
 来自 `lua/plugins/orgmode.lua`：
 
 - TODO 流程：`TODO -> NEXT/WAITING/HOLD -> DONE/CANCELLED`
+- Clock in 状态切换（Norang）：普通 `TODO` 任务在 clock in 后自动变 `NEXT`；若对 `NEXT` 项目节点 clock in 会回到 `TODO`
 - 完成日志：写入 `LOGBOOK`
 - Agenda 打开后自动移动到右侧
 - 自定义 agenda：
@@ -81,11 +82,13 @@ Punch 相关：
 - `<Leader>opI`：Punch In（开启连续记时，并 clock 到默认任务）
 - `<Leader>opo`：Clock out 但保持连续（自动回父任务或默认任务）
 - `<Leader>opO`：Punch Out（停止连续记时，并 clock out）
+- `<Leader>oxi`：对当前条目 clock in（带 Norang TODO/NEXT 自动切换）
+- `<Leader>oxo`：对当前条目 clock out（若时长为 `0:00` 自动删除该 CLOCK 行）
 
 原生 clock（orgmode.nvim）：
 
 - Org 文件中：`<Leader>oxi` / `<Leader>oxo` / `<Leader>oxj`
-- Agenda 视图中：`I` / `O`
+- Agenda 视图中：`I`（已接入 Norang TODO/NEXT 自动切换）/ `O`（支持 `0:00` CLOCK 清理）
 
 ## 5. 推荐日常流程
 
@@ -128,6 +131,13 @@ Punch 相关：
 ### 7.5 `<Leader>opo` 后没有回父任务
 
 若当前条目向上的祖先里没有 `TODO/NEXT/WAITING/HOLD` 父任务，会回到默认任务，这是预期行为。
+
+### 7.6 clock in 后 agenda 时间线没有出现 time block
+
+这是预期行为：time grid 的“时间块”来自带具体时间的时间戳（如 `SCHEDULED: <... 10:00-11:00>`），不是来自 `CLOCK:` 记录。
+
+- clock 数据会写入 `LOGBOOK`；可在 agenda 中按 `R` 切换 clock report 查看汇总
+- 若希望在时间线占位，请给任务设置带时间的 `SCHEDULED`/timestamp
 
 ## 8. 相关文件
 

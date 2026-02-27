@@ -2,7 +2,7 @@ local M = {}
 
 M.cfg = {
   org_agenda_files = { "~/OneDrive/cone/**/*.org" },
-  organization_task_id = "",
+  organization_task_id = "3CA66213-50ED-48B9-8E24-310B0959DA75",
   project_todo_keywords = { "TODO", "NEXT", "WAITING", "HOLD" },
 }
 
@@ -166,48 +166,267 @@ local function call_org_action(action)
   if not ok or type(orgmode.action) ~= "function" then
     return false
   end
-  return pcall(orgmode.action, action)
+
+  local ok_action, result = pcall(orgmode.action, action)
+  if not ok_action then
+    return false
+  end
+
+  if type(result) == "table" and type(result.wait) == "function" then
+    local ok_wait = pcall(result.wait, result, 2000)
+    if not ok_wait then
+      return false
+    end
+  end
+
+  return true
 end
 
-local function feedkeys(keys)
-  local termcodes = vim.api.nvim_replace_termcodes(keys, true, false, true)
-  vim.api.nvim_feedkeys(termcodes, "n", true)
+local function call_org_clock_method(method)
+  local ok, orgmode = pcall(require, "orgmode")
+  if not ok or not orgmode.clock or type(orgmode.clock[method]) ~= "function" then
+    return false
+  end
+
+  return pcall(function()
+    local result = orgmode.clock[method](orgmode.clock)
+    if type(result) == "table" and type(result.wait) == "function" then
+      result:wait(2000)
+    end
+  end)
+end
+
+local function get_clocked_headline()
+  local ok, orgmode = pcall(require, "orgmode")
+  if not ok or not orgmode.clock then
+    return nil
+  end
+
+  orgmode.clock:update_clocked_headline()
+  return orgmode.clock.clocked_headline
+end
+
+local function get_active_clock_context()
+  local headline = get_clocked_headline()
+  if not headline then
+    return nil
+  end
+
+  local headline_line = headline:get_range().start_line
+  local current = headline.file:reload_sync():get_closest_headline({ headline_line, 0 })
+  if not current then
+    return nil
+  end
+
+  local logbook = current:get_logbook()
+  local active = logbook and logbook:get_active() or nil
+  if not active or not active.start_time or not active.start_time.range then
+    return nil
+  end
+
+  return {
+    file = current.file,
+    headline_line = current:get_range().start_line,
+    clock_line = active.start_time.range.start_line,
+  }
+end
+
+local function cleanup_zero_duration_clock(context)
+  if not context then
+    return
+  end
+
+  context.file:update(function(file)
+    local headline = file:reload_sync():get_closest_headline({ context.headline_line, 0 })
+    if not headline then
+      return
+    end
+
+    local line_nr = context.clock_line
+    if not line_nr or line_nr < 1 then
+      return
+    end
+
+    local line = vim.fn.getline(line_nr)
+    if not line:match("=>%s*0:00%s*$") then
+      return
+    end
+
+    local buf = vim.api.nvim_get_current_buf()
+    vim.fn.deletebufline(buf, line_nr)
+
+    local prev_line = vim.fn.getline(line_nr - 1)
+    local next_line = vim.fn.getline(line_nr)
+    if prev_line:match("^%s*:LOGBOOK:%s*$") and next_line:match("^%s*:END:%s*$") then
+      vim.fn.deletebufline(buf, line_nr - 1, line_nr)
+    end
+  end):wait(2000)
+end
+
+local function has_todo_descendant(headline, todo_keys)
+  for _, child in ipairs(headline:get_child_headlines() or {}) do
+    local todo = child:get_todo()
+    if todo and todo_keys[todo] then
+      return true
+    end
+    if has_todo_descendant(child, todo_keys) then
+      return true
+    end
+  end
+  return false
+end
+
+local function classify_headline(headline)
+  local todo = headline:get_todo()
+  if not todo then
+    return false, false
+  end
+
+  local todo_keys = headline.file:get_todo_keywords():keys()
+  if not todo_keys[todo] then
+    return false, false
+  end
+
+  local is_project = has_todo_descendant(headline, todo_keys)
+  local is_task = not is_project
+  return is_project, is_task
+end
+
+local function apply_clock_in_state_transition()
+  local headline = get_clocked_headline()
+  if not headline then
+    return
+  end
+
+  local line = headline:get_range().start_line
+  headline.file
+    :update(function(file)
+      local current = file:reload_sync():get_closest_headline({ line, 0 })
+      if not current then
+        return
+      end
+
+      local todo = current:get_todo()
+      if not todo then
+        return
+      end
+
+      local is_project, is_task = classify_headline(current)
+      if todo == "TODO" and is_task then
+        current:set_todo("NEXT")
+      elseif todo == "NEXT" and is_project then
+        current:set_todo("TODO")
+      end
+    end)
+    :wait(2000)
 end
 
 local function org_clock_in()
-  if not call_org_action("clock.org_clock_in") then
-    feedkeys("<Leader>oxi")
+  local ok = call_org_action("clock.org_clock_in") or call_org_clock_method("org_clock_in")
+  if not ok then
+    vim.notify("org_punch: failed to clock in", vim.log.levels.ERROR)
+    return false
   end
+  apply_clock_in_state_transition()
+  return true
 end
 
 local function org_clock_out()
-  if not call_org_action("clock.org_clock_out") then
-    feedkeys("<Leader>oxo")
+  local active_clock = get_active_clock_context()
+
+  if not (call_org_action("clock.org_clock_out") or call_org_clock_method("org_clock_out")) then
+    vim.notify("org_punch: failed to clock out", vim.log.levels.ERROR)
+    return false
   end
+
+  cleanup_zero_duration_clock(active_clock)
+  return true
 end
 
 local function org_clock_goto()
-  if not call_org_action("clock.org_clock_goto") then
-    feedkeys("<Leader>oxj")
+  if not (call_org_action("clock.org_clock_goto") or call_org_clock_method("org_clock_goto")) then
+    vim.notify("org_punch: failed to goto active clock", vim.log.levels.ERROR)
+    return false
   end
+  return true
 end
 
 local function with_view_restored(fn)
   local win = vim.api.nvim_get_current_win()
   local buf = vim.api.nvim_get_current_buf()
   local view = vim.fn.winsaveview()
+  local win_opts = {
+    foldenable = vim.wo.foldenable,
+    foldlevel = vim.wo.foldlevel,
+  }
 
-  local ok, err = pcall(fn)
+  local ok, result = pcall(fn)
 
   if vim.api.nvim_win_is_valid(win) and vim.api.nvim_buf_is_valid(buf) then
     vim.api.nvim_set_current_win(win)
     vim.cmd(("keepalt keepjumps buffer %d"):format(buf))
     vim.fn.winrestview(view)
+    for opt, value in pairs(win_opts) do
+      pcall(vim.api.nvim_set_option_value, opt, value, { win = win })
+    end
   end
 
   if not ok then
-    vim.notify(("org_punch error: %s"):format(err), vim.log.levels.ERROR)
+    vim.notify(("org_punch error: %s"):format(result), vim.log.levels.ERROR)
+    return false, nil
   end
+
+  return true, result
+end
+
+local function clock_in_at_location(loc)
+  local ok, orgmode = pcall(require, "orgmode")
+  if not ok or not orgmode.clock or not orgmode.files then
+    vim.notify("org_punch: orgmode clock is unavailable", vim.log.levels.ERROR)
+    return false
+  end
+
+  local clock = orgmode.clock
+  local ok_run, err = pcall(function()
+    clock:update_clocked_headline()
+
+    if clock.clocked_headline and clock.clocked_headline:is_clocked_in() then
+      local prev_file = clock.clocked_headline.file
+      local prev_line = clock.clocked_headline:get_range().start_line
+      prev_file
+        :update(function(file)
+          local previous = file:reload_sync():get_closest_headline({ prev_line, 0 })
+          if previous and previous:is_clocked_in() then
+            previous:clock_out()
+          end
+        end)
+        :wait(2000)
+    end
+
+    local target_file = orgmode.files:get(loc.file)
+    local new_headline = nil
+    target_file
+      :update(function(file)
+        local target = file:reload_sync():get_closest_headline({ loc.line, 0 })
+        if not target then
+          error("default task headline not found")
+        end
+
+        target:clock_in()
+        new_headline = target
+      end)
+      :wait(2000)
+
+    clock.clocked_headline = new_headline
+  end)
+
+  if not ok_run then
+    vim.notify(("org_punch: failed to clock in default task (%s)"):format(tostring(err)), vim.log.levels.ERROR)
+    return false
+  end
+
+  apply_clock_in_state_transition()
+  return true
 end
 
 local function find_parent_project_line_in_current_buffer()
@@ -258,39 +477,53 @@ end
 function M.clock_in_default()
   if not M.cfg.organization_task_id or M.cfg.organization_task_id == "" then
     vim.notify("org_punch: organization_task_id is required (set vim.g.org_organization_task_id)", vim.log.levels.ERROR)
-    return
+    return false
   end
 
   local loc = find_task_by_id(M.cfg.organization_task_id)
   if not loc then
     vim.notify("org_punch: default task not found by :ID:", vim.log.levels.ERROR)
-    return
+    return false
   end
 
-  with_view_restored(function()
-    vim.cmd("keepalt keepjumps silent edit " .. vim.fn.fnameescape(loc.file))
-    vim.api.nvim_win_set_cursor(0, { loc.line, 0 })
-    org_clock_in()
-  end)
+  return clock_in_at_location(loc)
 end
 
 function M.punch_in()
   maybe_warn_norang_todo_mismatch()
   M.state.keep_clock_running = true
-  M.clock_in_default()
+
+  local ok = M.clock_in_default()
+  if not ok then
+    M.state.keep_clock_running = false
+    return false
+  end
+
   vim.notify("Org Punch In: keep clock running = true")
+  return true
+end
+
+function M.clock_in_current_task()
+  maybe_warn_norang_todo_mismatch()
+  return org_clock_in()
+end
+
+function M.clock_out_current_task()
+  maybe_warn_norang_todo_mismatch()
+  return org_clock_out()
 end
 
 function M.punch_out()
   maybe_warn_norang_todo_mismatch()
   M.state.keep_clock_running = false
 
-  with_view_restored(function()
-    org_clock_goto()
-    org_clock_out()
-  end)
+  local ok = org_clock_out()
+  if not ok then
+    return false
+  end
 
   vim.notify("Org Punch Out: keep clock running = false")
+  return true
 end
 
 function M.clock_out_keep_running()

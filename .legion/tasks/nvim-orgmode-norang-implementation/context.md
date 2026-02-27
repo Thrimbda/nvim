@@ -52,6 +52,30 @@
 - 已收敛 organization_task_id 为单一入口：仅通过 `vim.g.org_organization_task_id` 传入，避免空字符串覆盖模块默认。
 - 已更新文档：agenda 命令列表与默认任务 ID 配置语义同步。
 - 已完成回归验证：语法校验通过；org_punch 默认任务 ID 查找通过；cleanup 文件发现总数恢复。
+- 已对照 Norang 文档补齐 clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO。
+- 已修复 org_punch 调用 orgmode.action 未等待 Promise 的问题，避免 clock 动作与后续状态切换竞态。
+- 已接管 org/agenda clock-in 映射（`<Leader>oxi` 与 agenda `I`）统一走 org_punch 包装逻辑。
+- 已验证行为：headless 用例通过（`** TODO Task 1` clock in 后变 `** NEXT Task 1`；`* NEXT Project` clock in 后变 `* TODO Project`）。
+- 已补充文档：time grid 的 time block 来源于时间戳，clock 数据通过 agenda `R` 查看 clock report。
+- 已修复 punch_in 误报成功：当默认任务 clock-in 失败（缺 ID/找不到 ID）时，punch_in 返回 false 且 keep_clock_running 回退为 false。
+- 已将 organization_task_id 单一入口写入 `lua/config/options.lua`，当前默认值与实际 org 文件 ID 对齐。
+- 已完成回归验证：`vim.g.org_organization_task_id` 读取为配置值；无 ID 时 `punch_in` 输出明确错误并返回 false。
+- 已修复 clock_out 零时长清理：clock_out 后若刚关闭的 CLOCK 为 `0:00`，自动删除该 CLOCK 行；若 LOGBOOK 变空则同步删除空 drawer。
+- 已统一 clock-out 入口：禁用 orgmode 默认 org/agenda clock_out 映射，改由 org_punch 包装器处理（Org `<Leader>oxo` / Agenda `O`）。
+- 已完成回归验证：即时 clock in + clock out 后，不再保留 `0:00` CLOCK 记录。
+- 已新增冒烟测试文件 `lua/tests/smoke/orgmode_smoke.lua`，覆盖 7 个关键场景（punch in/out、TODO/NEXT 自动切换、0:00 CLOCK 清理、norang refresh/cleanup）。
+- 已新增批量执行脚本 `tests/smoke/run.sh`，按 case 顺序逐个执行并在失败时立即退出。
+- 已新增 CI 工作流 `.github/workflows/org-smoke.yml`：安装 Neovim、按 lazy-lock commit 拉取 orgmode、执行 smoke 脚本。
+- 已本地逐个执行全部 smoke case，全部通过。
+- 已模拟 GitHub Actions 环境（克隆固定 orgmode commit + 运行脚本）并验证全通过。
+- 已修复 punch_in 触发 fold 全收起问题：`with_view_restored` 现在恢复窗口 fold 相关选项（foldlevel/foldenable/foldmethod/foldexpr/foldtext）。
+- 已验证回归：构造跨文件 punch_in 场景，foldlevel 从 99 保持到 99，不再被 org ftplugin 的 startup folded 覆盖。
+- 已执行 smoke 脚本回归（7 个 case）并全部通过。
+- 已定位并修复 punch in/out 造成 fold/高亮副作用的根因：默认任务 clock-in 原实现通过当前窗口切换 buffer，会触发 ftplugin 与窗口状态污染。
+- 默认任务 clock-in 现改为无切窗路径：直接通过 orgmode files/clock API 对目标 headline 操作，不再 `edit` 到默认任务文件。
+- punch_out 去除了 `org_clock_goto` 跳转，直接对活动时钟执行 clock_out，避免窗口切换带来的语法/折叠异常。
+- 补充回归用例：新增 `punch_in_preserves_current_buffer`、`punch_out_preserves_current_buffer` 两个 smoke case。
+- 扩展后的 smoke 套件（9 个 case）已全部通过。
 
 
 ### 🟡 进行中
@@ -89,6 +113,12 @@
 | 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。 | 用户需要类似 Emacs 的固定时间线展示，不应依赖当天是否存在 timed 条目。 | 保留默认 `require-timed`；会在无 timed 条目时隐藏时间线，体验不符合需求。 | 2026-02-12 |
 | 先输出审查结论与优化建议，再由用户决定是否进入补丁修复。 | 当前用户请求是“整体 review”，优先提供可执行问题清单与优先级。 | 直接落地修复；可能超出本次 review 请求边界。 | 2026-02-12 |
 | organization_task_id 统一由 `vim.g.org_organization_task_id` 作为唯一指定入口，插件层只在非空时透传给 org_punch。 | 消除双来源覆盖冲突，避免未配置时空字符串覆盖导致 punch in 失败。 | 保留 org_punch 硬编码默认 ID；会造成环境耦合与多用户配置冲突。 | 2026-02-12 |
+| 不将 CLOCK 记录直接渲染为时间线 time block，而是遵循 orgmode 语义：时间线展示时间戳，clock 通过 report 展示。 | 与 Norang/Org 行为一致，避免将日志数据误作计划数据，降低副作用。 | 将 clock-in 自动写入 SCHEDULED 时间戳以强制占位；会污染计划字段且偏离原流程。 | 2026-02-12 |
+| 保留 organization_task_id 的单一配置入口为 `vim.g.org_organization_task_id`，并在仓库默认 options 中提供有效值。 | 既满足“单一入口”约束，又避免未配置导致 punch_in 静默失败。 | 恢复 org_punch 内置硬编码默认 ID；会与单一入口目标冲突。 | 2026-02-12 |
+| 将 `0:00` 清理逻辑放在 org_punch 的 clock_out 包装层，而不是改动 orgmode.nvim 源码。 | 最小侵入且可控，能同时覆盖 punch/out 与手动 clock-out 映射路径。 | 直接改 orgmode.nvim 上游逻辑；会增加维护成本且升级风险更高。 | 2026-02-12 |
+| CI 依赖不走完整 LazyVim 启动链，改为 headless + `-u NONE` + 显式 runtimepath 注入（repo + orgmode）。 | 显著降低依赖体积与不确定性，确保 smoke 测试稳定、快速、可复现。 | 在 CI 启动完整 nvim 配置并同步全部插件；更慢且外部依赖更多。 | 2026-02-12 |
+| 保持“切到默认任务 clock-in 再切回”的流程不变，仅补充窗口选项恢复层，避免改动 orgmode 行为边界。 | 最小改动即可消除 fold 副作用，风险低且兼容现有 punch 逻辑。 | 改为不切窗直接操作底层文件对象；实现复杂且更容易引入新竞态。 | 2026-02-12 |
+| 将 punch 默认任务路径从“切窗 + 光标定位 + clock_in”改为“数据层定位 + clock_in”，并保持用户当前窗口不变。 | 从源头消除窗口局部状态污染（fold/highlight/layout）风险。 | 继续使用切窗方案并修补更多窗口选项恢复；复杂且脆弱。 | 2026-02-12 |
 
 ---
 
@@ -106,4 +136,4 @@
 
 ---
 
-*最后更新: 2026-02-26 23:14 by Claude*
+*最后更新: 2026-02-27 13:04 by Claude*

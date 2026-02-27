@@ -44,9 +44,20 @@
 - [x] 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败） | 来源: review 2026-02-12
 - [x] 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值 | 来源: review 2026-02-12
 - [x] 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容 | 来源: 用户请求 bugfix 2026-02-12
+- [x] 实现 Norang clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO | 来源: 用户反馈 clock in 后未自动切换 NEXT
+- [x] 接管 org/agenda clock-in 映射并统一走 org_punch 包装器，保证状态切换逻辑一致 | 来源: 用户反馈 clock in 行为不一致
+- [x] 补充文档说明：时间线 time block 来源于时间戳，clock 记录通过 agenda 的 R 查看报告 | 来源: 用户反馈 clock in 后时间线无 time block
+- [x] 修复 punch_in 误报成功：默认任务 clock-in 失败时返回 false 并回退 keep_clock_running=false | 来源: 用户反馈 punch in 无法 clock in
+- [x] 在单一入口设置 organization_task_id：写入 lua/config/options.lua 并校正文档 | 来源: 用户反馈 punch in 无法 clock in
+- [x] 修复 clock_out 未清理 0:00 记录：统一 org/agenda clock-out 入口到 org_punch，并在 clock_out 后自动删除零时长 CLOCK 行 | 来源: 用户反馈 2026-02-27
+- [x] 新增 org-mode 冒烟测试集（7 个 case）与本地批量运行脚本 tests/smoke/run.sh | 来源: 用户请求：设计单测冒烟并逐个运行
+- [x] 新增 GitHub Actions 工作流 .github/workflows/org-smoke.yml，在 CI 中按 lazy-lock 固定 commit 拉取 orgmode 并执行冒烟测试 | 来源: 用户请求：setup github action
+- [x] 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext | 来源: 用户反馈 punch in 后所有标题折叠
+- [x] 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转 | 来源: 用户反馈 punch 后 fold/高亮异常
+- [x] 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染 | 来源: 回归防护 2026-02-27
 
 
 ---
 
-*最后更新: 2026-02-26 23:15*
+*最后更新: 2026-02-27 13:04*
 6-02-26 23:09*

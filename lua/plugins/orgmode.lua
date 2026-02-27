@@ -16,8 +16,14 @@ return {
           global = {
             org_capture = "<Leader>X",
           },
+          agenda = {
+            org_agenda_clock_in = false,
+            org_agenda_clock_out = false,
+          },
           org = {
             org_toggle_checkbox = "<C-Space>",
+            org_clock_in = false,
+            org_clock_out = false,
           },
         },
         org_agenda_time_grid = {
@@ -139,7 +145,14 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         group = agenda_right_group,
         pattern = "orgagenda",
-        callback = function()
+        callback = function(args)
+          vim.keymap.set("n", "I", function()
+            require("org_punch").clock_in_current_task()
+          end, { buffer = args.buf, desc = "Clock in (Norang NEXT transition)" })
+          vim.keymap.set("n", "O", function()
+            require("org_punch").clock_out_current_task()
+          end, { buffer = args.buf, desc = "Clock out (remove 0:00 entry)" })
+
           local agenda_win = vim.api.nvim_get_current_win()
           vim.schedule(function()
             if not vim.api.nvim_win_is_valid(agenda_win) then
@@ -197,6 +210,8 @@ return {
       vim.keymap.set("n", "<Leader>opI", punch.punch_in, { desc = "Org Punch In" })
       vim.keymap.set("n", "<Leader>opO", punch.punch_out, { desc = "Org Punch Out" })
       vim.keymap.set("n", "<Leader>opo", punch.clock_out_keep_running, { desc = "Clock out (keep running)" })
+      vim.keymap.set("n", "<Leader>oxi", punch.clock_in_current_task, { desc = "Org Clock In (Norang NEXT transition)" })
+      vim.keymap.set("n", "<Leader>oxo", punch.clock_out_current_task, { desc = "Org Clock Out (remove 0:00 entry)" })
 
       vim.keymap.set("n", "<F12>", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
       vim.keymap.set("n", "<Leader>oab", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
