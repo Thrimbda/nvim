@@ -25,6 +25,7 @@ return {
             org_toggle_checkbox = "<C-Space>",
             org_clock_in = false,
             org_clock_out = false,
+            org_meta_return = false,
           },
         },
         org_agenda_time_grid = {
@@ -42,6 +43,14 @@ return {
           "|",
           "DONE(d)",
           "CANCELLED(c)",
+        },
+        org_todo_keyword_faces = {
+          TODO = ":foreground #e86671 :weight bold",
+          NEXT = ":foreground #61afef :weight bold",
+          WAITING = ":foreground #e5c07b :weight bold",
+          HOLD = ":foreground #d19a66 :weight bold",
+          DONE = ":foreground #98c379 :weight bold :slant italic",
+          CANCELLED = ":foreground #5c6370 :slant italic",
         },
         org_log_into_drawer = "LOGBOOK",
         org_log_done = "note",
@@ -203,6 +212,40 @@ return {
               vim.api.nvim_set_current_win(current_win)
             end
           end)
+        end,
+      })
+
+      local function run_org_action(action)
+        local ok, orgmode = pcall(require, "orgmode")
+        if not ok or type(orgmode.action) ~= "function" then
+          vim.notify("orgmode action is unavailable", vim.log.levels.ERROR)
+          return
+        end
+
+        local ok_action, result = pcall(orgmode.action, action)
+        if not ok_action then
+          vim.notify(("orgmode action failed: %s"):format(action), vim.log.levels.ERROR)
+          return
+        end
+
+        if type(result) == "table" and type(result.wait) == "function" then
+          pcall(result.wait, result, 2000)
+        end
+      end
+
+      local org_meta_return_group = vim.api.nvim_create_augroup("OrgSmartMetaReturn", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = org_meta_return_group,
+        pattern = "org",
+        callback = function(args)
+          vim.keymap.set("n", "<Leader><CR>", function()
+            local line = vim.api.nvim_get_current_line()
+            if line:match("^%*+%s+") then
+              run_org_action("org_mappings.insert_heading_respect_content")
+              return
+            end
+            run_org_action("org_mappings.meta_return")
+          end, { buffer = args.buf, desc = "Org Meta Return (respect heading content)" })
         end,
       })
 
