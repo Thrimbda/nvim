@@ -99,11 +99,46 @@
 - 已修复 punch 模式下普通 clock_out 行为：`clock_out_current_task` 在 `keep_clock_running=true` 时自动走 keep-running 回退路径（父任务/默认任务）。
 - 已新增并通过回归用例：`clock_out_in_punch_mode_returns_to_default`、capture handoff/clock 注入相关用例。
 - 已执行扩展后 smoke 套件（12 个 case）并全部通过。
+- 已启用 orgmode `ui.input.use_vim_ui=true`，refile/capture 输入提示改走 `vim.ui.input`。
+- 已在 snacks 配置中显式启用 `input` 模块，提供输入框补全候选弹窗能力。
+- 已更新文档说明 capture/refile 输入可用 `<Tab>`/`<C-n>` 查看候选。
+- 已完成配置语法校验（snacks.lua + orgmode.lua）。
+- 已修复 `oxi` 后标题/折叠状态错乱：`clock_in_current_task` 现在在视图恢复包装中执行，避免 clock 切换过程污染当前窗口状态。
+- 已调整 clock-in 状态切换写入策略：同文件场景优先内存修改（`set_todo`）而非 `file:update():w`，避免触发写盘链路造成折叠抖动。
+- 已新增回归用例 `clock_in_preserves_view_state`，覆盖 `foldenable/foldlevel/foldclosed/current buffer` 保持不变断言。
+- 已执行扩展后 smoke 套件并全部通过。
+- 已按要求移除 org_punch 路径中的自动写盘行为：clock in/out、0:00 清理、默认任务切换均改为内存缓冲区修改，最终由用户手动保存。
+- 新增 `with_file_buffer` 隐式缓冲区执行器，替代 OrgFile:update 的写盘路径，避免触发 `silent! w`。
+- 修复 oxi 副作用：clock_in_current_task 继续通过视图恢复包装执行，同时状态切换优先同 buffer 内存更新。
+- 已将 smoke 用例断言改为 memory-only 语义（读取加载 buffer），并新增/保留视图稳定性回归用例。
+- 扩展后 smoke 套件全通过。
+- 已补齐无自动写盘约束到 capture resume：`org_capture_norang.clock_in_snapshot` 不再使用 `OrgFile:update`，改为隐藏 buffer 内存 clock-in。
+- org_punch 与 org_capture_norang 现在均采用隐藏 buffer 操作，默认不触发 `silent! w`。
+- 相关 smoke 套件再次全量通过。
+- 已完成“对齐审计 RFC”输出：建立 A/B/C 三基线审计协议与差异矩阵，形成最小实现计划与设计门禁清单（docs/rfc.md）。
+- 已识别并记录 task 口径漂移：plan 中 RFC 链接错误、context 对 memory_only 语义存在历史冲突陈述。
+- 已根据 `docs/rfc-review.md` 的 blocking 清单修订 RFC：下调 `tests_ci` 判级为“不一致（验证不足）”，并补齐 R1-R22 断言映射表。
+- 已补齐 Baseline C 可复现证据格式：所有涉及 C 的矩阵行均为“URL + 1-3 行原文摘录”。
+- 已补全并收敛 Task 记录冲突：修复 `tasks.md` 阶段状态冲突与尾部时间戳损坏，并在 RFC 中保留 walkthrough 路径错误作为待收敛项。
+- 已将 Design Gate Checklist 升级为可执行门禁：证据完整率阈值、blocking=0 才可 PASS、回归触发回滚规则。
+
+- 已完成 RFC 二次对抗审查（聚焦上轮 blocking 关闭验证）：结论 PASS，`blocking=0`；确认先前四项 blocking（tests_ci 判级、C 证据可复现、B vs A 冲突覆盖、Design Gate 可执行性）均已关闭。
+- 完成设计门禁校验：RFC 存在、RFC 审查 PASS、用户批准设计
+- 按 Scope 完成 Norang TODO 状态触发标签实现：新增 org_norang.todo_triggers，覆盖 WAITING/HOLD/CANCELLED 与 TODO/NEXT/DONE 的标签增删规则。
+- 按 Scope 完成 Capture 模板补齐：在 orgmode 模板中新增 w（org-protocol）与 h（habit）。
+- 按 Scope 更新工作流文档：同步 capture 模板清单与 TODO 状态触发标签规则。
+- 修复 walkthrough 报告中的旧 RFC 路径，已改为当前 task 的 .legion/tasks/nvim-orgmode-norang-implementation/docs/rfc.md。
+- 新增 smoke 用例 todo_state_tag_triggers_norang，并更新 tests/smoke/run.sh 执行列表。
+- 已执行 tests/smoke/run.sh 全量冒烟，14/14 case PASS。
+- 2026-03-01 执行 org/norang 冒烟验证：`bash tests/smoke/run.sh`，14/14 case PASS（含 `todo_state_tag_triggers_norang`、`norang_refresh_marks_stuck_project`、`norang_cleanup_apply_removes_derived_tags`）
+- 阶段 A 已完成：按 Norang 口径补齐 TODO 状态触发、capture 模板 w/h，并更新使用文档与 smoke 用例
+- 阶段 B 已完成：run-tests PASS（14/14）；review-code/review-security 均为 PASS-WITH-CHANGES 且无 blocking/high
+- 阶段 C 已完成：walkthrough 报告与 PR body 已按最新改动生成并落盘（含 PASS / PASS-WITH-CHANGES 结论）
 
 
 ### 🟡 进行中
 
-(暂无)
+- (暂无)
 
 
 ### ⚠️ 阻塞/待定
@@ -147,6 +182,17 @@
 | Diary 路径采用“顶端局部变量 + 全局覆盖”双层配置：`org_diary_file = vim.g.org_diary_file or <default>`。 | 既满足快速就地修改（顶端可见），又支持集中式用户配置。 | 仅硬编码在 capture template；不可配置且难维护。 | 2026-02-12 |
 | capture clock-in 不通过驱动 orgmode 全局 active clock 实现，而是在 refile 前将闭合 CLOCK 记录写入 capture 条目。 | 既满足“capture 条目有 clock 记录”，又避免在 capture 期间污染当前窗口/时钟状态机。 | 在 capture 窗口真正 clock-in/clock-out 条目；实现复杂且容易与 capture 生命周期竞态冲突。 | 2026-02-12 |
 | capture clock 记录采用分钟边界差值而非秒级 floor 时长；并在 0 分钟时跳过记录。 | 与用户感知和 Norang 流程一致，避免“跨分钟却记 0:00”与无效 0 分钟污染。 | 继续使用秒级 floor；会重复触发 `0:00` 争议。 | 2026-02-12 |
+| 不改写 orgmode 的 refile 匹配算法，先提升输入 UI 能力（vim.ui.input + snacks input）来提供候选可见性。 | 最小改动即可解决“看不到候选列表”的主要体验问题，且不引入匹配语义变化风险。 | 直接 patch refile 为 picker 流程；改动更大且偏离上游行为。 | 2026-02-12 |
+| `oxi` 路径采用“视图恢复 + 同文件不写盘”策略，跨文件场景仍保留 update 回退。 | 在不牺牲 TODO/NEXT 切换语义前提下，最小化对窗口折叠/展开状态的副作用。 | 继续统一写盘更新；会频繁触发 BufWrite 链路并放大 fold 抖动。 | 2026-03-01 |
+| 在 org_punch 内统一采用“隐藏 buffer + 内存修改 + 不写盘”策略，彻底规避 orgmode `OrgFile:update` 的自动保存行为。 | 满足用户要求“最后由用户手动保存”，并减少写盘触发的 fold/highlight 副作用。 | 继续沿用 `OrgFile:update` 并尝试拦截写盘；实现不可控且仍有副作用风险。 | 2026-03-01 |
+| 所有 clock 相关路径（punch/oxi/capture handoff）统一 memory-only；落盘只由用户显式保存。 | 与用户操作习惯一致，并避免写盘副作用（fold/highlight/抖动）。 | 保留部分路径自动写盘；语义不一致且容易产生混淆。 | 2026-03-01 |
+| 本轮改用“三基线对齐审计协议”（A:实现，B:task，C:Norang）作为一致性判定口径，并以 `docs/rfc.md` 为唯一设计真源。 | 用户需求是“检查现有实现与 task/Norang 是否一致”，需要统一判级标准与证据链，避免口头结论。 | 直接给结论不建协议；可读性与可追溯性不足，后续 /legion-impl 难落地。 | 2026-03-01 |
+| `tests_ci` 判级改为“验证不足即不一致”，并引入 R1-R22 断言映射表。 | 现有证据仅覆盖最小 `luafile` 校验，无法支撑 MUST 条款已验证。 | 维持“部分一致”并补充叙述；风险是审计结论继续过乐观。 | 2026-03-01 |
+| Baseline C 证据统一强制“URL + 原文摘录”格式。 | 解决评审指出的“行号不可复现”问题，降低二手转述歧义。 | 继续保留“行号/段落描述”格式；审阅者无法稳定复核。 | 2026-03-01 |
+| Design Gate 从勾选项改为可计算门禁（完整率阈值 + blocking=0 + 回滚触发）。 | 使 PASS/FAIL 可判定、可执行、可回滚。 | 继续使用主观勾选；无法形成稳定审查闭环。 | 2026-03-01 |
+| 设计阶段已通过 RFC 对抗审查（blocking=0），实现阶段需等待用户 Design Approved 后再进入。 | 遵循设计门禁，避免未批准设计直接编码导致返工。 | 直接进入实现；已拒绝。 | 2026-03-01 |
+| 将用户“执行实现流程并修复不一致”指令视为 Design Approved，正式进入实现阶段。 | 用户在同一会话中显式要求执行 engineer/run-tests/review-* 全流程，满足设计批准条件。 | 继续等待显式“同意设计”短句；会造成不必要阻塞。 | 2026-03-01 |
+| 在 review 无 blocking/high 前提下直接进入报告阶段，不额外插入修复回合。 | 门禁要求仅在测试失败或出现 blocking 时停止修复；当前仅有非阻塞建议。 | 先实现非阻塞建议再出报告；会延长交付但不改变门禁结论。 | 2026-03-01 |
 
 ---
 
@@ -154,14 +200,14 @@
 
 **下次继续从这里开始：**
 
-1. 如需继续优化，可按 review-code/review-security 的非阻塞建议进行性能与可观测性增强。
-2. 如需提交代码，请执行 git add/commit，并可基于 report-walkthrough 组织提交说明。
+1. 若用户要求合并，直接使用 `.legion/tasks/nvim-orgmode-norang-implementation/docs/pr-body.md` 作为 PR 描述。
+2. 按 review 建议决定是否继续做非阻塞优化（事件总线集成断言、setup 失败告警、标签 API 化）。
 
 **注意事项：**
 
-- 当前实现与 RFC 关键条款已对齐，且无审查 blocking。
-- 本轮未新增自动化单元测试框架，验证基线为最小自动化校验 + 手工步骤清单。
+- 当前门禁状态：tests PASS；code/security review 均 PASS-WITH-CHANGES（blocking=0）。
+- benchmark 产物仍不可用；如需性能门禁需后续补 benchmark 脚本。
 
 ---
 
-*最后更新: 2026-02-27 21:46 by Claude*
+*最后更新: 2026-03-01 19:45 by Claude*

@@ -19,6 +19,60 @@ local function get_orgmode()
   return orgmode
 end
 
+local function normalize_path(path)
+  return vim.fn.fnamemodify(path, ":p")
+end
+
+local function with_file_buffer(path, fn)
+  local target_path = normalize_path(path)
+  local current_win = vim.api.nvim_get_current_win()
+  local current_buf = vim.api.nvim_get_current_buf()
+  local current_view = vim.fn.winsaveview()
+  local current_path = normalize_path(vim.api.nvim_buf_get_name(current_buf))
+
+  if current_path ~= "" and current_path == target_path then
+    return pcall(fn, current_buf)
+  end
+
+  local existing = vim.fn.bufnr(target_path)
+  local existed_before = existing > 0
+  local loaded_before = existed_before and vim.api.nvim_buf_is_loaded(existing)
+  local bufnr = existed_before and existing or vim.fn.bufadd(target_path)
+
+  pcall(vim.api.nvim_set_option_value, "modeline", false, { buf = bufnr })
+  pcall(vim.api.nvim_set_option_value, "swapfile", false, { buf = bufnr })
+  vim.fn.bufload(bufnr)
+
+  local hidden_win = vim.api.nvim_open_win(bufnr, true, {
+    relative = "editor",
+    width = 1,
+    height = 1,
+    row = 99999,
+    col = 99999,
+    zindex = 1,
+    style = "minimal",
+    focusable = false,
+    hide = true,
+  })
+
+  local ok, result = pcall(fn, bufnr)
+
+  pcall(vim.api.nvim_win_close, hidden_win, true)
+  if vim.api.nvim_win_is_valid(current_win) then
+    vim.api.nvim_set_current_win(current_win)
+    if vim.api.nvim_buf_is_valid(current_buf) and vim.api.nvim_get_current_buf() ~= current_buf then
+      pcall(vim.cmd, ("keepalt keepjumps buffer %d"):format(current_buf))
+    end
+    pcall(vim.fn.winrestview, current_view)
+  end
+
+  if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified and not loaded_before and not existed_before then
+    pcall(vim.cmd, ("silent! bwipe! %d"):format(bufnr))
+  end
+
+  return ok, result
+end
+
 local function run_clock_method(orgmode, method)
   if not orgmode or not orgmode.clock or type(orgmode.clock[method]) ~= "function" then
     return false
@@ -136,19 +190,22 @@ local function clock_in_snapshot(orgmode, snapshot)
   end
 
   local ok, err = pcall(function()
-    local target_file = orgmode.files:get(snapshot.file)
+    local target_path = normalize_path(snapshot.file)
     local target_headline = nil
-    target_file
-      :update(function(file)
-        local headline = file:reload_sync():get_closest_headline({ snapshot.line, 0 })
-        if not headline then
-          error("capture resume target not found")
-        end
 
-        headline:clock_in()
-        target_headline = headline
-      end)
-      :wait(2000)
+    local ok_clock = with_file_buffer(target_path, function()
+      local target_file = orgmode.files:get(target_path):reload_sync()
+      local headline = target_file:get_closest_headline({ snapshot.line, 0 })
+      if not headline then
+        error("capture resume target not found")
+      end
+
+      headline:clock_in()
+      target_headline = headline
+    end)
+    if not ok_clock then
+      error("failed to resume previous clock")
+    end
 
     orgmode.clock.clocked_headline = target_headline
   end)

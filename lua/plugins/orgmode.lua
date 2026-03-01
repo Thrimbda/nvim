@@ -12,6 +12,11 @@ return {
         org_agenda_files = org_agenda_files,
         org_default_notes_file = org_default_notes_file,
         org_startup_indented = true,
+        ui = {
+          input = {
+            use_vim_ui = true,
+          },
+        },
         org_agenda_use_time_grid = true,
         mappings = {
           global = {
@@ -78,6 +83,16 @@ return {
           p = {
             description = "Phone call",
             template = "* PHONE %? :PHONE:REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          w = {
+            description = "Org protocol",
+            template = "* TODO Review %a :REFILE:\n%U\n",
+            target = org_default_notes_file,
+          },
+          h = {
+            description = "Habit",
+            template = "* NEXT %? :REFILE:\nSCHEDULED: %t\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n%U\n",
             target = org_default_notes_file,
           },
           j = {
@@ -183,6 +198,8 @@ return {
           },
         },
       })
+
+      require("org_norang.todo_triggers").setup()
 
       local agenda_right_group = vim.api.nvim_create_augroup("OrgAgendaRightSide", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {

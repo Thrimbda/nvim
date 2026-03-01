@@ -1,93 +1,106 @@
-# nvim-orgmode Norang 实现 Walkthrough 报告
+# nvim-orgmode Norang 实现 Walkthrough 报告（最新改动）
 
-## 1) 变更概览（文件与能力）
+## 1) 目标与范围
 
-### 目标与范围
+- 目标：按 Norang 口径完成本轮对齐修复，覆盖 TODO 状态触发标签、capture 模板补齐（w/h）、文档同步、smoke 扩展，并给出可审计交付结论。
+- Scope 绑定：`lua/plugins/orgmode.lua`、`lua/org_norang/**/*.lua`、`lua/tests/smoke/orgmode_smoke.lua`、`tests/smoke/run.sh`、`docs/orgmode-norang-workflow.md`、`.legion/tasks/nvim-orgmode-norang-implementation/docs/*`。
+- 设计真源（RFC）：`.legion/tasks/nvim-orgmode-norang-implementation/docs/rfc.md`。
 
-- 目标：基于设计真源 RFC 落地 `org_norang`，完成命令、刷新协议、agenda 扩展、与 `org_punch` 协同，并形成可验证交付。
-- 实现范围（绑定 Scope）：`lua/plugins/orgmode.lua`、`lua/org_punch.lua`、`lua/org_norang/**`、`docs/orgmode-norang-workflow.md`。
-- 设计真源：`.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md`。
+## 2) 设计摘要
 
-### 代码与文档改动清单
+- 设计依据：以 RFC 的 A/B/C 三基线与 Design Gate 为唯一判级口径，实施“先对齐语义，再补测试证据，再收敛交付文档”的最小改动策略。
+- 本轮重点对齐项：
+  - TODO 状态触发标签（WAITING/HOLD/CANCELLED 与 TODO/NEXT/DONE 的增删规则）
+  - capture 模板覆盖（新增 `w` org-protocol、`h` habit）
+  - 工作流文档与快捷键说明同步
+  - smoke 回归覆盖新增 `todo_state_tag_triggers_norang`
+- 相关产物：
+  - 代码审查：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-code.md`
+  - 安全审查：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-security.md`
+  - 测试报告：`.legion/tasks/nvim-orgmode-norang-implementation/docs/test-report.md`
 
-- `lua/org_norang/init.lua`
-  - 新增 `setup/refresh/reload/cleanup` 命令注册与状态管理。
-  - 接入 `BufWritePost` 自动刷新（仅 agenda 范围）。
-  - 配置校验失败统一进入 `S5/E_CFG_INVALID`。
-- `lua/org_norang/parser.lua`
-  - 提供 headline/TODO/tag 解析能力，服务派生标签计算。
-- `lua/org_norang/rules.lua`
-  - 实现 `PROJECT/STUCK/ARCHIVE_CANDIDATE` 的 `approx` 规则判定。
-- `lua/org_norang/refresh.lua`
-  - 实现单文件与全量刷新事务、路径级互斥、冲突检测（`changedtick/mtime`）、汇总统计。
-  - 在 `memory_only` 下遵循仅处理已加载 buffer，未加载文件记 `skipped_unloaded`。
-- `lua/org_norang/cleanup.lua`
-  - 实现派生标签清理（dry-run/apply），并在 apply 路径增加锁与冲突检测。
+## 3) 改动清单（按模块/文件类型）
+
+### Lua 代码
+
+- `lua/org_norang/todo_triggers.lua`
+  - 新增并接入 TODO 状态触发器，实现 WAITING/HOLD/CANCELLED 自动标签同步。
+  - 对 `TODO/NEXT/DONE` 做标签清理，避免 WAITING/HOLD/CANCELLED 残留。
 - `lua/plugins/orgmode.lua`
-  - 接入 `org_norang.setup`，扩展 `b` 视图：`PROJECT+STUCK`、`PROJECT-STUCK`、`ARCHIVE_CANDIDATE`。
-- `lua/org_punch.lua`
-  - 增加轻量协同校验提示；保持 keep-running 主流程不阻断。
+  - capture 模板新增 `w`（org-protocol）与 `h`（habit）并保持现有 Norang capture handoff 兼容。
+  - 在 orgmode setup 后执行 `require("org_norang.todo_triggers").setup()`，启用状态触发监听。
+
+### 测试与脚本
+
+- `lua/tests/smoke/orgmode_smoke.lua`
+  - 新增 `todo_state_tag_triggers_norang`，覆盖 TODO 状态流下标签增删断言。
+- `tests/smoke/run.sh`
+  - 将 `todo_state_tag_triggers_norang` 纳入 smoke 套件执行序列。
+
+### 文档与交付物
+
 - `docs/orgmode-norang-workflow.md`
-  - 补充命令、排错、回滚与 cleanup 使用说明。
+  - 更新 capture 模板清单（含 `w/h`）与 TODO 状态触发规则说明。
+- `.legion/tasks/nvim-orgmode-norang-implementation/docs/report-walkthrough.md`
+  - 依据最新 diff 重新生成（本文件）。
 
-## 2) 关键实现决策（为什么这么做）
+## 4) 如何验证（命令 + 预期）
 
-- 以 RFC 作为唯一设计真源，避免实现中口径漂移，确保 R1-R21 可追踪验收。
-- 固定 V1 `memory_only`：避免隐式加载与自动写盘副作用，保持用户可控的二次保存模型。
-- 全量刷新只处理已加载 buffer：与 RFC R12/R13/T16 对齐，未加载 agenda 文件统一记 `skipped_unloaded`。
-- 强化错误态收敛：`setup/reload` 对非法 `opts` 做类型门禁，错误统一收敛 `S5/E_CFG_INVALID`，避免崩溃路径。
-- cleanup apply 引入锁与快照冲突检测：避免覆盖用户最新修改，保障回滚操作安全性。
+- 运行命令：`bash tests/smoke/run.sh`
+- 预期结果：
+  - 终端输出所有 case PASS，最终 `All smoke cases passed.`
+  - 总结应为 `14/14 case 通过`
+  - 关键 case 必须 PASS：
+    - `todo_state_tag_triggers_norang`
+    - `capture_clock_handoff_resumes_previous`
+    - `capture_pre_refile_injects_clock_line`
+    - `norang_refresh_marks_stuck_project`
+    - `norang_cleanup_apply_removes_derived_tags`
 
-## 3) 验证结果摘要
+## 5) 测试与审查结论
 
-### 测试结论
+- 测试结论：`PASS`
+  - 证据：`.legion/tasks/nvim-orgmode-norang-implementation/docs/test-report.md`
+  - 结果：`14/14` 冒烟用例通过。
+- 代码审查结论：`PASS-WITH-CHANGES`
+  - 证据：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-code.md`
+  - 状态：无 blocking。
+- 安全审查结论：`PASS-WITH-CHANGES`
+  - 证据：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-security.md`
+  - 状态：无 blocking/high。
 
-- 测试报告：`.legion/tasks/nvim-orgmode-norang-implementation/docs/test-report.md`。
-- 执行方式：逐文件运行 `nvim --headless -u NONE '+set rtp+=.' '+luafile <FILE>' '+qa'`。
-- 结果：7/7 PASS（`lua/org_norang/*.lua`、`lua/plugins/orgmode.lua`、`lua/org_punch.lua`）。
-- 说明：本轮验证口径为“最小必选自动化 + RFC 手工断言清单”。
+## 6) Benchmark 结果或门槛说明
 
-### 审查结论
+- benchmark 数据：本轮无独立性能基准数据。
+- 原因：当前变更聚焦语义对齐与回归覆盖，仓库未提供稳定可复现的基准脚本。
+- 交付门槛（替代 benchmark）：
+  - smoke `14/14 PASS`
+  - code/security review 均为 `PASS-WITH-CHANGES` 且 `blocking=0`
 
-- 代码评审：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-code.md`，结论 `PASS-WITH-CHANGES`，无 blocking。
-- 安全评审：`.legion/tasks/nvim-orgmode-norang-implementation/docs/review-security.md`，结论 `PASS-WITH-CHANGES`，无 blocking。
-- 关键闭环：此前安全 FAIL 路径（`setup/reload` 非 table opts）已关闭，验证为“不崩溃 + false + S5”。
+## 7) 可观测性（metrics/logging）
 
-### benchmark 结果或门槛说明
+- 运行时可观测性：当前主要通过 `vim.notify` 与命令返回值暴露失败。
+- 测试可观测性：smoke runner 按 case 输出 PASS/FAIL，失败时直接 `cquit 1` 快速中断。
+- 已知缺口：
+  - `todo_triggers.setup()` 失败时缺少显式告警（review 已给出非阻塞建议）。
+  - TODO 触发自动改标过程暂无结构化审计日志（review-security 非阻塞建议）。
 
-- 本次未提供独立 benchmark 数据。
-- 原因：当前交付门槛聚焦协议正确性、语法可加载性与安全收敛；仓库尚无稳定的性能基准脚本。
-- 现阶段门槛：以 RFC 语义一致性（R1-R21）与最小校验 PASS 作为上线前准入条件。
+## 8) 风险与回滚
 
-## 4) 审查结论与剩余风险
+- 主要风险：
+  - 触发器依赖 orgmode 事件系统，若加载顺序异常可能出现静默降级。
+  - TODO 标签写入目前采用文本重写策略，边缘语法下有一致性风险（非阻塞）。
+- 回滚方案：
+  1. 在 `lua/plugins/orgmode.lua` 暂时移除/注释 `require("org_norang.todo_triggers").setup()`。
+  2. 从 `org_capture_templates` 撤回 `w/h` 条目（如需最小回退）。
+  3. 重新运行 `bash tests/smoke/run.sh` 确认核心能力不回归。
 
-### 综合结论
+## 9) 未决项与下一步
 
-- 当前实现可进入交付：核心能力落地、最小校验通过、代码/安全审查均无阻塞项。
-- 结论级别：`PASS-WITH-CHANGES`（存在可改进项，但不阻断当前版本）。
-
-### 可观测性现状
-
-- 已具备 `vim.notify` 级别的运行时提示与错误回传。
-- `observability.log_level` 已有配置校验，但日志分级过滤与持久化审计尚未完整闭环。
-
-### 剩余风险
-
-- 高频保存场景下，agenda 文件集合重复展开可能造成性能抖动（建议做缓存/失效机制）。
-- `refresh.debounce_ms` 当前语义与实现仍有差距（需补齐去抖或文档声明未启用）。
-- 审计追踪不足：缺少结构化持久日志，不利于事后归因。
-- 极端情况下若内部状态被异常篡改（如 `M._user_opts` 非 table），`reload` 合并前仍建议做归一化保护。
-
-### 回滚路径
-
-- 关闭 `org_norang.setup` 与相关 agenda 扩展。
-- 执行 `:OrgNorangCleanupDerivedTags`（先 dry-run，后 `!` apply）清理派生标签副作用。
-- 验证仅派生标签被清理，用户标签保持不变。
-
-## 5) 下一步建议（可执行）
-
-1. 在 `refresh.lua` 增加 agenda 集合缓存与失效策略，降低高频触发下 glob 开销。
-2. 在 `init.lua` 落地按 buffer/path 的 debounce，真正消费 `refresh.debounce_ms`。
-3. 统一日志出口并接入 `log_level` 过滤，补充可选 JSONL 审计记录（命令、错误码、phase 迁移、时间戳）。
-4. 为 `setup/reload` 增加回归用例（`nil/table/string/number`），固化“无崩溃 + 错误码一致 + phase 收敛”。
-5. 补充轻量 benchmark 脚本（大 agenda 文件集）并设定基线阈值，形成后续版本性能门禁。
+- 未决项：
+  - 将 `todo_state_tag_triggers_norang` 从“直接调用 listener”升级为“真实事件总线派发”集成断言。
+  - 为 trigger setup 失败补充 warning 与健康状态可视化。
+  - 将标签更新实现收敛为 headline/tag API，降低字符串拼接耦合。
+- 下一步建议：
+  1. 先补 setup 失败告警与 event-dispatch 集成测试，再做实现细化。
+  2. 评估 smoke runner 增加单 case 超时，降低 CI 卡死风险。

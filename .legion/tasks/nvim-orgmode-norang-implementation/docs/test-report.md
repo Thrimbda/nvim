@@ -1,38 +1,38 @@
-# 测试验证报告（最新代码最小校验）
+# 测试验证报告（org/norang 聚焦）
 
-## 验证范围
+## 执行信息
 
-- `lua/org_punch.lua`
-- `lua/plugins/orgmode.lua`
-- `lua/org_norang/cleanup.lua`
-- `lua/org_norang/init.lua`
-- `lua/org_norang/parser.lua`
-- `lua/org_norang/refresh.lua`
-- `lua/org_norang/rules.lua`
+- 仓库根目录：`/Users/c1/.config/nvim`
+- 执行时间：2026-03-01
+- 执行命令：`bash tests/smoke/run.sh`
 
-## 执行命令与结果
-
-逐文件执行以下命令（均在仓库根目录执行）：
-
-```bash
-nvim --headless -u NONE '+set rtp+=.' '+luafile <FILE>' '+qa'
-```
-
-执行结果：
-
-- `lua/org_punch.lua`：PASS
-- `lua/plugins/orgmode.lua`：PASS
-- `lua/org_norang/cleanup.lua`：PASS
-- `lua/org_norang/init.lua`：PASS
-- `lua/org_norang/parser.lua`：PASS
-- `lua/org_norang/refresh.lua`：PASS
-- `lua/org_norang/rules.lua`：PASS
-
-> 以上命令执行时均无报错输出，进程正常退出。
-
-## 结论
+## 结果
 
 **PASS**
 
-- 本次改动涉及的 Lua 文件已按要求逐个通过 `nvim --headless -u NONE +luafile` 最小校验。
-- 未发现加载失败或语法级错误。
+- 总计：14/14 case 通过
+- 关键 Norang 相关 case：
+  - `norang_refresh_marks_stuck_project`: PASS
+  - `norang_cleanup_apply_removes_derived_tags`: PASS
+  - `todo_state_tag_triggers_norang`: PASS
+
+## 全部用例结果
+
+- `punch_in_requires_id`: PASS
+- `punch_in_clocks_default_task`: PASS
+- `punch_in_preserves_current_buffer`: PASS
+- `punch_out_preserves_current_buffer`: PASS
+- `clock_in_todo_task_switches_to_next`: PASS
+- `clock_in_next_project_switches_to_todo`: PASS
+- `clock_in_preserves_view_state`: PASS
+- `clock_out_removes_zero_duration_clock`: PASS
+- `clock_out_in_punch_mode_returns_to_default`: PASS
+- `norang_refresh_marks_stuck_project`: PASS
+- `norang_cleanup_apply_removes_derived_tags`: PASS
+- `capture_clock_handoff_resumes_previous`: PASS
+- `capture_pre_refile_injects_clock_line`: PASS
+- `todo_state_tag_triggers_norang`: PASS
+
+## 失败明细
+
+- 无（本轮未出现失败用例）

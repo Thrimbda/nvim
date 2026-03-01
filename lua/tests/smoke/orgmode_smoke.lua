@@ -24,8 +24,29 @@ local function read_lines(path)
   return lines
 end
 
+local function read_buffer_lines_for_file(path)
+  local ok_org, orgmode = pcall(require, "orgmode")
+  if not ok_org or not orgmode.files then
+    return read_lines(path)
+  end
+
+  local ok_file, file = pcall(function()
+    return orgmode.files:get(path):reload_sync()
+  end)
+  if not ok_file or not file then
+    return read_lines(path)
+  end
+
+  local bufnr = file:bufnr()
+  if bufnr > -1 and vim.api.nvim_buf_is_loaded(bufnr) then
+    return vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  end
+
+  return read_lines(path)
+end
+
 local function read_line(path, line_nr)
-  local lines = read_lines(path)
+  local lines = read_buffer_lines_for_file(path)
   return lines[line_nr] or ""
 end
 
@@ -95,6 +116,45 @@ local function setup_norang(paths)
   return norang
 end
 
+local function setup_todo_triggers()
+  local ok, err = require("org_norang.todo_triggers").setup()
+  assert_true(ok == true, "todo trigger setup failed: " .. tostring(err))
+end
+
+local function run_org_action(action)
+  local orgmode = require("orgmode")
+  local ok_action, result = pcall(orgmode.action, action)
+  assert_true(ok_action, "orgmode action failed: " .. tostring(action))
+  if type(result) == "table" and type(result.wait) == "function" then
+    result:wait(2000)
+  end
+end
+
+local function get_current_headline_state(line_nr)
+  local orgmode = require("orgmode")
+  local headline = orgmode.files:get_closest_headline()
+  local tags = headline:get_own_tags()
+  return {
+    line = vim.fn.getline(line_nr),
+    tags = tags,
+  }
+end
+
+local function apply_todo_trigger_now()
+  local trigger = require("org_norang.todo_triggers")
+  local orgmode = require("orgmode")
+  trigger._state.listener({ headline = orgmode.files:get_closest_headline() })
+end
+
+local function has_tag_in_list(tags, tag)
+  for _, item in ipairs(tags or {}) do
+    if item == tag then
+      return true
+    end
+  end
+  return false
+end
+
 local function test_punch_in_requires_id()
   local punch = require("org_punch")
   punch.setup({
@@ -126,7 +186,7 @@ local function test_punch_in_clocks_default_task()
   assert_true(ok == true, "punch_in should succeed")
   assert_true(punch.state.keep_clock_running == true, "keep_clock_running should be true after success")
 
-  local lines = read_lines(path)
+  local lines = read_buffer_lines_for_file(path)
   local has_clock = false
   for _, line in ipairs(lines) do
     if line:match("^%s*CLOCK:%s*%[") then
@@ -200,7 +260,7 @@ local function test_clock_in_todo_task_switches_to_next()
 
   local ok = punch.clock_in_current_task()
   assert_true(ok == true, "clock_in_current_task should succeed")
-  assert_true(read_line(path, 2):match("^%*%*%s+NEXT%s+") ~= nil, "TODO task should switch to NEXT after clock in")
+  assert_true(vim.fn.getline(2):match("^%*%*%s+NEXT%s+") ~= nil, "TODO task should switch to NEXT after clock in")
 
   punch.clock_out_current_task()
 end
@@ -219,7 +279,7 @@ local function test_clock_in_next_project_switches_to_todo()
 
   local ok = punch.clock_in_current_task()
   assert_true(ok == true, "clock_in_current_task should succeed")
-  assert_true(read_line(path, 1):match("^%*%s+TODO%s+") ~= nil, "NEXT project should switch back to TODO on clock in")
+  assert_true(vim.fn.getline(1):match("^%*%s+TODO%s+") ~= nil, "NEXT project should switch back to TODO on clock in")
 
   punch.clock_out_current_task()
 end
@@ -237,7 +297,7 @@ local function test_clock_out_removes_zero_duration_clock()
   assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
   assert_true(punch.clock_out_current_task() == true, "clock_out_current_task should succeed")
 
-  local lines = read_lines(path)
+  local lines = read_buffer_lines_for_file(path)
   for _, line in ipairs(lines) do
     assert_true(not line:match("CLOCK:.*=>%s*0:00%s*$"), "0:00 clock entry should be removed")
   end
@@ -269,6 +329,51 @@ local function test_clock_out_in_punch_mode_returns_to_default()
   orgmode.clock:update_clocked_headline()
   assert_true(orgmode.clock.clocked_headline ~= nil, "clock should continue running in punch mode")
   assert_true(orgmode.clock.clocked_headline:get_title() == "Organization", "clock should return to default task")
+
+  punch.punch_out()
+end
+
+local function test_clock_in_preserves_view_state()
+  local default_path = write_temp_org({
+    "* Tasks",
+    "** TODO Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local task_path = write_temp_org({
+    "* TODO Focus project",
+    "** TODO Nested task",
+    "*** TODO Deep task",
+  })
+
+  setup_orgmode({ task_path, default_path })
+  local punch = setup_punch({ task_path, default_path }, DEFAULT_TASK_ID)
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(task_path))
+  vim.wo.foldenable = true
+  vim.wo.foldlevel = 99
+  vim.cmd("normal! zM")
+
+  local before_buf = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+  local before_foldlevel = vim.wo.foldlevel
+  local before_foldenable = vim.wo.foldenable
+  local before_foldclosed = vim.fn.foldclosed(2)
+
+  assert_true(punch.punch_in() == true, "punch_in should succeed")
+
+  vim.api.nvim_win_set_cursor(0, { 2, 0 })
+  assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
+
+  local after_buf = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+  local after_foldlevel = vim.wo.foldlevel
+  local after_foldenable = vim.wo.foldenable
+  local after_foldclosed = vim.fn.foldclosed(2)
+
+  assert_true(before_buf == after_buf, "clock_in_current_task should keep current buffer")
+  assert_true(before_foldlevel == after_foldlevel, "clock_in_current_task should preserve foldlevel")
+  assert_true(before_foldenable == after_foldenable, "clock_in_current_task should preserve foldenable")
+  assert_true(before_foldclosed == after_foldclosed, "clock_in_current_task should preserve fold closed state")
 
   punch.punch_out()
 end
@@ -333,7 +438,7 @@ local function test_capture_clock_handoff_resumes_previous()
 
   require("org_punch").clock_out_current_task({ ignore_keep_running = true, silent = true })
 
-  local lines = read_lines(path)
+  local lines = read_buffer_lines_for_file(path)
   for _, line in ipairs(lines) do
     assert_true(not line:match("=>%s*0:00%s*$"), "capture handoff should not leave 0:00 clock entries")
   end
@@ -379,6 +484,60 @@ local function test_capture_pre_refile_injects_clock_line()
   capture.finish_capture_clock_handoff()
 end
 
+local function test_todo_state_tag_triggers_norang()
+  local path = write_temp_org({
+    "* TODO Trigger task :WAITING:HOLD:CANCELLED:",
+  })
+
+  setup_orgmode({ path })
+  setup_todo_triggers()
+  vim.cmd("silent edit " .. vim.fn.fnameescape(path))
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+  run_org_action("org_mappings.todo_next_state")
+  apply_todo_trigger_now()
+  local state = get_current_headline_state(1)
+  assert_true(state.line:match("^%*%s+NEXT%s+") ~= nil, "todo should switch to NEXT")
+  assert_true(not has_tag_in_list(state.tags, "WAITING"), "NEXT should remove WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "NEXT should remove HOLD tag")
+  assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "NEXT should remove CANCELLED tag")
+
+  run_org_action("org_mappings.todo_next_state")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(has_tag_in_list(state.tags, "WAITING"), "WAITING should add WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "WAITING should not force HOLD tag")
+  assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "WAITING should clear CANCELLED by flow")
+
+  run_org_action("org_mappings.todo_next_state")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(has_tag_in_list(state.tags, "WAITING"), "HOLD should keep WAITING tag")
+  assert_true(has_tag_in_list(state.tags, "HOLD"), "HOLD should add HOLD tag")
+
+  run_org_action("org_mappings.todo_next_state")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(not has_tag_in_list(state.tags, "WAITING"), "DONE should remove WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "DONE should remove HOLD tag")
+  assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "DONE should remove CANCELLED tag")
+
+  run_org_action("org_mappings.todo_next_state")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(has_tag_in_list(state.tags, "CANCELLED"), "CANCELLED should add CANCELLED tag")
+  assert_true(not has_tag_in_list(state.tags, "WAITING"), "CANCELLED should remove WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "CANCELLED should remove HOLD tag")
+
+  require("orgmode").files:get_closest_headline():set_todo("TODO")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(state.line:match("^%*%s+TODO%s+") ~= nil, "todo should switch back to TODO")
+  assert_true(not has_tag_in_list(state.tags, "WAITING"), "TODO should remove WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "TODO should remove HOLD tag")
+  assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "TODO should remove CANCELLED tag")
+end
+
 local CASES = {
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
@@ -386,12 +545,14 @@ local CASES = {
   punch_out_preserves_current_buffer = test_punch_out_preserves_current_buffer,
   clock_in_todo_task_switches_to_next = test_clock_in_todo_task_switches_to_next,
   clock_in_next_project_switches_to_todo = test_clock_in_next_project_switches_to_todo,
+  clock_in_preserves_view_state = test_clock_in_preserves_view_state,
   clock_out_removes_zero_duration_clock = test_clock_out_removes_zero_duration_clock,
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
   norang_refresh_marks_stuck_project = test_norang_refresh_marks_stuck_project,
   norang_cleanup_apply_removes_derived_tags = test_norang_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
+  todo_state_tag_triggers_norang = test_todo_state_tag_triggers_norang,
 }
 
 function M.run(case_name)

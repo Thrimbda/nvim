@@ -163,3 +163,54 @@
 2026-02-27T13:46:37.232Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义,success
 2026-02-27T13:46:37.244Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支,success
 2026-02-27T13:46:53.896Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: capture clock 记录采用分钟边界差值而非秒级 floor 时长；并在 0 分钟时跳过记录。,success
+2026-02-28T15:48:38.315Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
+2026-02-28T15:49:00.886Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
+2026-02-28T15:49:22.231Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 不改写 orgmode 的 refile 匹配算法，先提升输入 UI 能力（vim.ui.input + snacks input）来提供候选可见性。,success
+2026-02-28T16:15:18.886Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
+2026-02-28T16:15:50.369Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
+2026-02-28T16:16:10.062Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
+2026-02-28T16:16:10.089Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
+2026-02-28T16:16:35.849Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: `oxi` 路径采用“视图恢复 + 同文件不写盘”策略，跨文件场景仍保留 update 回退。,success
+2026-03-01T04:22:05.589Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
+2026-03-01T04:22:35.317Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
+2026-03-01T04:23:02.994Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
+2026-03-01T04:23:03.344Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
+2026-03-01T04:23:32.978Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在 org_punch 内统一采用“隐藏 buffer + 内存修改 + 不写盘”策略，彻底规避 orgmode `OrgFile:update` 的自动保存行为。,success
+2026-03-01T04:29:32.758Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
+2026-03-01T04:30:02.845Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
+2026-03-01T04:30:36.696Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 所有 clock 相关路径（punch/oxi/capture handoff）统一 memory-only；落盘只由用户显式保存。,success
+2026-03-01T04:45:21.509Z,legion_list_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-01T04:45:26.593Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-01T04:45:26.604Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-03-01T04:45:26.604Z,legion_read_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"section: all, includeReviews: true",success
+2026-03-01T04:49:21.643Z,legion_switch_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,taskId: nvim-orgmode-norang-implementation,success
+2026-03-01T05:01:39.085Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addTask: 用户批准设计（Design Approved）,success
+2026-03-01T05:01:59.118Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 设计阶段已通过 RFC 对抗审查（blocking=0），实现阶段需等待用户 Design Approved 后再进入。,success
+2026-03-01T05:02:02.136Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 用户批准设计（Design Approved）,success
+2026-03-01T05:02:10.616Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-03-01T06:17:27.209Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-01T06:17:32.968Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
+2026-03-01T06:17:54.639Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 用户批准设计（Design Approved）,success
+2026-03-01T06:18:03.460Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将用户“执行实现流程并修复不一致”指令视为 Design Approved，正式进入实现阶段。,success
+2026-03-01T06:18:15.193Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
+2026-03-01T06:18:21.575Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 生成并更新 walkthrough 报告与 PR body 建议,success
+2026-03-01T06:18:25.610Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T06:28:20.254Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 按 Scope 完成 Norang TODO 状态触发标签实现：新增 org_norang.todo_triggers，覆盖 WAITING/HOLD/CANCELLED 与 TODO/NEXT/DONE 的标签增删规则。,success
+2026-03-01T06:28:29.771Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 Norang 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
+2026-03-01T06:28:38.303Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
+2026-03-01T06:28:45.019Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
+2026-03-01T06:28:53.196Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 Norang 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
+2026-03-01T06:28:59.791Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
+2026-03-01T06:29:06.920Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
+2026-03-01T06:29:29.952Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addConstraint: Justification: 由于使用 legion MCP 写回 context/tasks，.legion/config.json 与 .legion/ledger.csv 被工具自动更新（审计元数据），非业务实现改动；业务代码与文档仅修改在本轮 Scope 列表内。,success
+2026-03-01T06:30:34.816Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T06:44:07.593Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-01T06:44:23.211Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/test-report.md,success
+2026-03-01T06:44:29.283Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-03-01T11:28:24.312Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T11:28:24.313Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T11:28:24.321Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
+2026-03-01T11:28:28.171Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 生成并更新 walkthrough 报告与 PR body 建议,success
+2026-03-01T11:28:34.466Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在 review 无 blocking/high 前提下直接进入报告阶段，不额外插入修复回合。,success

@@ -3,22 +3,17 @@
 ## 结论
 PASS-WITH-CHANGES
 
-> 基于有限信息的评审：本次按你给定范围复审当前工作区实现，已审查文件：
-> `lua/org_norang/init.lua`、`lua/org_norang/parser.lua`、`lua/org_norang/rules.lua`、`lua/org_norang/refresh.lua`、`lua/org_norang/cleanup.lua`、`lua/plugins/orgmode.lua`、`lua/org_punch.lua`、`docs/orgmode-norang-workflow.md`。
-
 ## Blocking Issues
 - [ ] (none)
 
 ## 建议（非阻塞）
-- `lua/org_norang/refresh.lua:43` - `is_agenda_file()` 每次调用都会重新 `expand_agenda_files()` 构建集合；在 `BufWritePost` 高频触发下会重复 glob，建议做缓存或增量失效，降低运行时开销。
-- `lua/org_norang/init.lua:10` - `refresh.debounce_ms` 已配置校验但未看到实际节流逻辑，字段语义与行为存在偏差；建议实现 debounce 或在文档明确“当前版本未启用”。
-- `lua/org_norang/init.lua:31` - `observability.log_level` 当前仅校验未参与日志过滤，建议统一通知出口按级别裁剪，保持配置一致性。
+- `lua/tests/smoke/orgmode_smoke.lua:143` - 测试通过直接调用 `trigger._state.listener(...)` 驱动逻辑，绕过了真实事件总线；建议补一条通过 `orgmode.events.dispatch(events.TodoChanged:new(...))` 的集成断言，避免“单元通过但集成断裂”漏检。
+- `lua/plugins/orgmode.lua:202` - `require("org_norang.todo_triggers").setup()` 的返回值未处理；当 `orgmode.events` 不可用时会静默失效，建议至少 `vim.notify` 一次 warning，便于定位配置/加载顺序问题。
+- `lua/org_norang/todo_triggers.lua:9` - 当前通过手工正则重写 headline 行来改标签，可维护性一般；orgmode 已提供 `headline:add_tag/remove_tag`，建议改为 API 级增删，降低对文本格式细节（尾随空格、标签对齐、边缘语法）的耦合。
+- `docs/orgmode-norang-workflow.md:42` - 文档已描述触发规则，但未注明“标签触发依赖 orgmode TodoChanged 事件”；建议补 1 行依赖说明和排障提示（如 setup 失败时行为退化）。
 
 ## 修复指导
-1. 已关闭的上版 blocking 结论
-   - agenda 边界：`BufWritePost` 回调已通过 `refresh.is_agenda_file(M._cfg, args.buf)` 做范围过滤（`lua/org_norang/init.lua:211`），`refresh_file` 也在入口拒绝非 agenda 文件（`lua/org_norang/refresh.lua:219`），该 blocking 已关闭。
-   - 配置类型校验：`validate_cfg` 已补全关键字段类型守卫，并在 `setup` 中用 `pcall(validate_cfg, ...)` 吸收异常统一落入 `E_CFG_INVALID/S5`（`lua/org_norang/init.lua:67`、`lua/org_norang/init.lua:248`），该 blocking 已关闭。
-2. 建议改进项的具体落地方式
-   - agenda 集合缓存：在 `refresh.lua` 维护 `cfg` 级 memo（如按 `org_agenda_files` hash 缓存 `agenda_file_set`），在 reload/setup 后失效重建。
-   - debounce：在 `BufWritePost` 回调层引入 `vim.defer_fn` + 按 buffer/path 去抖 map，读取并使用 `refresh.debounce_ms`。
-   - log_level：封装统一 `notify(cfg, msg, level)` 过滤函数（按 `error/warn/info/debug`），让 `rules.lua` 的 precise 降级提示也走同一出口。
+1. 补集成测试：在 `lua/tests/smoke/orgmode_smoke.lua` 新增一段“真实事件派发”路径，示例：`event_manager.dispatch(events.TodoChanged:new(headline, 'TODO', false))`，然后断言标签变化。
+2. 加 setup 失败可观测性：在 `lua/plugins/orgmode.lua` 对 `setup()` 返回 `(ok, err)` 做判断，`ok ~= true` 时用 `vim.notify(('todo_triggers disabled: %s'):format(err), vim.log.levels.WARN)`。
+3. 收敛标签写入实现：在 `lua/org_norang/todo_triggers.lua` 将 `apply_tag_delta` 改为 `remove_tag` + `add_tag` 组合，最后调用一次 `headline:align_tags()`；保留现有标签顺序需求时，可先读 `get_own_tags()` 后按顺序批量操作。
+4. 文档补依赖与排障：在 `docs/orgmode-norang-workflow.md` 的“TODO 状态触发标签”段追加“依赖 todo_triggers.setup 成功注册事件监听”的说明，并给出快速自检步骤（切换 TODO 状态后观察标签是否自动同步）。

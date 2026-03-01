@@ -39,6 +39,11 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
 来自 `lua/plugins/orgmode.lua`：
 
 - TODO 流程：`TODO -> NEXT/WAITING/HOLD -> DONE/CANCELLED`
+- TODO 状态触发标签（Norang）：
+  - 切到 `WAITING` 自动添加 `WAITING`
+  - 切到 `HOLD` 自动添加 `WAITING` 与 `HOLD`
+  - 切到 `CANCELLED` 自动添加 `CANCELLED` 并移除 `WAITING/HOLD`
+  - 切到 `TODO/NEXT/DONE` 自动移除 `WAITING/HOLD/CANCELLED`
 - Clock in 状态切换（Norang）：普通 `TODO` 任务在 clock in 后自动变 `NEXT`；若对 `NEXT` 项目节点 clock in 会回到 `TODO`
 - 完成日志：写入 `LOGBOOK`
 - Agenda 打开后自动移动到右侧
@@ -48,8 +53,11 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
   - `n` Note
   - `m` Meeting
   - `p` Phone call
+  - `w` Org protocol（Web 链接快速捕获）
+  - `h` Habit（`STYLE=habit` + `REPEAT_TO_STATE=NEXT`）
   - `j` Journal（写入 `diary.org` datetree）
   - Capture 期间会执行 clock handoff：打开模板时暂停当前 clock，完成/取消 capture 后恢复之前 clock
+- Clock/punch 状态切换默认只改内存 buffer，不自动写盘（由你手动保存）
 - 自定义 agenda：
   - `:Org agenda b`：Block agenda（保留 Refile/Today/Next/Waiting/Hold，并新增派生视图）
   - `:Org agenda n`：NEXT 列表
@@ -169,6 +177,7 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
 - `<Leader>or`：refile 到指定位置
 - `<Leader>ok`：kill（不保存关闭）
 - `g?`：显示 capture 帮助
+- refile 输入框已切换到 `vim.ui.input`（snacks input），可用 `<Tab>`/`<C-n>` 看补全候选
 
 ### 4.7 Closing Note 窗口
 

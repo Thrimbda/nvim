@@ -206,6 +206,8 @@ local function get_clocked_headline()
   return orgmode.clock.clocked_headline
 end
 
+local with_file_buffer
+
 local function get_active_clock_context()
   local headline = get_clocked_headline()
   if not headline then
@@ -225,7 +227,7 @@ local function get_active_clock_context()
   end
 
   return {
-    file = current.file,
+    path = normalize_path(current.file.filename),
     headline_line = current:get_range().start_line,
     clock_line = active.start_time.range.start_line,
   }
@@ -236,31 +238,29 @@ local function cleanup_zero_duration_clock(context)
     return
   end
 
-  context.file:update(function(file)
-    local headline = file:reload_sync():get_closest_headline({ context.headline_line, 0 })
-    if not headline then
-      return
-    end
-
+  local ok = with_file_buffer(context.path, function(bufnr)
     local line_nr = context.clock_line
     if not line_nr or line_nr < 1 then
       return
     end
 
-    local line = vim.fn.getline(line_nr)
-    if not line:match("=>%s*0:00%s*$") then
+    local line = vim.api.nvim_buf_get_lines(bufnr, line_nr - 1, line_nr, false)[1]
+    if not line or not line:match("=>%s*0:00%s*$") then
       return
     end
 
-    local buf = vim.api.nvim_get_current_buf()
-    vim.fn.deletebufline(buf, line_nr)
+    vim.api.nvim_buf_set_lines(bufnr, line_nr - 1, line_nr, false, {})
 
-    local prev_line = vim.fn.getline(line_nr - 1)
-    local next_line = vim.fn.getline(line_nr)
-    if prev_line:match("^%s*:LOGBOOK:%s*$") and next_line:match("^%s*:END:%s*$") then
-      vim.fn.deletebufline(buf, line_nr - 1, line_nr)
+    local prev_line = line_nr > 1 and vim.api.nvim_buf_get_lines(bufnr, line_nr - 2, line_nr - 1, false)[1] or nil
+    local next_line = vim.api.nvim_buf_get_lines(bufnr, line_nr - 1, line_nr, false)[1]
+    if prev_line and next_line and prev_line:match("^%s*:LOGBOOK:%s*$") and next_line:match("^%s*:END:%s*$") then
+      vim.api.nvim_buf_set_lines(bufnr, line_nr - 2, line_nr, false, {})
     end
-  end):wait(2000)
+  end)
+
+  if not ok then
+    vim.notify("org_punch: failed to cleanup 0:00 clock entry", vim.log.levels.WARN)
+  end
 end
 
 local function has_todo_descendant(headline, todo_keys)
@@ -299,26 +299,53 @@ local function apply_clock_in_state_transition()
   end
 
   local line = headline:get_range().start_line
-  headline.file
-    :update(function(file)
-      local current = file:reload_sync():get_closest_headline({ line, 0 })
-      if not current then
-        return
-      end
+  local file = headline.file:reload_sync()
+  local current = file:get_closest_headline({ line, 0 })
+  if not current then
+    return
+  end
 
-      local todo = current:get_todo()
-      if not todo then
-        return
-      end
+  local todo = current:get_todo()
+  if not todo then
+    return
+  end
 
-      local is_project, is_task = classify_headline(current)
-      if todo == "TODO" and is_task then
-        current:set_todo("NEXT")
-      elseif todo == "NEXT" and is_project then
-        current:set_todo("TODO")
-      end
-    end)
-    :wait(2000)
+  local is_project, is_task = classify_headline(current)
+  local next_todo = nil
+  if todo == "TODO" and is_task then
+    next_todo = "NEXT"
+  elseif todo == "NEXT" and is_project then
+    next_todo = "TODO"
+  end
+
+  if not next_todo then
+    return
+  end
+
+  local current_path = normalize_path(vim.api.nvim_buf_get_name(0))
+  local target_path = normalize_path(current.file.filename)
+  if current_path ~= "" and current_path == target_path then
+    local ok_set = pcall(current.set_todo, current, next_todo)
+    if ok_set then
+      return
+    end
+  end
+
+  local ok = with_file_buffer(target_path, function()
+    local org_ok, orgmode = pcall(require, "orgmode")
+    if not org_ok then
+      return
+    end
+    local update_file = orgmode.files:get(target_path):reload_sync()
+    local updated = update_file:get_closest_headline({ line, 0 })
+    if updated then
+      updated:set_todo(next_todo)
+    end
+  end)
+
+  if not ok then
+    vim.notify("org_punch: failed to update TODO state after clock in", vim.log.levels.WARN)
+  end
 end
 
 local function org_clock_in()
@@ -379,6 +406,56 @@ local function with_view_restored(fn)
   return true, result
 end
 
+with_file_buffer = function(path, fn)
+  local target_path = normalize_path(path)
+  local current_win = vim.api.nvim_get_current_win()
+  local current_buf = vim.api.nvim_get_current_buf()
+  local current_view = vim.fn.winsaveview()
+  local current_path = normalize_path(vim.api.nvim_buf_get_name(current_buf))
+
+  if current_path ~= "" and current_path == target_path then
+    return pcall(fn, current_buf)
+  end
+
+  local existing = vim.fn.bufnr(target_path)
+  local existed_before = existing > 0
+  local loaded_before = existed_before and vim.api.nvim_buf_is_loaded(existing)
+  local bufnr = existed_before and existing or vim.fn.bufadd(target_path)
+
+  pcall(vim.api.nvim_set_option_value, "modeline", false, { buf = bufnr })
+  pcall(vim.api.nvim_set_option_value, "swapfile", false, { buf = bufnr })
+  vim.fn.bufload(bufnr)
+
+  local hidden_win = vim.api.nvim_open_win(bufnr, true, {
+    relative = "editor",
+    width = 1,
+    height = 1,
+    row = 99999,
+    col = 99999,
+    zindex = 1,
+    style = "minimal",
+    focusable = false,
+    hide = true,
+  })
+
+  local ok, result = pcall(fn, bufnr)
+
+  pcall(vim.api.nvim_win_close, hidden_win, true)
+  if vim.api.nvim_win_is_valid(current_win) then
+    vim.api.nvim_set_current_win(current_win)
+    if vim.api.nvim_buf_is_valid(current_buf) and vim.api.nvim_get_current_buf() ~= current_buf then
+      pcall(vim.cmd, ("keepalt keepjumps buffer %d"):format(current_buf))
+    end
+    pcall(vim.fn.winrestview, current_view)
+  end
+
+  if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified and not loaded_before and not existed_before then
+    pcall(vim.cmd, ("silent! bwipe! %d"):format(bufnr))
+  end
+
+  return ok, result
+end
+
 local function clock_in_at_location(loc)
   local ok, orgmode = pcall(require, "orgmode")
   if not ok or not orgmode.clock or not orgmode.files then
@@ -391,33 +468,36 @@ local function clock_in_at_location(loc)
     clock:update_clocked_headline()
 
     if clock.clocked_headline and clock.clocked_headline:is_clocked_in() then
-      local prev_file = clock.clocked_headline.file
+      local prev_path = normalize_path(clock.clocked_headline.file.filename)
       local prev_line = clock.clocked_headline:get_range().start_line
-      prev_file
-        :update(function(file)
-          local previous = file:reload_sync():get_closest_headline({ prev_line, 0 })
-          if previous and previous:is_clocked_in() then
-            previous:clock_out()
-          end
-        end)
-        :wait(2000)
+
+      local ok_prev = with_file_buffer(prev_path, function()
+        local prev_file = orgmode.files:get(prev_path):reload_sync()
+        local previous = prev_file:get_closest_headline({ prev_line, 0 })
+        if previous and previous:is_clocked_in() then
+          previous:clock_out()
+        end
+      end)
+      if not ok_prev then
+        error("failed to clock out previous active task")
+      end
     end
 
-    local target_file = orgmode.files:get(loc.file)
-    local new_headline = nil
-    target_file
-      :update(function(file)
-        local target = file:reload_sync():get_closest_headline({ loc.line, 0 })
-        if not target then
-          error("default task headline not found")
-        end
+    local target_path = normalize_path(loc.file)
+    local ok_target = with_file_buffer(target_path, function()
+      local target_file = orgmode.files:get(target_path):reload_sync()
+      local target = target_file:get_closest_headline({ loc.line, 0 })
+      if not target then
+        error("default task headline not found")
+      end
 
-        target:clock_in()
-        new_headline = target
-      end)
-      :wait(2000)
+      target:clock_in()
+    end)
+    if not ok_target then
+      error("failed to clock in default task")
+    end
 
-    clock.clocked_headline = new_headline
+    clock:update_clocked_headline()
   end)
 
   if not ok_run then
@@ -505,7 +585,11 @@ end
 
 function M.clock_in_current_task()
   maybe_warn_norang_todo_mismatch()
-  return org_clock_in()
+  local ok, result = with_view_restored(function()
+    return org_clock_in()
+  end)
+
+  return ok and result == true
 end
 
 function M.clock_out_current_task(opts)

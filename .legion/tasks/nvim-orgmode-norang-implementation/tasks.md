@@ -2,9 +2,9 @@
 
 ## 快速恢复
 
-**当前阶段**: (unknown)
+**当前阶段**: 阶段 3 - 阶段 3: 报告 ✅ COMPLETE
 **当前任务**: (none)
-**进度**: 6/6 任务完成
+**进度**: 10/10 任务完成
 
 ---
 
@@ -23,9 +23,12 @@
 
 ---
 
-## 阶段 3: 阶段 3: 报告 🟡 IN PROGRESS
+## 阶段 3: 阶段 3: 报告 ✅ COMPLETE
 
+- [x] RFC 生成完成（对齐审计 RFC） | 验收: 生成 docs/rfc.md，包含 A/B/C 基线、差异矩阵、最小实现计划与 Design Gate Checklist
 - [x] 生成 walkthrough 报告与变更说明 | 验收: 生成 docs/report-walkthrough.md，包含下一步与风险备注
+- [x] RFC 二次审查完成（复核上轮 blocking 关闭状态） | 验收: 生成 docs/rfc-review.md，结论 PASS 且明确 `blocking=0`
+- [x] 用户批准设计（Design Approved） | 验收: 用户明确确认 RFC 方案后，方可进入 /legion-impl
 
 ---
 
@@ -63,9 +66,20 @@
 - [x] 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK | 来源: 用户反馈 diary 末尾 1 分钟被记为 0 + 0:00 条目残留
 - [x] 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义 | 来源: 用户反馈 todo.org 残留 0:00 条目
 - [x] 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支 | 来源: 用户反馈 punch in 状态 clock out 未回 default task
+- [x] 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled | 来源: 用户反馈 refile 无 fuzzy 候选列表
+- [x] 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘 | 来源: 用户反馈 2026-03-01
+- [x] 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态 | 来源: 回归防护 2026-03-01
+- [x] 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路） | 来源: 用户要求 clock 修改由手动保存
+- [x] 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件） | 来源: 无自动写盘改造后的测试回归
+- [x] 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改 | 来源: 用户强调所有 clock 修改需手动保存
+- [x] 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档 | 来源: 用户新增实现指令 2026-03-01
+- [x] 重新执行 review-code 与 review-security，若有 blocking 则先修复 | 来源: 用户新增实现指令 2026-03-01
+- [x] 生成并更新 walkthrough 报告与 PR body 建议 | 来源: 用户新增实现指令 2026-03-01
+- [x] 按 Norang 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置 | 来源: 用户实现指令 2026-03-01
+- [x] 补齐 capture 模板 w/h 并更新工作流文档模板清单 | 来源: 用户实现指令 2026-03-01
+- [x] 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表 | 来源: 用户实现指令 2026-03-01
 
 
 ---
 
-*最后更新: 2026-02-27 21:46*
-6-02-26 23:09*
+*最后更新: 2026-03-01 19:45*
