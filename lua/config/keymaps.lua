@@ -24,34 +24,30 @@ end, { desc = "Opencode Toggle" })
 -- Terminal Switching Logic
 local function toggle_terminal(pos)
   local snacks = require("snacks")
-  local term = snacks.terminal.get()
+  local term = snacks.terminal.get(nil, { create = false })
+  local width = (pos == "right") and 0.4 or nil
+  local height = (pos == "bottom") and 0.4 or nil
 
-  if term and term:valid() then
-    if term.opts.position == pos then
+  if term then
+    if term:valid() and term.opts.position == pos then
       term:hide()
-    else
-      term:hide()
-      term.opts.position = pos
-      term.opts.width = (pos == "right") and 0.4 or nil
-      term.opts.height = (pos == "bottom") and 0.4 or nil
-      term:show()
+      return
     end
-  else
-    if term then
-      term.opts.position = pos
-      term.opts.width = (pos == "right") and 0.4 or nil
-      term.opts.height = (pos == "bottom") and 0.4 or nil
-      term:show()
-    else
-      snacks.terminal.toggle(nil, {
-        win = {
-          position = pos,
-          width = (pos == "right") and 0.4 or nil,
-          height = (pos == "bottom") and 0.4 or nil,
-        },
-      })
-    end
+
+    term.opts.position = pos
+    term.opts.width = width
+    term.opts.height = height
+    term:show()
+    return
   end
+
+  snacks.terminal.toggle(nil, {
+    win = {
+      position = pos,
+      width = width,
+      height = height,
+    },
+  })
 end
 
 vim.keymap.set("n", "<leader>tj", function()
