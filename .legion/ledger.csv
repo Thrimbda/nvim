@@ -256,3 +256,37 @@
 2026-03-04T08:30:16.022Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
 2026-03-04T08:31:50.189Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 NP-006A 断言收紧为“存在父任务时必须回父任务”，并修复 org_punch 逻辑以满足该约束。,success
 2026-03-04T08:32:14.612Z,legion_update_plan,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T13:32:10.668Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T13:32:34.021Z,legion_list_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T13:33:20.060Z,legion_create_task,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,goal: 将现有 Norang workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。,failed
+2026-03-04T13:33:29.311Z,legion_propose_task,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,name: norang-workflow-ai-skill,success
+2026-03-04T13:33:33.549Z,legion_approve_proposal,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,proposalId: proposal-mmc2uqu3-3e0ebb,success
+2026-03-04T13:33:36.875Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
+2026-03-04T13:34:25.919Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 生成 task-brief，明确目标、验收、假设、风险与验证,success
+2026-03-04T13:34:29.985Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 完成风险/规模标签决策（Low/Medium/High + Epic）,success
+2026-03-04T13:34:32.547Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 根据风险等级产出 design-lite 或 RFC,success
+2026-03-04T13:34:35.211Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 在项目根目录创建 Norang workflow Skill,success
+2026-03-04T13:34:43.343Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 恢复 .legion active task 并读取 plan/context/tasks/task-brief 上下文,success
+2026-03-04T13:34:45.908Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/task-brief.md,success
+2026-03-04T13:34:49.818Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/design-lite.md,success
+2026-03-04T13:34:52.561Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 本任务按 Low 风险执行，采用 design-lite，不进入 RFC/review-rfc 流程。,success
+2026-03-04T13:34:56.022Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 受权限策略限制无法直接加载 skill-creator，改为按仓库规范手工创建 `skills/norang-workflow/SKILL.md`。,success
+2026-03-04T13:36:38.698Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 在项目根目录创建 Norang workflow Skill,success
+2026-03-04T13:36:40.747Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 执行测试与结果归档,success
+2026-03-04T13:36:46.511Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 通过 engineer 在项目根目录落地 `skills/norang-workflow/SKILL.md`,success
+2026-03-04T13:36:49.855Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/SKILL.md,success
+2026-03-04T13:36:55.329Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/references/quick-checklist.md,success
+2026-03-04T13:45:14.612Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 执行测试与结果归档,success
+2026-03-04T13:45:17.553Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 执行代码评审（必要时安全评审）,success
+2026-03-04T13:45:20.710Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 生成 walkthrough 与 PR body,success
+2026-03-04T13:45:24.214Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 执行 run-tests 并生成 docs/test-report.md（PASS）,success
+2026-03-04T13:45:26.466Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/test-report.md,success
+2026-03-04T13:45:29.843Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/review-code.md,success
+2026-03-04T13:45:32.809Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 本任务不执行 review-security。,success
+2026-03-04T13:47:01.636Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/playbook.md,success
+2026-03-04T13:47:05.736Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 生成 walkthrough 与 PR body,success
+2026-03-04T13:47:14.064Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 生成 docs/report-walkthrough.md 与 docs/pr-body.md，可直接用于提交流程,success
+2026-03-04T13:47:16.794Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
+2026-03-04T13:51:29.102Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 根据用户要求将 `skills/norang-workflow/SKILL.md` 改写为中文版本，并保留原有执行边界与安全门禁语义,success
+2026-03-04T13:51:32.641Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/SKILL.md,success
+2026-03-04T13:51:32.643Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/references/quick-checklist.md,success

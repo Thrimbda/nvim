@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "currentTask": "orgmode-norang-e2e-parity-suite",
+  "currentTask": "norang-workflow-ai-skill",
   "settings": {
     "autoRemind": true,
     "remindBeforeReset": true,
@@ -31,9 +31,16 @@
     {
       "id": "orgmode-norang-e2e-parity-suite",
       "name": "orgmode-norang-e2e-parity-suite",
-      "status": "active",
+      "status": "paused",
       "createdAt": "2026-03-04T07:11:55.542Z",
-      "updatedAt": "2026-03-04T08:32:14.612Z"
+      "updatedAt": "2026-03-04T13:33:33.546Z"
+    },
+    {
+      "id": "norang-workflow-ai-skill",
+      "name": "norang-workflow-ai-skill",
+      "status": "active",
+      "createdAt": "2026-03-04T13:33:33.546Z",
+      "updatedAt": "2026-03-04T13:51:32.642Z"
     }
   ],
   "pendingProposals": [
@@ -321,6 +328,84 @@
       "decidedAt": "2026-03-04T07:11:55.542Z",
       "decidedBy": "Claude",
       "createdTaskId": "orgmode-norang-e2e-parity-suite"
+    },
+    {
+      "id": "proposal-mmc2uqu3-3e0ebb",
+      "name": "norang-workflow-ai-skill",
+      "goal": "将现有 Norang workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。",
+      "rationale": "当前仓库已有 Norang 工作流文档，但缺少面向 AI agent 的标准化执行说明与可复用 skill 入口。将其产品化为根目录 skill 能降低后续任务中的重复解释成本，并支持最少人工打断的端到端交付流程。",
+      "points": [
+        "复用 docs/orgmode-norang-workflow.md 的既有规则作为事实来源",
+        "输出 AI 可执行流程（前置检查、日常操作、异常处理、回滚）",
+        "将 Skill 落地到项目根目录以便版本化协作",
+        "补齐 test/review/report/pr-body 交付链路"
+      ],
+      "scope": [
+        "skills/norang-workflow/**",
+        ".legion/tasks/norang-workflow-ai-skill/**",
+        "docs/orgmode-norang-workflow.md"
+      ],
+      "phases": [
+        {
+          "name": "阶段 0: 任务澄清与风险分级",
+          "tasks": [
+            {
+              "description": "生成 task-brief，明确目标、验收、假设、风险与验证",
+              "acceptance": "docs/task-brief.md 存在且包含风险分级与验证计划"
+            },
+            {
+              "description": "完成风险/规模标签决策（Low/Medium/High + Epic）",
+              "acceptance": "task-brief 写明风险等级与标签"
+            }
+          ]
+        },
+        {
+          "name": "阶段 1: 设计",
+          "tasks": [
+            {
+              "description": "根据风险等级产出 design-lite 或 RFC",
+              "acceptance": "docs/design-lite.md 或 docs/rfc.md 生成并可执行"
+            }
+          ]
+        },
+        {
+          "name": "阶段 2: 实现",
+          "tasks": [
+            {
+              "description": "在项目根目录创建 Norang workflow Skill",
+              "acceptance": "skills/norang-workflow/SKILL.md 存在且内容可指导 AI 执行"
+            }
+          ]
+        },
+        {
+          "name": "阶段 3: 验证与评审",
+          "tasks": [
+            {
+              "description": "执行测试与结果归档",
+              "acceptance": "docs/test-report.md 生成"
+            },
+            {
+              "description": "执行代码评审（必要时安全评审）",
+              "acceptance": "docs/review-code.md 生成；若触发条件满足则有 docs/review-security.md"
+            }
+          ]
+        },
+        {
+          "name": "阶段 4: 报告",
+          "tasks": [
+            {
+              "description": "生成 walkthrough 与 PR body",
+              "acceptance": "docs/report-walkthrough.md 与 docs/pr-body.md 生成"
+            }
+          ]
+        }
+      ],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-03-04T13:33:29.308Z",
+      "status": "approved",
+      "decidedAt": "2026-03-04T13:33:33.546Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "norang-workflow-ai-skill"
     }
   ]
 }
