@@ -11,6 +11,45 @@ local function assert_true(value, message)
   end
 end
 
+local function encode_json(payload)
+  local ok_json, encoded = pcall(vim.json.encode, payload)
+  if ok_json and type(encoded) == "string" then
+    return encoded
+  end
+
+  local ok_fn, fallback = pcall(vim.fn.json_encode, payload)
+  if ok_fn and type(fallback) == "string" then
+    return fallback
+  end
+
+  return "{}"
+end
+
+local function build_parity_failure_message(assertion)
+  local payload = {
+    v = 1,
+    id = tostring(assertion.id or "NP-UNKNOWN"),
+    phase = tostring(assertion.phase or "unknown"),
+    case = tostring(assertion.case_name or "unknown"),
+    expected = tostring(assertion.expected or "(unspecified)"),
+    actual = tostring(assertion.actual or "(nil)"),
+  }
+
+  if assertion.context ~= nil then
+    payload.context = assertion.context
+  end
+
+  return "PARITY_FAIL " .. encode_json(payload)
+end
+
+local function assert_parity(condition, assertion)
+  if condition then
+    return
+  end
+
+  error(build_parity_failure_message(assertion), 0)
+end
+
 local function write_temp_org(lines)
   local path = vim.fn.tempname() .. ".org"
   local ok, err = pcall(vim.fn.writefile, lines, path)
@@ -153,6 +192,50 @@ local function has_tag_in_list(tags, tag)
     end
   end
   return false
+end
+
+local function get_active_clock_title()
+  local orgmode = require("orgmode")
+  orgmode.clock:update_clocked_headline()
+  if not orgmode.clock.clocked_headline then
+    return nil
+  end
+  return orgmode.clock.clocked_headline:get_title()
+end
+
+local function find_line_number(path, pattern)
+  local lines = read_buffer_lines_for_file(path)
+  for idx, line in ipairs(lines) do
+    if line:match(pattern) then
+      return idx
+    end
+  end
+  return nil
+end
+
+local function get_subtree_lines(path, heading_line)
+  local lines = read_buffer_lines_for_file(path)
+  local heading = lines[heading_line] or ""
+  local stars = heading:match("^(%*+)")
+  if not stars then
+    return {}
+  end
+
+  local level = #stars
+  local last = #lines
+  for idx = heading_line + 1, #lines do
+    local cand = (lines[idx] or ""):match("^(%*+)")
+    if cand and #cand <= level then
+      last = idx - 1
+      break
+    end
+  end
+
+  local out = {}
+  for idx = heading_line, last do
+    table.insert(out, lines[idx])
+  end
+  return out
 end
 
 local function test_punch_in_requires_id()
@@ -331,6 +414,83 @@ local function test_clock_out_in_punch_mode_returns_to_default()
   assert_true(orgmode.clock.clocked_headline:get_title() == "Organization", "clock should return to default task")
 
   punch.punch_out()
+end
+
+local function test_clock_out_in_punch_mode_returns_to_parent()
+  local case_name = "clock_out_in_punch_mode_returns_to_parent"
+  local default_path = write_temp_org({
+    "* Tasks",
+    "** TODO Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local task_path = write_temp_org({
+    "* TODO Parent project",
+    "** TODO Child task",
+  })
+
+  setup_orgmode({ task_path, default_path })
+  local punch = setup_punch({ task_path, default_path }, DEFAULT_TASK_ID)
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(task_path))
+  assert_parity(punch.punch_in() == true, {
+    id = "NP-002",
+    phase = "punch",
+    case_name = case_name,
+    expected = "punch_in succeeds",
+    actual = "punch_in failed",
+  })
+
+  assert_parity(punch.clock_out_current_task({ ignore_keep_running = true, silent = true }) == true, {
+    id = "NP-015",
+    phase = "clock",
+    case_name = case_name,
+    expected = "able to clear active default clock before focused clock in",
+    actual = "clock_out_current_task(ignore_keep_running=true) failed",
+  })
+
+  vim.api.nvim_win_set_cursor(0, { 2, 0 })
+  assert_parity(punch.clock_in_current_task() == true, {
+    id = "NP-003",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_in_current_task succeeds",
+    actual = "clock_in_current_task failed",
+  })
+  assert_parity(get_active_clock_title() == "Child task", {
+    id = "NP-015",
+    phase = "clock",
+    case_name = case_name,
+    expected = "active clock title=Child task before clock_out fallback",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  assert_parity(punch.clock_out_current_task() == true, {
+    id = "NP-006A",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_out_current_task succeeds in punch mode",
+    actual = "clock_out_current_task failed",
+  })
+
+  local parent_fallback_title = get_active_clock_title()
+  assert_parity(parent_fallback_title == "Parent project", {
+    id = "NP-006A",
+    phase = "clock",
+    case_name = case_name,
+    expected = "active clock title=Parent project",
+    actual = "active clock title=" .. tostring(parent_fallback_title),
+  })
+
+  assert_parity(punch.punch_out() == true, {
+    id = "NP-005",
+    phase = "teardown",
+    case_name = case_name,
+    expected = "punch_out succeeds",
+    actual = "punch_out failed",
+  })
+
 end
 
 local function test_clock_in_preserves_view_state()
@@ -538,6 +698,401 @@ local function test_todo_state_tag_triggers_norang()
   assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "TODO should remove CANCELLED tag")
 end
 
+local function test_norang_e2e_integrated_flow()
+  local case_name = "norang_e2e_integrated_flow"
+  local default_path = write_temp_org({
+    "* Tasks",
+    "** TODO Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local workflow_path = write_temp_org({
+    "* TODO Parent project",
+    "** TODO Focus task",
+    "* TODO Solo focus",
+    "* TODO Capture candidate",
+    "* TODO Trigger task :WAITING:HOLD:CANCELLED:",
+    "* TODO Dist Systems",
+    "** DONE Read paper",
+    "* TODO Cleanup target :PROJECT:STUCK:ARCHIVE_CANDIDATE:USER_TAG:",
+  })
+
+  setup_orgmode({ workflow_path, default_path })
+  local punch = setup_punch({ workflow_path, default_path }, DEFAULT_TASK_ID)
+  local norang = setup_norang({ workflow_path })
+  setup_todo_triggers()
+
+  local orgmode = require("orgmode")
+  local capture = require("org_capture_norang")
+  capture.setup()
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(workflow_path))
+
+  assert_parity(punch.punch_in() == true, {
+    id = "NP-002",
+    phase = "punch",
+    case_name = case_name,
+    expected = "punch_in succeeds",
+    actual = "punch_in failed",
+  })
+  assert_parity(punch.state.keep_clock_running == true, {
+    id = "NP-002",
+    phase = "punch",
+    case_name = case_name,
+    expected = "keep_clock_running=true",
+    actual = "keep_clock_running=" .. tostring(punch.state.keep_clock_running),
+  })
+  assert_parity(get_active_clock_title() == "Organization", {
+    id = "NP-002",
+    phase = "punch",
+    case_name = case_name,
+    expected = "active clock title=Organization",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  assert_parity(punch.clock_out_current_task({ ignore_keep_running = true, silent = true }) == true, {
+    id = "NP-015",
+    phase = "clock",
+    case_name = case_name,
+    expected = "able to clear active default clock before focused clock in",
+    actual = "clock_out_current_task(ignore_keep_running=true) failed",
+  })
+
+  local focus_line = find_line_number(workflow_path, "^%*%*%s+TODO%s+Focus task")
+  assert_parity(type(focus_line) == "number", {
+    id = "NP-003",
+    phase = "setup",
+    case_name = case_name,
+    expected = "Focus task headline exists",
+    actual = "Focus task headline missing",
+  })
+  vim.api.nvim_win_set_cursor(0, { focus_line, 0 })
+  assert_parity(punch.clock_in_current_task() == true, {
+    id = "NP-003",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_in_current_task succeeds on Focus task",
+    actual = "clock_in_current_task failed on Focus task",
+  })
+  assert_parity(vim.fn.getline(focus_line):match("^%*%*%s+NEXT%s+Focus task") ~= nil, {
+    id = "NP-003",
+    phase = "clock",
+    case_name = case_name,
+    expected = "Focus task TODO switches to NEXT",
+    actual = "line=" .. vim.fn.getline(focus_line),
+  })
+  assert_parity(get_active_clock_title() == "Focus task", {
+    id = "NP-015",
+    phase = "clock",
+    case_name = case_name,
+    expected = "active clock title=Focus task",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  assert_parity(punch.clock_out_current_task() == true, {
+    id = "NP-006A",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_out_current_task succeeds with TODO parent",
+    actual = "clock_out_current_task failed",
+  })
+  local integrated_parent_fallback_title = get_active_clock_title()
+  assert_parity(integrated_parent_fallback_title == "Parent project", {
+    id = "NP-006A",
+    phase = "clock",
+    case_name = case_name,
+    expected = "active clock title=Parent project",
+    actual = "active clock title=" .. tostring(integrated_parent_fallback_title),
+  })
+
+  assert_parity(punch.clock_out_current_task({ ignore_keep_running = true, silent = true }) == true, {
+    id = "NP-015",
+    phase = "clock",
+    case_name = case_name,
+    expected = "able to clear parent clock before default-fallback branch",
+    actual = "clock_out_current_task(ignore_keep_running=true) failed",
+  })
+
+  local solo_line = find_line_number(workflow_path, "^%*%s+TODO%s+Solo focus")
+  assert_parity(type(solo_line) == "number", {
+    id = "NP-006B",
+    phase = "setup",
+    case_name = case_name,
+    expected = "Solo focus headline exists",
+    actual = "Solo focus headline missing",
+  })
+  vim.api.nvim_win_set_cursor(0, { solo_line, 0 })
+  assert_parity(punch.clock_in_current_task() == true, {
+    id = "NP-003",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_in_current_task succeeds on Solo focus",
+    actual = "clock_in_current_task failed on Solo focus",
+  })
+  assert_parity(vim.fn.getline(solo_line):match("^%*%s+NEXT%s+Solo focus") ~= nil, {
+    id = "NP-003",
+    phase = "clock",
+    case_name = case_name,
+    expected = "Solo focus TODO switches to NEXT",
+    actual = "line=" .. vim.fn.getline(solo_line),
+  })
+  assert_parity(punch.clock_out_current_task() == true, {
+    id = "NP-006B",
+    phase = "clock",
+    case_name = case_name,
+    expected = "clock_out_current_task succeeds with no TODO parent",
+    actual = "clock_out_current_task failed",
+  })
+  assert_parity(get_active_clock_title() == "Organization", {
+    id = "NP-006B",
+    phase = "clock",
+    case_name = case_name,
+    expected = "active clock title=Organization",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  local capture_line = find_line_number(workflow_path, "^%*%s+TODO%s+Capture candidate")
+  assert_parity(type(capture_line) == "number", {
+    id = "NP-008",
+    phase = "setup",
+    case_name = case_name,
+    expected = "Capture candidate headline exists",
+    actual = "Capture candidate headline missing",
+  })
+  vim.api.nvim_win_set_cursor(0, { capture_line, 0 })
+  assert_parity(punch.clock_out_current_task({ ignore_keep_running = true, silent = true }) == true, {
+    id = "NP-015",
+    phase = "capture",
+    case_name = case_name,
+    expected = "able to clear active clock before capture handoff",
+    actual = "clock_out_current_task(ignore_keep_running=true) failed",
+  })
+  orgmode.clock:org_clock_in():wait(2000)
+  assert_parity(get_active_clock_title() == "Capture candidate", {
+    id = "NP-015",
+    phase = "capture",
+    case_name = case_name,
+    expected = "active clock title=Capture candidate before handoff",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  local source_file = orgmode.files:get_current_file()
+  local source_headline = source_file:get_closest_headline({ capture_line, 0 })
+  assert_parity(source_headline ~= nil, {
+    id = "NP-008",
+    phase = "setup",
+    case_name = case_name,
+    expected = "source headline resolves for capture",
+    actual = "source headline=nil",
+  })
+  local source_line = source_headline:get_range().start_line
+  assert_parity(type(source_line) == "number", {
+    id = "NP-008",
+    phase = "setup",
+    case_name = case_name,
+    expected = "source headline has valid start line",
+    actual = "source line=" .. tostring(source_line),
+  })
+
+  capture.begin_capture_clock_handoff()
+  assert_parity(get_active_clock_title() == nil, {
+    id = "NP-007",
+    phase = "capture",
+    case_name = case_name,
+    expected = "active clock pauses during capture",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  capture._state.capture_started_at = os.time() - 61
+  orgmode.capture.on_pre_refile(orgmode.capture, {
+    source_file = source_file,
+    source_headline = source_headline,
+    template = { whole_file = false },
+  })
+
+  local capture_lines = get_subtree_lines(workflow_path, source_line)
+  local has_logbook = false
+  local has_non_zero_clock = false
+  for _, line in ipairs(capture_lines) do
+    if line:match("^%s*:LOGBOOK:%s*$") then
+      has_logbook = true
+    end
+    if line:match("^%s*CLOCK:%s*%[") and line:match("=>%s*%d+:%d%d%s*$") and not line:match("=>%s*0:00%s*$") then
+      has_non_zero_clock = true
+    end
+  end
+  assert_parity(has_logbook, {
+    id = "NP-008",
+    phase = "capture",
+    case_name = case_name,
+    expected = "capture pre-refile injects LOGBOOK",
+    actual = "LOGBOOK not found",
+  })
+  assert_parity(has_non_zero_clock, {
+    id = "NP-008",
+    phase = "capture",
+    case_name = case_name,
+    expected = "capture pre-refile injects non-zero CLOCK",
+    actual = "non-zero CLOCK not found",
+  })
+
+  capture.finish_capture_clock_handoff()
+  assert_parity(get_active_clock_title() == "Capture candidate", {
+    id = "NP-007",
+    phase = "capture",
+    case_name = case_name,
+    expected = "previous clock resumes after capture",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+
+  local trigger_line = find_line_number(workflow_path, "^%*%s+TODO%s+Trigger task")
+  assert_parity(type(trigger_line) == "number", {
+    id = "NP-009",
+    phase = "setup",
+    case_name = case_name,
+    expected = "Trigger task headline exists",
+    actual = "Trigger task headline missing",
+  })
+  vim.api.nvim_win_set_cursor(0, { trigger_line, 0 })
+
+  local trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("WAITING")
+  apply_todo_trigger_now()
+  local state = get_current_headline_state(trigger_line)
+  assert_parity(has_tag_in_list(state.tags, "WAITING"), {
+    id = "NP-009",
+    phase = "tags",
+    case_name = case_name,
+    expected = "WAITING state adds WAITING tag",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("HOLD")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(trigger_line)
+  assert_parity(has_tag_in_list(state.tags, "WAITING") and has_tag_in_list(state.tags, "HOLD"), {
+    id = "NP-009",
+    phase = "tags",
+    case_name = case_name,
+    expected = "HOLD adds WAITING and HOLD tags",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("CANCELLED")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(trigger_line)
+  assert_parity(has_tag_in_list(state.tags, "CANCELLED") and not has_tag_in_list(state.tags, "WAITING") and not has_tag_in_list(state.tags, "HOLD"), {
+    id = "NP-009",
+    phase = "tags",
+    case_name = case_name,
+    expected = "CANCELLED keeps only CANCELLED from trigger set",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("NEXT")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(trigger_line)
+  assert_parity(not has_tag_in_list(state.tags, "WAITING") and not has_tag_in_list(state.tags, "HOLD") and not has_tag_in_list(state.tags, "CANCELLED"), {
+    id = "NP-010",
+    phase = "tags",
+    case_name = case_name,
+    expected = "NEXT clears WAITING/HOLD/CANCELLED",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("DONE")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(trigger_line)
+  assert_parity(not has_tag_in_list(state.tags, "WAITING") and not has_tag_in_list(state.tags, "HOLD") and not has_tag_in_list(state.tags, "CANCELLED"), {
+    id = "NP-010",
+    phase = "tags",
+    case_name = case_name,
+    expected = "DONE clears WAITING/HOLD/CANCELLED",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  trigger_headline = orgmode.files:get_closest_headline()
+  trigger_headline:set_todo("TODO")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(trigger_line)
+  assert_parity(not has_tag_in_list(state.tags, "WAITING") and not has_tag_in_list(state.tags, "HOLD") and not has_tag_in_list(state.tags, "CANCELLED"), {
+    id = "NP-010",
+    phase = "tags",
+    case_name = case_name,
+    expected = "TODO clears WAITING/HOLD/CANCELLED",
+    actual = "tags=" .. table.concat(state.tags or {}, ","),
+  })
+
+  local refresh_result = norang.refresh_file(workflow_path)
+  assert_parity(refresh_result.ok == true, {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "norang refresh_file succeeds",
+    actual = "refresh ok=" .. tostring(refresh_result.ok),
+  })
+  local dist_line = find_line_number(workflow_path, "^%*%s+TODO%s+Dist Systems")
+  assert_parity(type(dist_line) == "number", {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "Dist Systems headline exists",
+    actual = "Dist Systems headline missing",
+  })
+  assert_parity((read_line(workflow_path, dist_line) or ""):match(":PROJECT:STUCK:") ~= nil, {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "Dist Systems marked with PROJECT:STUCK",
+    actual = "line=" .. tostring(read_line(workflow_path, dist_line)),
+  })
+
+  local cleanup_result = norang.cleanup_derived_tags({ apply = true })
+  assert_parity(cleanup_result.changed_files >= 1, {
+    id = "NP-012",
+    phase = "cleanup",
+    case_name = case_name,
+    expected = "cleanup apply changes at least one file",
+    actual = "changed_files=" .. tostring(cleanup_result.changed_files),
+  })
+  local cleanup_line_nr = find_line_number(workflow_path, "^%*%s+TODO%s+Cleanup target")
+  local cleanup_line = cleanup_line_nr and read_line(workflow_path, cleanup_line_nr) or ""
+  assert_parity(cleanup_line:match("PROJECT") == nil and cleanup_line:match("STUCK") == nil and cleanup_line:match("ARCHIVE_CANDIDATE") == nil, {
+    id = "NP-012",
+    phase = "cleanup",
+    case_name = case_name,
+    expected = "cleanup removes PROJECT/STUCK/ARCHIVE_CANDIDATE",
+    actual = "line=" .. cleanup_line,
+  })
+  assert_parity(cleanup_line:match("USER_TAG") ~= nil, {
+    id = "NP-012",
+    phase = "cleanup",
+    case_name = case_name,
+    expected = "cleanup preserves user tags",
+    actual = "line=" .. cleanup_line,
+  })
+
+  assert_parity(punch.punch_out() == true, {
+    id = "NP-015",
+    phase = "teardown",
+    case_name = case_name,
+    expected = "punch_out succeeds",
+    actual = "punch_out failed",
+  })
+  assert_parity(get_active_clock_title() == nil, {
+    id = "NP-015",
+    phase = "teardown",
+    case_name = case_name,
+    expected = "no active clock after punch_out",
+    actual = "active clock title=" .. tostring(get_active_clock_title()),
+  })
+end
+
 local CASES = {
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
@@ -547,12 +1102,14 @@ local CASES = {
   clock_in_next_project_switches_to_todo = test_clock_in_next_project_switches_to_todo,
   clock_in_preserves_view_state = test_clock_in_preserves_view_state,
   clock_out_removes_zero_duration_clock = test_clock_out_removes_zero_duration_clock,
+  clock_out_in_punch_mode_returns_to_parent = test_clock_out_in_punch_mode_returns_to_parent,
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
   norang_refresh_marks_stuck_project = test_norang_refresh_marks_stuck_project,
   norang_cleanup_apply_removes_derived_tags = test_norang_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
   todo_state_tag_triggers_norang = test_todo_state_tag_triggers_norang,
+  norang_e2e_integrated_flow = test_norang_e2e_integrated_flow,
 }
 
 function M.run(case_name)

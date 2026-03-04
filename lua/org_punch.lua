@@ -2,7 +2,7 @@ local M = {}
 
 M.cfg = {
   org_agenda_files = { "~/OneDrive/cone/**/*.org" },
-  organization_task_id = "3CA66213-50ED-48B9-8E24-310B0959DA75",
+  organization_task_id = "",
   project_todo_keywords = { "TODO", "NEXT", "WAITING", "HOLD" },
 }
 
@@ -549,6 +549,57 @@ local function find_parent_project_line_in_current_buffer()
   return nil
 end
 
+local function find_parent_project_location_for_active_clock()
+  local active = get_clocked_headline()
+  if not active then
+    return nil
+  end
+
+  local target_path = normalize_path(active.file.filename)
+  local target_line = active:get_range().start_line
+  local keywords = {}
+  for _, kw in ipairs(M.cfg.project_todo_keywords or {}) do
+    keywords[kw] = true
+  end
+
+  if vim.tbl_isempty(keywords) then
+    return nil
+  end
+
+  local ok_loc, loc = with_file_buffer(target_path, function()
+    local org_ok, orgmode = pcall(require, "orgmode")
+    if not org_ok or not orgmode.files then
+      return nil
+    end
+
+    local file = orgmode.files:get(target_path):reload_sync()
+    local current = file:get_closest_headline({ target_line, 0 })
+    if not current then
+      return nil
+    end
+
+    local parent = current:get_parent_headline()
+    while parent do
+      local todo = parent:get_todo()
+      if todo and keywords[todo] then
+        return {
+          file = target_path,
+          line = parent:get_range().start_line,
+        }
+      end
+      parent = parent:get_parent_headline()
+    end
+
+    return nil
+  end)
+
+  if not ok_loc then
+    return nil
+  end
+
+  return loc
+end
+
 function M.setup(opts)
   M.cfg = vim.tbl_deep_extend("force", M.cfg, opts or {})
   maybe_warn_norang_todo_mismatch()
@@ -628,15 +679,26 @@ function M.clock_out_keep_running()
     end
 
     local parent_line = find_parent_project_line_in_current_buffer()
+    local parent_location = nil
+    if parent_line then
+      local current_path = normalize_path(vim.api.nvim_buf_get_name(0))
+      if current_path ~= "" then
+        parent_location = {
+          file = current_path,
+          line = parent_line,
+        }
+      end
+    else
+      parent_location = find_parent_project_location_for_active_clock()
+    end
 
     if not org_clock_out() then
       return false
     end
 
     if M.state.keep_clock_running then
-      if parent_line then
-        vim.api.nvim_win_set_cursor(0, { parent_line, 0 })
-        return org_clock_in()
+      if parent_location then
+        return clock_in_at_location(parent_location)
       end
       return M.clock_in_default()
     end

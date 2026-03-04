@@ -214,3 +214,45 @@
 2026-03-01T11:28:24.321Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
 2026-03-01T11:28:28.171Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 生成并更新 walkthrough 报告与 PR body 建议,success
 2026-03-01T11:28:34.466Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在 review 无 blocking/high 前提下直接进入报告阶段，不额外插入修复回合。,success
+2026-03-04T07:10:27.848Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-04T07:10:31.561Z,legion_list_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
+2026-03-04T07:11:40.579Z,legion_create_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,goal: 设计并落地一个端到端测试套件，覆盖 norang 原文的关键行为并验证当前实现与 orgmode/orgmode.nvim 语义一致。,failed
+2026-03-04T07:11:51.816Z,legion_propose_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,name: orgmode-norang-e2e-parity-suite,success
+2026-03-04T07:11:55.546Z,legion_approve_proposal,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,proposalId: proposal-mmbp7z0l-b2308f,success
+2026-03-04T07:11:59.472Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T07:14:16.179Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 生成 task-brief，明确问题定义、验收标准、假设与风险,success
+2026-03-04T07:14:16.227Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 根据任务复杂度确定设计强度并形成设计门禁,success
+2026-03-04T07:14:23.385Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
+2026-03-04T07:14:29.657Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/task-brief.md,success
+2026-03-04T07:14:33.265Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 本任务按 Medium + Epic 执行，并采用 rfc:heavy 设计强度（先 RFC + review-rfc，再实现）。,success
+2026-03-04T07:14:37.675Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addConstraint: 执行策略采用 Autopilot：不等待设计人工确认，默认以 PR 作为延迟批准载体；仅在不可逆风险或信息无法推断时再提问。,success
+2026-03-04T07:20:38.452Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
+2026-03-04T07:20:38.453Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 执行 RFC 对抗审查并收敛 blocking,success
+2026-03-04T07:20:44.316Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: phase 2,success
+2026-03-04T07:21:07.642Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T07:21:07.655Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
+2026-03-04T07:21:08.094Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T07:21:08.161Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 生成 walkthrough 与 PR body 文档,success
+2026-03-04T07:21:13.532Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T08:27:56.975Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 生成 walkthrough 与 PR body 文档,success
+2026-03-04T08:28:02.365Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T08:28:14.966Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: phase 5,success
+2026-03-04T08:28:48.085Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,progress.completed: RFC 已生成并通过二次对抗审查（docs/rfc.md + docs/rfc-review.md，结论 PASS）,success
+2026-03-04T08:28:55.425Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/rfc.md,success
+2026-03-04T08:28:55.452Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/test-report.md,success
+2026-03-04T08:28:55.452Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/review-code.md,success
+2026-03-04T08:28:55.453Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/rfc-review.md,success
+2026-03-04T08:28:55.454Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/review-security.md,success
+2026-03-04T08:28:55.454Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/pr-body.md,success
+2026-03-04T08:29:00.886Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 NP-006A（父任务回退）从“可选回退 default”收紧为严格父任务回退，并据此修复 org_punch 实现。,success
+2026-03-04T08:29:00.886Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 smoke runner runtimepath 注入从 Ex 拼接迁移到受控 Lua 校验，并将 HOME 依赖回退改为显式 opt-in。,success
+2026-03-04T08:29:06.724Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,handoff: 使用 `.legion/tasks/orgmode-norang-e2e-parity-suite/docs/pr-body.md` 作为 PR 描述提交评审,success
+2026-03-04T08:29:24.636Z,legion_update_plan,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T08:29:29.712Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addConstraint: 因 NP-006A 严格断言触发真实偏差，实施阶段允许最小越界修复 `lua/org_punch.lua`（已回写 plan scope 并在 RFC/review 中记录）。,success
+2026-03-04T08:29:47.186Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/playbook.md,success
+2026-03-04T08:30:16.022Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
+2026-03-04T08:31:50.189Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 NP-006A 断言收紧为“存在父任务时必须回父任务”，并修复 org_punch 逻辑以满足该约束。,success
+2026-03-04T08:32:14.612Z,legion_update_plan,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
