@@ -290,3 +290,6 @@
 2026-03-04T13:51:29.102Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 根据用户要求将 `skills/norang-workflow/SKILL.md` 改写为中文版本，并保留原有执行边界与安全门禁语义,success
 2026-03-04T13:51:32.641Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/SKILL.md,success
 2026-03-04T13:51:32.643Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/references/quick-checklist.md,success
+2026-03-05T12:19:18.191Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 在 `README.md` 新增“安装 Norang Workflow Skill（给人类和 AI）”章节，基于 skills.sh CLI 文档补充安装与使用指引,success
+2026-03-05T12:19:20.876Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: README.md,success
+2026-03-05T12:32:14.143Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 按用户反馈将 README 中 skills.sh 安装命令从本地路径 `.` 改为 GitHub 链接 `https://github.com/Thrimbda/nvim`，避免安装源歧义,success

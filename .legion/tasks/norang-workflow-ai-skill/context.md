@@ -17,6 +17,8 @@
 - 生成 docs/report-walkthrough.md 与 docs/pr-body.md，可直接用于提交流程
 - 根据用户要求将 `skills/norang-workflow/SKILL.md` 改写为中文版本，并保留原有执行边界与安全门禁语义
 - 同步将 `skills/norang-workflow/references/quick-checklist.md` 改写为中文，确保与主 Skill 口径一致
+- 在 `README.md` 新增“安装 Norang Workflow Skill（给人类和 AI）”章节，基于 skills.sh CLI 文档补充安装与使用指引
+- 按用户反馈将 README 中 skills.sh 安装命令从本地路径 `.` 改为 GitHub 链接 `https://github.com/Thrimbda/nvim`，避免安装源歧义
 
 
 ### 🟡 进行中
@@ -61,4 +63,4 @@
 
 ---
 
-*最后更新: 2026-03-04 21:51 by Claude*
+*最后更新: 2026-03-05 20:32 by Claude*
