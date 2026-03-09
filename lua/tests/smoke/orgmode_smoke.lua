@@ -238,6 +238,34 @@ local function get_subtree_lines(path, heading_line)
   return out
 end
 
+local function close_all_folds_for_test()
+  vim.wo.foldenable = true
+  vim.wo.foldlevel = 99
+  vim.cmd("normal! zM")
+end
+
+local function capture_view_state(line_nr)
+  return {
+    buf = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p"),
+    foldlevel = vim.wo.foldlevel,
+    foldenable = vim.wo.foldenable,
+    foldmethod = vim.wo.foldmethod,
+    foldexpr = vim.wo.foldexpr,
+    foldcolumn = vim.wo.foldcolumn,
+    foldclosed = vim.fn.foldclosed(line_nr),
+  }
+end
+
+local function assert_same_view_state(before, after, label)
+  assert_true(before.buf == after.buf, label .. " should preserve current buffer")
+  assert_true(before.foldlevel == after.foldlevel, label .. " should preserve foldlevel")
+  assert_true(before.foldenable == after.foldenable, label .. " should preserve foldenable")
+  assert_true(before.foldmethod == after.foldmethod, label .. " should preserve foldmethod")
+  assert_true(before.foldexpr == after.foldexpr, label .. " should preserve foldexpr")
+  assert_true(before.foldcolumn == after.foldcolumn, label .. " should preserve foldcolumn")
+  assert_true(before.foldclosed == after.foldclosed, label .. " should preserve fold closed state")
+end
+
 local function test_punch_in_requires_id()
   local punch = require("org_punch")
   punch.setup({
@@ -298,10 +326,11 @@ local function test_punch_in_preserves_current_buffer()
   local punch = setup_punch({ current_path, default_path }, DEFAULT_TASK_ID)
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(current_path))
-  local before = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+  close_all_folds_for_test()
+  local before = capture_view_state(1)
   assert_true(punch.punch_in() == true, "punch_in should succeed")
-  local after = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
-  assert_true(before == after, "punch_in should preserve current buffer")
+  local after = capture_view_state(1)
+  assert_same_view_state(before, after, "punch_in")
 
   punch.punch_out()
 end
@@ -323,10 +352,34 @@ local function test_punch_out_preserves_current_buffer()
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(current_path))
   assert_true(punch.punch_in() == true, "punch_in should succeed")
-  local before = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+  close_all_folds_for_test()
+  local before = capture_view_state(1)
   assert_true(punch.punch_out() == true, "punch_out should succeed")
-  local after = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
-  assert_true(before == after, "punch_out should preserve current buffer")
+  local after = capture_view_state(1)
+  assert_same_view_state(before, after, "punch_out")
+end
+
+local function test_clock_out_preserves_view_state()
+  local path = write_temp_org({
+    "* TODO Focus project",
+    "** TODO Nested task",
+    "*** TODO Deep task",
+  })
+
+  setup_orgmode({ path })
+  local punch = setup_punch({ path }, "")
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(path))
+  close_all_folds_for_test()
+  vim.api.nvim_win_set_cursor(0, { 2, 0 })
+  assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
+
+  close_all_folds_for_test()
+  local before = capture_view_state(2)
+  assert_true(punch.clock_out_current_task({ ignore_keep_running = true, silent = true }) == true, "clock_out_current_task should succeed")
+  local after = capture_view_state(2)
+
+  assert_same_view_state(before, after, "clock_out_current_task")
 end
 
 local function test_clock_in_todo_task_switches_to_next()
@@ -511,29 +564,16 @@ local function test_clock_in_preserves_view_state()
   local punch = setup_punch({ task_path, default_path }, DEFAULT_TASK_ID)
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(task_path))
-  vim.wo.foldenable = true
-  vim.wo.foldlevel = 99
-  vim.cmd("normal! zM")
-
-  local before_buf = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
-  local before_foldlevel = vim.wo.foldlevel
-  local before_foldenable = vim.wo.foldenable
-  local before_foldclosed = vim.fn.foldclosed(2)
+  close_all_folds_for_test()
+  local before = capture_view_state(2)
 
   assert_true(punch.punch_in() == true, "punch_in should succeed")
 
   vim.api.nvim_win_set_cursor(0, { 2, 0 })
   assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
 
-  local after_buf = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
-  local after_foldlevel = vim.wo.foldlevel
-  local after_foldenable = vim.wo.foldenable
-  local after_foldclosed = vim.fn.foldclosed(2)
-
-  assert_true(before_buf == after_buf, "clock_in_current_task should keep current buffer")
-  assert_true(before_foldlevel == after_foldlevel, "clock_in_current_task should preserve foldlevel")
-  assert_true(before_foldenable == after_foldenable, "clock_in_current_task should preserve foldenable")
-  assert_true(before_foldclosed == after_foldclosed, "clock_in_current_task should preserve fold closed state")
+  local after = capture_view_state(2)
+  assert_same_view_state(before, after, "clock_in_current_task")
 
   punch.punch_out()
 end
@@ -1098,6 +1138,7 @@ local CASES = {
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
   punch_in_preserves_current_buffer = test_punch_in_preserves_current_buffer,
   punch_out_preserves_current_buffer = test_punch_out_preserves_current_buffer,
+  clock_out_preserves_view_state = test_clock_out_preserves_view_state,
   clock_in_todo_task_switches_to_next = test_clock_in_todo_task_switches_to_next,
   clock_in_next_project_switches_to_todo = test_clock_in_next_project_switches_to_todo,
   clock_in_preserves_view_state = test_clock_in_preserves_view_state,

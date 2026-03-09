@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "currentTask": "norang-workflow-ai-skill",
+  "currentTask": "org-punch-fold-preservation-fix",
   "settings": {
     "autoRemind": true,
     "remindBeforeReset": true,
@@ -38,9 +38,16 @@
     {
       "id": "norang-workflow-ai-skill",
       "name": "norang-workflow-ai-skill",
-      "status": "active",
+      "status": "paused",
       "createdAt": "2026-03-04T13:33:33.546Z",
-      "updatedAt": "2026-03-05T12:32:14.140Z"
+      "updatedAt": "2026-03-09T07:04:35.393Z"
+    },
+    {
+      "id": "org-punch-fold-preservation-fix",
+      "name": "org-punch-fold-preservation-fix",
+      "status": "active",
+      "createdAt": "2026-03-09T07:04:35.393Z",
+      "updatedAt": "2026-03-09T07:07:21.516Z"
     }
   ],
   "pendingProposals": [
@@ -406,6 +413,65 @@
       "decidedAt": "2026-03-04T13:33:33.546Z",
       "decidedBy": "Claude",
       "createdTaskId": "norang-workflow-ai-skill"
+    },
+    {
+      "id": "proposal-mmiu5qop-293e47",
+      "name": "org-punch-fold-preservation-fix",
+      "goal": "修复 org_punch 的 clock in/out 对折叠视图的破坏，并增加回归测试覆盖所有相关路径。",
+      "rationale": "用户报告 clock in/clock out 仍会打乱 fold，且之前两次修复未覆盖全部路径；需要一个独立任务记录根因、实现与测试，以避免与现有 Norang 任务混淆。",
+      "points": [
+        "找出所有未经过 view restore 的 clock/punch 路径",
+        "统一在相关入口恢复窗口视图与折叠状态",
+        "增加 smoke 回归测试，覆盖 punch in、普通 clock out、punch out 与 keep-running 路径"
+      ],
+      "scope": [
+        "lua/org_punch.lua",
+        "lua/tests/smoke/orgmode_smoke.lua",
+        ".legion/tasks/org-punch-fold-preservation-fix/**"
+      ],
+      "phases": [
+        {
+          "name": "阶段 0: 定位与设计",
+          "tasks": [
+            {
+              "description": "确认 fold 被破坏的代码路径与根因",
+              "acceptance": "列出受影响入口与修复策略"
+            },
+            {
+              "description": "建立任务记录并确定最小修复范围",
+              "acceptance": "task plan/context/tasks 已创建"
+            }
+          ]
+        },
+        {
+          "name": "阶段 1: 实现",
+          "tasks": [
+            {
+              "description": "修复 org_punch 中所有相关 clock/punch 路径的 view/fold 恢复",
+              "acceptance": "相关入口执行后保持 buffer 与 fold 状态稳定"
+            }
+          ]
+        },
+        {
+          "name": "阶段 2: 验证",
+          "tasks": [
+            {
+              "description": "新增/更新 smoke 测试覆盖 fold 回归场景",
+              "acceptance": "测试覆盖 punch in/out、clock in/out 关键路径"
+            },
+            {
+              "description": "运行相关 smoke 测试并确认通过",
+              "acceptance": "目标 smoke 用例全部 PASS"
+            }
+          ]
+        }
+      ],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-03-09T07:04:29.019Z",
+      "status": "approved",
+      "decidedAt": "2026-03-09T07:04:35.393Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "org-punch-fold-preservation-fix"
     }
   ]
 }

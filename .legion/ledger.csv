@@ -293,3 +293,10 @@
 2026-03-05T12:19:18.191Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 在 `README.md` 新增“安装 Norang Workflow Skill（给人类和 AI）”章节，基于 skills.sh CLI 文档补充安装与使用指引,success
 2026-03-05T12:19:20.876Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: README.md,success
 2026-03-05T12:32:14.143Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 按用户反馈将 README 中 skills.sh 安装命令从本地路径 `.` 改为 GitHub 链接 `https://github.com/Thrimbda/nvim`，避免安装源歧义,success
+2026-03-09T07:04:16.885Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
+2026-03-09T07:04:29.022Z,legion_propose_task,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,name: org-punch-fold-preservation-fix,success
+2026-03-09T07:04:35.399Z,legion_approve_proposal,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,proposalId: proposal-mmiu5qop-293e47,success
+2026-03-09T07:04:41.447Z,legion_switch_task,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,taskId: org-punch-fold-preservation-fix,success
+2026-03-09T07:04:43.873Z,legion_update_tasks,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,setCurrentTask: phase 1,success
+2026-03-09T07:07:14.450Z,legion_update_context,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,addDecision: 优先在 `org_punch` 的公共入口统一恢复窗口视图，而不是依赖“尽量不写文件”来避免折叠错乱。,success
+2026-03-09T07:07:21.518Z,legion_update_tasks,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,completeTask: phase 1,success

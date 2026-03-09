@@ -23,6 +23,7 @@ CASES=(
 	punch_in_clocks_default_task
 	punch_in_preserves_current_buffer
 	punch_out_preserves_current_buffer
+	clock_out_preserves_view_state
 	clock_in_todo_task_switches_to_next
 	clock_in_next_project_switches_to_todo
 	clock_in_preserves_view_state

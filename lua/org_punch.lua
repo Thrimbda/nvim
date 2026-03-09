@@ -385,6 +385,9 @@ local function with_view_restored(fn)
   local win_opts = {
     foldenable = vim.wo.foldenable,
     foldlevel = vim.wo.foldlevel,
+    foldmethod = vim.wo.foldmethod,
+    foldexpr = vim.wo.foldexpr,
+    foldcolumn = vim.wo.foldcolumn,
   }
 
   local ok, result = pcall(fn)
@@ -404,6 +407,11 @@ local function with_view_restored(fn)
   end
 
   return true, result
+end
+
+local function run_with_preserved_view(fn)
+  local ok, result = with_view_restored(fn)
+  return ok and result == true
 end
 
 with_file_buffer = function(path, fn)
@@ -606,68 +614,74 @@ function M.setup(opts)
 end
 
 function M.clock_in_default()
-  if not M.cfg.organization_task_id or M.cfg.organization_task_id == "" then
-    vim.notify("org_punch: organization_task_id is required (set vim.g.org_organization_task_id)", vim.log.levels.ERROR)
-    return false
-  end
+  return run_with_preserved_view(function()
+    if not M.cfg.organization_task_id or M.cfg.organization_task_id == "" then
+      vim.notify("org_punch: organization_task_id is required (set vim.g.org_organization_task_id)", vim.log.levels.ERROR)
+      return false
+    end
 
-  local loc = find_task_by_id(M.cfg.organization_task_id)
-  if not loc then
-    vim.notify("org_punch: default task not found by :ID:", vim.log.levels.ERROR)
-    return false
-  end
+    local loc = find_task_by_id(M.cfg.organization_task_id)
+    if not loc then
+      vim.notify("org_punch: default task not found by :ID:", vim.log.levels.ERROR)
+      return false
+    end
 
-  return clock_in_at_location(loc)
+    return clock_in_at_location(loc)
+  end)
 end
 
 function M.punch_in()
-  maybe_warn_norang_todo_mismatch()
-  M.state.keep_clock_running = true
+  return run_with_preserved_view(function()
+    maybe_warn_norang_todo_mismatch()
+    M.state.keep_clock_running = true
 
-  local ok = M.clock_in_default()
-  if not ok then
-    M.state.keep_clock_running = false
-    return false
-  end
+    local ok = M.clock_in_default()
+    if not ok then
+      M.state.keep_clock_running = false
+      return false
+    end
 
-  vim.notify("Org Punch In: keep clock running = true")
-  return true
+    vim.notify("Org Punch In: keep clock running = true")
+    return true
+  end)
 end
 
 function M.clock_in_current_task()
   maybe_warn_norang_todo_mismatch()
-  local ok, result = with_view_restored(function()
+  return run_with_preserved_view(function()
     return org_clock_in()
   end)
-
-  return ok and result == true
 end
 
 function M.clock_out_current_task(opts)
   opts = opts or {}
 
-  if not opts.silent then
-    maybe_warn_norang_todo_mismatch()
-  end
+  return run_with_preserved_view(function()
+    if not opts.silent then
+      maybe_warn_norang_todo_mismatch()
+    end
 
-  if M.state.keep_clock_running and not opts.ignore_keep_running then
-    return M.clock_out_keep_running()
-  end
+    if M.state.keep_clock_running and not opts.ignore_keep_running then
+      return M.clock_out_keep_running()
+    end
 
-  return org_clock_out()
+    return org_clock_out()
+  end)
 end
 
 function M.punch_out()
-  maybe_warn_norang_todo_mismatch()
-  M.state.keep_clock_running = false
+  return run_with_preserved_view(function()
+    maybe_warn_norang_todo_mismatch()
+    M.state.keep_clock_running = false
 
-  local ok = org_clock_out()
-  if not ok then
-    return false
-  end
+    local ok = org_clock_out()
+    if not ok then
+      return false
+    end
 
-  vim.notify("Org Punch Out: keep clock running = false")
-  return true
+    vim.notify("Org Punch Out: keep clock running = false")
+    return true
+  end)
 end
 
 function M.clock_out_keep_running()
