@@ -8,7 +8,7 @@ M.cfg = {
 
 M.state = {
   keep_clock_running = false,
-  warned_norang_mismatch = false,
+  warned_legion_mismatch = false,
 }
 
 local function escape_pattern(text)
@@ -30,7 +30,22 @@ local function expand_home(path)
 end
 
 local function normalize_path(path)
-  return vim.fn.fnamemodify(path, ":p")
+  local absolute = vim.fn.fnamemodify(path, ":p")
+  local real = nil
+  if vim.uv and type(vim.uv.fs_realpath) == "function" then
+    real = vim.uv.fs_realpath(absolute)
+  elseif vim.loop and type(vim.loop.fs_realpath) == "function" then
+    real = vim.loop.fs_realpath(absolute)
+  end
+  return real or absolute
+end
+
+local function current_file_path()
+  local name = vim.api.nvim_buf_get_name(0)
+  if name == "" then
+    return nil
+  end
+  return normalize_path(name)
 end
 
 local function uniq(list)
@@ -65,15 +80,15 @@ local function same_items(a, b)
   return true
 end
 
-local function maybe_warn_norang_todo_mismatch()
-  if M.state.warned_norang_mismatch then
+local function maybe_warn_legion_todo_mismatch()
+  if M.state.warned_legion_mismatch then
     return
   end
-  local ok, norang = pcall(require, "org_norang")
-  if not ok or type(norang.get_config) ~= "function" then
+  local ok, legion = pcall(require, "org_legion")
+  if not ok or type(legion.get_config) ~= "function" then
     return
   end
-  local cfg = norang.get_config()
+  local cfg = legion.get_config()
   if not cfg or not cfg.todo or not cfg.todo.active then
     return
   end
@@ -81,9 +96,9 @@ local function maybe_warn_norang_todo_mismatch()
     return
   end
 
-  M.state.warned_norang_mismatch = true
+  M.state.warned_legion_mismatch = true
   vim.notify(
-    "org_punch: TODO keywords differ from org_norang.todo.active; punch keeps running unchanged",
+    "org_punch: TODO keywords differ from org_legion.todo.active; punch keeps running unchanged",
     vim.log.levels.WARN
   )
 end
@@ -131,6 +146,14 @@ local function heading_level(line)
   return stars and #stars or nil
 end
 
+local function notify_once(message, level)
+  if type(vim.notify_once) == "function" then
+    vim.notify_once(message, level)
+    return
+  end
+  vim.notify(message, level)
+end
+
 local function find_task_by_id(id)
   if not id or id == "" then
     return nil
@@ -138,6 +161,7 @@ local function find_task_by_id(id)
 
   local files = expand_org_files()
   local id_pat = "^%s*:ID:%s*" .. escape_pattern(id) .. "%s*$"
+  local matches = {}
 
   for _, file in ipairs(files) do
     local ok, lines = pcall(vim.fn.readfile, file)
@@ -152,12 +176,78 @@ local function find_task_by_id(id)
       if id_line then
         local heading_line = find_heading_line(lines, id_line)
         if heading_line then
-          return { file = file, line = heading_line }
+          table.insert(matches, { file = file, line = heading_line })
         end
       end
     end
   end
 
+  if #matches == 0 then
+    return nil
+  end
+
+  local current_path = current_file_path()
+  if current_path then
+    for _, match in ipairs(matches) do
+      if match.file == current_path then
+        if #matches > 1 then
+          notify_once(
+            "org_punch: organization_task_id matched multiple files; preferring the current buffer and keeping IDs unique is recommended",
+            vim.log.levels.WARN
+          )
+        end
+        return match
+      end
+    end
+  end
+
+  if #matches > 1 then
+    notify_once(
+      "org_punch: organization_task_id matched multiple files; using the first match and keeping IDs unique is recommended",
+      vim.log.levels.WARN
+    )
+  end
+
+  return matches[1]
+end
+
+local function find_active_clocked_headline_in_tree(headline)
+  if headline:is_clocked_in() then
+    return headline
+  end
+
+  for _, child in ipairs(headline:get_child_headlines() or {}) do
+    local active = find_active_clocked_headline_in_tree(child)
+    if active then
+      return active
+    end
+  end
+
+  return nil
+end
+
+local function detect_clocked_headline(orgmode)
+  if not orgmode or not orgmode.clock or not orgmode.files then
+    return nil
+  end
+
+  orgmode.clock:update_clocked_headline()
+  if orgmode.clock.clocked_headline then
+    return orgmode.clock.clocked_headline
+  end
+
+  for _, file in ipairs(orgmode.files:all()) do
+    local refreshed = file:reload_sync()
+    for _, headline in ipairs(refreshed:get_headlines()) do
+      local active = find_active_clocked_headline_in_tree(headline)
+      if active then
+        orgmode.clock.clocked_headline = active
+        return active
+      end
+    end
+  end
+
+  orgmode.clock.clocked_headline = nil
   return nil
 end
 
@@ -202,8 +292,7 @@ local function get_clocked_headline()
     return nil
   end
 
-  orgmode.clock:update_clocked_headline()
-  return orgmode.clock.clocked_headline
+  return detect_clocked_headline(orgmode)
 end
 
 local with_file_buffer
@@ -231,6 +320,40 @@ local function get_active_clock_context()
     headline_line = current:get_range().start_line,
     clock_line = active.start_time.range.start_line,
   }
+end
+
+local function get_active_clock_context_for_location(path, line)
+  local target_path = normalize_path(path)
+  local ok_ctx, context = with_file_buffer(target_path, function()
+    local org_ok, orgmode = pcall(require, "orgmode")
+    if not org_ok or not orgmode.files then
+      return nil
+    end
+
+    local file = orgmode.files:get(target_path):reload_sync()
+    local current = file:get_closest_headline({ line, 0 })
+    if not current then
+      return nil
+    end
+
+    local logbook = current:get_logbook()
+    local active = logbook and logbook:get_active() or nil
+    if not active or not active.start_time or not active.start_time.range then
+      return nil
+    end
+
+    return {
+      path = target_path,
+      headline_line = current:get_range().start_line,
+      clock_line = active.start_time.range.start_line,
+    }
+  end)
+
+  if not ok_ctx then
+    return nil
+  end
+
+  return context
 end
 
 local function cleanup_zero_duration_clock(context)
@@ -349,11 +472,13 @@ local function apply_clock_in_state_transition()
 end
 
 local function org_clock_in()
+  local active_clock = get_active_clock_context()
   local ok = call_org_action("clock.org_clock_in") or call_org_clock_method("org_clock_in")
   if not ok then
     vim.notify("org_punch: failed to clock in", vim.log.levels.ERROR)
     return false
   end
+  cleanup_zero_duration_clock(active_clock)
   apply_clock_in_state_transition()
   return true
 end
@@ -472,12 +597,14 @@ local function clock_in_at_location(loc)
   end
 
   local clock = orgmode.clock
+  local target_headline = nil
   local ok_run, err = pcall(function()
-    clock:update_clocked_headline()
+    local active_headline = detect_clocked_headline(orgmode)
 
-    if clock.clocked_headline and clock.clocked_headline:is_clocked_in() then
-      local prev_path = normalize_path(clock.clocked_headline.file.filename)
-      local prev_line = clock.clocked_headline:get_range().start_line
+    if active_headline and active_headline:is_clocked_in() then
+      local prev_path = normalize_path(active_headline.file.filename)
+      local prev_line = active_headline:get_range().start_line
+      local prev_context = get_active_clock_context_for_location(prev_path, prev_line)
 
       local ok_prev = with_file_buffer(prev_path, function()
         local prev_file = orgmode.files:get(prev_path):reload_sync()
@@ -489,6 +616,8 @@ local function clock_in_at_location(loc)
       if not ok_prev then
         error("failed to clock out previous active task")
       end
+
+      cleanup_zero_duration_clock(prev_context)
     end
 
     local target_path = normalize_path(loc.file)
@@ -500,12 +629,13 @@ local function clock_in_at_location(loc)
       end
 
       target:clock_in()
+      target_headline = target_file:reload_sync():get_closest_headline({ loc.line, 0 }) or target
     end)
     if not ok_target then
       error("failed to clock in default task")
     end
 
-    clock:update_clocked_headline()
+    clock.clocked_headline = target_headline or detect_clocked_headline(orgmode)
   end)
 
   if not ok_run then
@@ -610,7 +740,7 @@ end
 
 function M.setup(opts)
   M.cfg = vim.tbl_deep_extend("force", M.cfg, opts or {})
-  maybe_warn_norang_todo_mismatch()
+  maybe_warn_legion_todo_mismatch()
 end
 
 function M.clock_in_default()
@@ -632,7 +762,7 @@ end
 
 function M.punch_in()
   return run_with_preserved_view(function()
-    maybe_warn_norang_todo_mismatch()
+    maybe_warn_legion_todo_mismatch()
     M.state.keep_clock_running = true
 
     local ok = M.clock_in_default()
@@ -647,7 +777,7 @@ function M.punch_in()
 end
 
 function M.clock_in_current_task()
-  maybe_warn_norang_todo_mismatch()
+  maybe_warn_legion_todo_mismatch()
   return run_with_preserved_view(function()
     return org_clock_in()
   end)
@@ -658,7 +788,7 @@ function M.clock_out_current_task(opts)
 
   return run_with_preserved_view(function()
     if not opts.silent then
-      maybe_warn_norang_todo_mismatch()
+      maybe_warn_legion_todo_mismatch()
     end
 
     if M.state.keep_clock_running and not opts.ignore_keep_running then
@@ -671,7 +801,7 @@ end
 
 function M.punch_out()
   return run_with_preserved_view(function()
-    maybe_warn_norang_todo_mismatch()
+    maybe_warn_legion_todo_mismatch()
     M.state.keep_clock_running = false
 
     local ok = org_clock_out()
@@ -685,7 +815,7 @@ function M.punch_out()
 end
 
 function M.clock_out_keep_running()
-  maybe_warn_norang_todo_mismatch()
+  maybe_warn_legion_todo_mismatch()
 
   local ok, result = with_view_restored(function()
     if not org_clock_goto() then

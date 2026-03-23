@@ -1,22 +1,22 @@
-下面给你一套“把 Norang（Bernt Hansen）那套 GTD / 项目推进 / 打卡 / 归档的全流程”迁移到 **Neovim + nvim-orgmode（orgmode.nvim）+ 你自己写的插件**的落地方案：先用 orgmode.nvim 覆盖它已经支持的部分；对 **Norang 工作流里最关键但 orgmode.nvim 没有“elisp skip 函数”那类能力**的部分，用一个小插件补齐（核心是：**自动给 headline 打 PROJECT / STUCK / ARCHIVE_CANDIDATE 等派生标签**，让 agenda 用纯 tags/property 查询就能做出 Norang 的 block agenda 视图）。
+下面给你一套“把 Legion（Bernt Hansen）那套 GTD / 项目推进 / 打卡 / 归档的全流程”迁移到 **Neovim + nvim-orgmode（orgmode.nvim）+ 你自己写的插件**的落地方案：先用 orgmode.nvim 覆盖它已经支持的部分；对 **Legion 工作流里最关键但 orgmode.nvim 没有“elisp skip 函数”那类能力**的部分，用一个小插件补齐（核心是：**自动给 headline 打 PROJECT / STUCK / ARCHIVE_CANDIDATE 等派生标签**，让 agenda 用纯 tags/property 查询就能做出 Legion 的 block agenda 视图）。
 
 ---
 
-## 1) 先把 Norang 的“全流程”拆成可移植模块
+## 1) 先把 Legion 的“全流程”拆成可移植模块
 
-Norang 那篇文档的 GTD 主线基本是：
+Legion 那篇文档的 GTD 主线基本是：
 
-1. **Capture**：所有输入先进 inbox/refile（不要当场分类）。([Norang 公共文档][1])
-2. **Refile**：定期把 inbox 的条目移动到正确文件/项目树。([Norang 公共文档][1])
-3. **TODO 流程**：用一套关键字区分 TODO / NEXT / WAITING / HOLD / DONE / CANCELLED 等，并且用“状态触发标签/记录”减少手工维护。([Norang 公共文档][1])
-4. **Agenda（Block agenda）**：用一个组合视图把“今天日程 + 待 refile + 下一步行动 + 项目列表 + 卡住项目 + 等待事项 +（月初）可归档项”等堆在一个屏里。([Norang 公共文档][1])
-5. **Clocking**：对正在做的事情打卡，最好能“punch in/out + 保持 clock 不中断”。([Norang 公共文档][1])
-6. **Archiving**：每月把“足够旧的已完成任务”批量归档（>30 天且最近两个月没活动时间戳的 DONE 任务）。([Norang 公共文档][1])
+1. **Capture**：所有输入先进 inbox/refile（不要当场分类）。([Legion 公共文档][1])
+2. **Refile**：定期把 inbox 的条目移动到正确文件/项目树。([Legion 公共文档][1])
+3. **TODO 流程**：用一套关键字区分 TODO / NEXT / WAITING / HOLD / DONE / CANCELLED 等，并且用“状态触发标签/记录”减少手工维护。([Legion 公共文档][1])
+4. **Agenda（Block agenda）**：用一个组合视图把“今天日程 + 待 refile + 下一步行动 + 项目列表 + 卡住项目 + 等待事项 +（月初）可归档项”等堆在一个屏里。([Legion 公共文档][1])
+5. **Clocking**：对正在做的事情打卡，最好能“punch in/out + 保持 clock 不中断”。([Legion 公共文档][1])
+6. **Archiving**：每月把“足够旧的已完成任务”批量归档（>30 天且最近两个月没活动时间戳的 DONE 任务）。([Legion 公共文档][1])
 
 你要在 Neovim 里复刻“全流程”，真正难点只有两个：
 
-- **“项目/卡住项目”的识别**：Norang 在 Emacs 里用一堆 skip 函数（按 subtree 结构判断“项目=有 TODO 子任务的 TODO headline；卡住=项目里没有 NEXT 子任务”）。orgmode.nvim 的 agenda 自定义视图是基于 tags/property 匹配串，不是任意函数。([Nvim Orgmode][2])
-- **“可归档项（按日期条件）”的自动筛选**：同理，纯匹配串很难做“30 天前且两个月内无时间戳”。([Norang 公共文档][1])
+- **“项目/卡住项目”的识别**：Legion 在 Emacs 里用一堆 skip 函数（按 subtree 结构判断“项目=有 TODO 子任务的 TODO headline；卡住=项目里没有 NEXT 子任务”）。orgmode.nvim 的 agenda 自定义视图是基于 tags/property 匹配串，不是任意函数。([Nvim Orgmode][2])
+- **“可归档项（按日期条件）”的自动筛选**：同理，纯匹配串很难做“30 天前且两个月内无时间戳”。([Legion 公共文档][1])
 
 解决思路：**你写的插件负责把这些“函数式逻辑”提前算出来，落成标签或属性**；agenda 就能继续用 orgmode.nvim 自带的 custom commands 来拼 block view。
 
@@ -24,7 +24,7 @@ Norang 那篇文档的 GTD 主线基本是：
 
 ## 2) orgmode.nvim 这边你能直接用上的能力
 
-下面这些对迁移 Norang 流程很关键，而且 orgmode.nvim 已经有：
+下面这些对迁移 Legion 流程很关键，而且 orgmode.nvim 已经有：
 
 ### 2.1 Capture 模板
 
@@ -48,7 +48,7 @@ orgmode.nvim 支持 capture templates（含时间/输入占位符、动态 targe
 
 ---
 
-## 3) 推荐的目录与文件结构（对齐 Norang 思路）
+## 3) 推荐的目录与文件结构（对齐 Legion 思路）
 
 最小可用的一套（你可按自己口味拆更多文件）：
 
@@ -56,7 +56,7 @@ orgmode.nvim 支持 capture templates（含时间/输入占位符、动态 targe
 - `~/org/gtd.org`：通用任务（非项目、单步任务、杂项）
 - `~/org/projects.org`：项目树（每个项目一个 headline，下面是子任务）
 - `~/org/tickler.org`：将来/提醒（可选）
-- `~/org/archive/*.org_archive`：归档文件（orgmode/Emacs 都习惯 `file.org_archive`）([Norang 公共文档][1])
+- `~/org/archive/*.org_archive`：归档文件（orgmode/Emacs 都习惯 `file.org_archive`）([Legion 公共文档][1])
 
 ---
 
@@ -74,8 +74,8 @@ return {
       org_agenda_files = { '~/org/**/*' },
       org_default_notes_file = '~/org/refile.org',
 
-      -- Norang 风格的 TODO 流程（核心关键字）
-      -- Norang 的关键词序列示例见文档（TODO/NEXT/DONE + WAITING/HOLD/CANCELLED/PHONE/MEETING）:contentReference[oaicite:14]{index=14}
+      -- Legion 风格的 TODO 流程（核心关键字）
+      -- Legion 的关键词序列示例见文档（TODO/NEXT/DONE + WAITING/HOLD/CANCELLED/PHONE/MEETING）:contentReference[oaicite:14]{index=14}
       org_todo_keywords = {
         'TODO(t)',
         'NEXT(n)',
@@ -88,7 +88,7 @@ return {
         'MEETING',
       },
 
-      -- 把状态变化记录到 LOGBOOK（Norang 强依赖 LOGBOOK/clock 这套习惯）
+      -- 把状态变化记录到 LOGBOOK（Legion 强依赖 LOGBOOK/clock 这套习惯）
       org_log_into_drawer = 'LOGBOOK', -- :contentReference[oaicite:15]{index=15}
 
       org_use_tag_inheritance = true, -- :contentReference[oaicite:16]{index=16}
@@ -124,7 +124,7 @@ return {
     })
 
     -- 你自己的插件（后面会给代码骨架）
-    require('org-norang').setup({
+    require('org-legion').setup({
       org_root = vim.fn.expand('~/org'),
       derived_tags = {
         project = 'PROJECT',
@@ -138,12 +138,12 @@ return {
 
 ---
 
-## 5) 用 org_agenda_custom_commands 拼出 Norang 的“Block agenda”外形
+## 5) 用 org_agenda_custom_commands 拼出 Legion 的“Block agenda”外形
 
 orgmode.nvim 的 custom commands 允许组合多个 block。([Nvim Orgmode][2])
-我们目标是做一个类似 Norang “一个屏看完”的 GTD 入口（你可以设成按键 `g` 或 `n`）。
+我们目标是做一个类似 Legion “一个屏看完”的 GTD 入口（你可以设成按键 `g` 或 `n`）。
 
-核心 blocks（对齐 Norang 的日常视角）：
+核心 blocks（对齐 Legion 的日常视角）：
 
 - Inbox（refile.org 里的 :REFILE:）
 - 今日 agenda（day）
@@ -157,7 +157,7 @@ orgmode.nvim 的 custom commands 允许组合多个 block。([Nvim Orgmode][2])
 -- 放进 orgmode.setup({ org_agenda_custom_commands = { ... }})
 org_agenda_custom_commands = {
   n = {
-    description = 'Norang GTD (block agenda)',
+    description = 'Legion GTD (block agenda)',
     types = {
       {
         type = 'tags_todo',
@@ -209,19 +209,19 @@ org_agenda_custom_commands = {
 
 ---
 
-## 6) 你要写的插件：把 Norang 的“函数逻辑”前置成标签
+## 6) 你要写的插件：把 Legion 的“函数逻辑”前置成标签
 
 ### 6.1 插件职责（最小可用 MVP）
 
-你的插件 `org-norang.nvim` 只做三件事，就能把 Norang 工作流的大部分关键视图跑起来：
+你的插件 `org-legion.nvim` 只做三件事，就能把 Legion 工作流的大部分关键视图跑起来：
 
 1. **扫描所有 agenda files**，解析 headline 树
 2. 自动给 headline 打派生标签：
-   - `PROJECT`：一个 TODO headline，且 subtree 内至少有一个 TODO 子任务（Norang 的“项目=带子任务的任务”）。
-   - `STUCK`：PROJECT 但 subtree 内没有可推进的 NEXT（Norang 的“卡住项目=没有 NEXT”）。
-   - `ARCHIVE_CANDIDATE`：DONE 且超过 30 天，且本月/上月无任何时间戳活动（Norang 的归档规则）。([Norang 公共文档][1])
+   - `PROJECT`：一个 TODO headline，且 subtree 内至少有一个 TODO 子任务（Legion 的“项目=带子任务的任务”）。
+   - `STUCK`：PROJECT 但 subtree 内没有可推进的 NEXT（Legion 的“卡住项目=没有 NEXT”）。
+   - `ARCHIVE_CANDIDATE`：DONE 且超过 30 天，且本月/上月无任何时间戳活动（Legion 的归档规则）。([Legion 公共文档][1])
 
-3. 暴露 `:OrgNorangRefresh`（手工触发）+ 在保存 org 文件后自动 refresh
+3. 暴露 `:OrgLegionRefresh`（手工触发）+ 在保存 org 文件后自动 refresh
 
 这样 agenda 里只需要 tags/property 匹配，不需要 skip 函数。
 
@@ -231,7 +231,7 @@ org_agenda_custom_commands = {
 
 > 我这里给的是“纯文本扫描 + 构树 + 重写 headline 行”的方案，优点是你不需要摸 orgmode.nvim 的内部 Lua API（因为 API 文档在 `:h OrgApi`，但不同版本可能变化）。缺点是你要自己写一点 org headline 解析。
 
-创建：`lua/org-norang/init.lua`
+创建：`lua/org-legion/init.lua`
 
 ```lua
 local M = {}
@@ -243,7 +243,7 @@ local default_cfg = {
     stuck = 'STUCK',
     archive_candidate = 'ARCHIVE_CANDIDATE',
   },
-  -- 你可以把关键词从 orgmode 配置里同步进来，这里先写死成 Norang 风格
+  -- 你可以把关键词从 orgmode 配置里同步进来，这里先写死成 Legion 风格
   todo_keywords = { 'TODO', 'NEXT', 'WAITING', 'HOLD', 'DONE', 'CANCELLED', 'PHONE', 'MEETING' },
   done_keywords = { 'DONE', 'CANCELLED', 'PHONE', 'MEETING' },
   next_keyword = 'NEXT',
@@ -405,7 +405,7 @@ local function refresh_buffer(bufnr, cfg)
 
     local is_stuck = is_project and not has_next
 
-    -- 归档候选：done + 30天前 + 最近两个月无时间戳（这里用“本月/上月无时间戳”近似 Norang 规则）:contentReference[oaicite:21]{index=21}
+    -- 归档候选：done + 30天前 + 最近两个月无时间戳（这里用“本月/上月无时间戳”近似 Legion 规则）:contentReference[oaicite:21]{index=21}
     local start_ln, end_ln = subtree_range(lines, node, idx)
     local archive_candidate = false
     if node.todo ~= nil and done_set[node.todo] then
@@ -450,7 +450,7 @@ end
 function M.setup(cfg)
   M._cfg = vim.tbl_deep_extend('force', default_cfg, cfg or {})
 
-  vim.api.nvim_create_user_command('OrgNorangRefresh', function()
+  vim.api.nvim_create_user_command('OrgLegionRefresh', function()
     M.refresh_all()
   end, {})
 
@@ -470,8 +470,8 @@ return M
 
 这段代码做了三件关键事：
 
-- 用 headline 树结构推导 `PROJECT/STUCK`（从而在 agenda 里复刻 Norang “Projects / Stuck Projects”块）([Norang 公共文档][1])
-- 用“本月/上月时间戳存在性”近似 Norang 的归档筛选（你可进一步把 “30 天” 精确化，逻辑来源于 Norang 的归档描述）([Norang 公共文档][1])
+- 用 headline 树结构推导 `PROJECT/STUCK`（从而在 agenda 里复刻 Legion “Projects / Stuck Projects”块）([Legion 公共文档][1])
+- 用“本月/上月时间戳存在性”近似 Legion 的归档筛选（你可进一步把 “30 天” 精确化，逻辑来源于 Legion 的归档描述）([Legion 公共文档][1])
 - 把推导结果落成 tags，使 orgmode.nvim 的 `tags` / `tags_todo` 视图能直接用 match 串过滤 ([Nvim Orgmode][2])
 
 ---
@@ -480,7 +480,7 @@ return M
 
 orgmode.nvim 的 clocking 支持点包括：clock in/out/cancel/goto、LOGBOOK 写入、agenda 高亮当前 clock、clock report、statusline 函数。([Nvim Orgmode][2])
 
-Norang 的 punch in/out（保持 clock 不中断）你可以这么落地：
+Legion 的 punch in/out（保持 clock 不中断）你可以这么落地：
 
 - **第一阶段（无插件）**：
   用 orgmode.nvim 自带 clock in/out 去做时间记录；用 statusline 显示当前 clock（`v:lua.orgmode.statusline()`）。([Nvim Orgmode][2])
@@ -493,34 +493,34 @@ Norang 的 punch in/out（保持 clock 不中断）你可以这么落地：
 
 ---
 
-## 8) 你每天怎么跑“全流程”（对齐 Norang 的节奏）
+## 8) 你每天怎么跑“全流程”（对齐 Legion 的节奏）
 
 1. **随手收集**：`<leader>oc` 选模板，把所有东西都丢 `refile.org`（带 :REFILE:）。([Nvim Orgmode][2])
-2. **打开 Norang GTD block agenda**：`<leader>oa` 然后选你定义的 `n`（或你映射的快捷键）。([Nvim Orgmode][2])
+2. **打开 Legion GTD block agenda**：`<leader>oa` 然后选你定义的 `n`（或你映射的快捷键）。([Nvim Orgmode][2])
 3. **清 Inbox**：在 “Inbox (Refile)” block 里逐条 `refile` 到 projects/gtd 等文件（orgmode.nvim 支持 refile 到 `destination.org/<headline>`）。([Nvim Orgmode][2])
 4. **推进项目**：
    - 看 “Stuck Projects”，给它们补一个 NEXT；
-   - 然后在 “Next Actions” block 挑今天要做的。([Norang 公共文档][1])
+   - 然后在 “Next Actions” block 挑今天要做的。([Legion 公共文档][1])
 
 5. **Clocking**：做事前 clock in，做完 clock out；你愿意的话再加 punch 逻辑。([Nvim Orgmode][2])
-6. **月初归档**：看 “Archive candidates”，批量把旧 DONE 任务移动到 `file.org_archive::* Archived Tasks`（Norang 的归档位置/策略描述）。([Norang 公共文档][1])
+6. **月初归档**：看 “Archive candidates”，批量把旧 DONE 任务移动到 `file.org_archive::* Archived Tasks`（Legion 的归档位置/策略描述）。([Legion 公共文档][1])
 
 ---
 
 ## 9) 你会遇到的“迁移差异”，以及最稳的处理方式
 
-- **差异 1：Norang 的 skip 函数很强**
+- **差异 1：Legion 的 skip 函数很强**
   我这里用“派生标签”替代函数逻辑：把复杂判断提前算好，agenda 只做匹配过滤。这样最贴合 orgmode.nvim 的能力边界。([Nvim Orgmode][2])
 
 - **差异 2：归档条件是时间逻辑**
-  你可以先用“本月/上月是否出现时间戳”做近似（已经够接近 Norang 的描述），后续再精确到“最后活动时间戳 <= today-30d”。([Norang 公共文档][1])
+  你可以先用“本月/上月是否出现时间戳”做近似（已经够接近 Legion 的描述），后续再精确到“最后活动时间戳 <= today-30d”。([Legion 公共文档][1])
 
 - **差异 3：状态触发标签（WAITING/HOLD 自动上 tag）**
-  Emacs org-mode 有 `org-todo-state-tags-triggers` 那种机制；orgmode.nvim 不一定完全等价。你可以把这个也交给插件：在保存时扫描 todo state，把 WAITING/HOLD/CANCELLED 同名 tag 自动同步（agenda 匹配就更稳定）。([Norang 公共文档][1])
+  Emacs org-mode 有 `org-todo-state-tags-triggers` 那种机制；orgmode.nvim 不一定完全等价。你可以把这个也交给插件：在保存时扫描 todo state，把 WAITING/HOLD/CANCELLED 同名 tag 自动同步（agenda 匹配就更稳定）。([Legion 公共文档][1])
 
 ---
 
-如果你愿意把“你现在的 org 文件结构（有哪些文件）+ 你打算保留 Norang 文档里的哪些视图块（比如是否要 Someday/Incubate、是否要 tickler）”贴一下，我可以直接按你的文件名把：
+如果你愿意把“你现在的 org 文件结构（有哪些文件）+ 你打算保留 Legion 文档里的哪些视图块（比如是否要 Someday/Incubate、是否要 tickler）”贴一下，我可以直接按你的文件名把：
 
 - `org_capture_templates`
 - `org_agenda_custom_commands`（完整 block）
@@ -528,5 +528,5 @@ Norang 的 punch in/out（保持 clock 不中断）你可以这么落地：
 
 全部替你对齐成一套可直接复制的配置。
 
-[1]: https://doc.norang.ca/org-mode.html "https://doc.norang.ca/org-mode.html"
+[1]: ../skills/legion-workflow/references/orgmode-legion-workflow.md "Legion workflow reference"
 [2]: https://nvim-orgmode.github.io/configuration "https://nvim-orgmode.github.io/configuration"

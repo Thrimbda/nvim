@@ -1,302 +1,316 @@
 ﻿timestamp,action,task_id,task_name,user,params_summary,result
 2026-02-06T05:56:19.221Z,legion_init,,,Claude,,success
-2026-02-06T05:56:30.769Z,legion_create_task,,,Claude,"goal: Add a Norang-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",failed
-2026-02-06T05:56:43.733Z,legion_propose_task,,,Claude,name: nvim-orgmode-norang-workflow,success
-2026-02-06T05:56:47.729Z,legion_approve_proposal,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,proposalId: proposal-mlah377y-a8b914,success
-2026-02-06T05:56:57.878Z,legion_get_status,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
-2026-02-06T05:57:33.770Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 1,success
-2026-02-06T05:57:38.537Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Risk level set to Low for orgmode workflow changes.,success
-2026-02-06T05:57:50.665Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Implement punch in/out via explicit Lua wrapper commands instead of hook-based clock-out automation.,success
-2026-02-06T05:57:53.480Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 1,success
-2026-02-06T06:00:04.677Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Expose default Organization task ID via vim.g.org_organization_task_id.,success
-2026-02-06T06:00:07.929Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: lua/org_punch.lua,success
-2026-02-06T06:00:10.992Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: docs/orgmode-norang-workflow.md,success
-2026-02-06T06:00:14.751Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
-2026-02-06T06:00:14.768Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
-2026-02-06T06:00:14.793Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 2,success
-2026-02-06T06:02:21.650Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 3,success
-2026-02-06T06:02:24.575Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 3,success
-2026-02-06T06:02:29.678Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/test-report.md,success
-2026-02-06T06:02:32.824Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/review-code.md,success
-2026-02-06T06:03:09.149Z,legion_update_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,completeTask: phase 4,success
-2026-02-06T06:03:12.454Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/report-walkthrough.md,success
-2026-02-06T06:03:16.534Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-norang-workflow/docs/pr-body.md,success
-2026-02-06T08:15:07.708Z,legion_get_status,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
-2026-02-06T08:15:40.773Z,legion_update_context,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,addDecision: Keep a single canonical usage doc at docs/orgmode-norang-workflow.md.,success
-2026-02-07T14:11:55.472Z,legion_list_tasks,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
-2026-02-07T14:11:55.476Z,legion_get_status,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,,success
-2026-02-07T14:11:55.476Z,legion_list_reviews,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,"status: open, type: all",success
-2026-02-07T14:12:15.060Z,legion_create_task,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,goal: 在现有 nvim-orgmode 配置基础上新增 org_norang 插件，补齐 Norang 工作流中项目识别、卡住项目识别、归档候选与 block agenda 自动化能力。,failed
-2026-02-07T14:12:26.338Z,legion_propose_task,nvim-orgmode-norang-workflow,nvim-orgmode-norang-workflow,Claude,name: nvim-orgmode-norang-plugin,success
-2026-02-07T14:12:30.422Z,legion_approve_proposal,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,proposalId: proposal-mlce8jfh-2fae3d,success
-2026-02-07T14:12:33.361Z,legion_switch_task,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,taskId: nvim-orgmode-norang-plugin,success
-2026-02-07T14:13:01.428Z,legion_update_tasks,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,completeTask: 梳理当前 orgmode/punch 配置与 suggestion 差异，形成约束与风险清单,success
-2026-02-07T14:13:03.767Z,legion_update_tasks,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,setCurrentTask: 产出 RFC 初稿（架构、规则、接口、迁移与验证）,success
-2026-02-07T14:13:10.172Z,legion_update_context,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,addDecision: RFC 固定写入 .legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md，并要求所有设计/审查产物均落在该 Task 的 docs 或 reports 目录。,success
-2026-02-07T14:13:15.437Z,legion_update_context,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,addFile: .legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md,success
-2026-02-07T14:13:18.304Z,legion_list_reviews,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,"status: open, type: all",success
-2026-02-07T14:22:19.426Z,legion_update_context,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,addDecision: 当前 RFC 审查结论定为 PASS-WITH-CHANGES，不进入实现阶段，先闭合唯一剩余收敛点。,success
-2026-02-07T14:22:22.268Z,legion_update_tasks,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,setCurrentTask: 按复审意见迭代 RFC 至收敛,success
-2026-02-07T14:25:15.066Z,legion_list_reviews,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,"status: open, type: all",success
-2026-02-07T14:25:20.245Z,legion_update_plan,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
-2026-02-07T14:25:25.160Z,legion_update_context,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,handoff: 请用户确认 RFC 设计（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md）与复审结论（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc-review.md）。,success
-2026-02-08T15:16:01.727Z,legion_init,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
-2026-02-08T15:16:04.389Z,legion_get_status,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
-2026-02-08T15:16:04.405Z,legion_list_tasks,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,,success
-2026-02-08T15:16:35.990Z,legion_propose_task,nvim-orgmode-norang-plugin,nvim-orgmode-norang-plugin,Claude,name: nvim-orgmode-norang-implementation,success
-2026-02-08T15:16:42.366Z,legion_approve_proposal,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,proposalId: proposal-mldvywic-58900f,success
-2026-02-08T15:16:46.546Z,legion_switch_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,taskId: nvim-orgmode-norang-implementation,success
-2026-02-08T15:16:46.546Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-02-08T15:17:06.410Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 实现阶段严格以已通过复审的 RFC 为唯一设计真源，不在实现过程中扩展规范口径。,success
-2026-02-08T15:17:33.649Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-08T15:39:35.254Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: V1 refresh_all 严格遵守 memory_only：仅处理已加载 buffer，对未加载 agenda 文件统计为 skipped_unloaded,success
-2026-02-08T15:39:42.952Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/org_norang/init.lua,success
-2026-02-08T15:39:42.981Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/org_norang/refresh.lua,success
-2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: lua/plugins/orgmode.lua,success
-2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: docs/orgmode-norang-workflow.md,success
-2026-02-08T15:39:45.939Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: phase 1,success
-2026-02-08T15:39:54.774Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addConstraint: Justification: 按执行规范需同步回写 .legion 任务上下文（context.md/tasks.md）记录实现进展；该改动不属于业务功能代码，仅用于任务追踪与交接。,success
-2026-02-11T15:19:19.375Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 本轮验证采用“最小必选自动化 + RFC T1-T16 手工步骤清单”作为交付口径。,success
-2026-02-11T15:19:19.375Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
-2026-02-11T15:22:18.650Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
-2026-02-11T15:22:22.133Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
-2026-02-11T15:22:25.067Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
-2026-02-11T15:22:28.793Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/review-code.md,success
-2026-02-11T15:22:34.008Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 优先修复审查 blocking/high，再进行最终复审与报告。,success
-2026-02-11T15:24:42.283Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在保持 RFC 口径不变前提下，优先关闭审查 blocking/high，再进行最终报告输出。,success
-2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
-2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
-2026-02-11T15:28:09.676Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
-2026-02-11T15:28:14.457Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
-2026-02-11T15:28:18.633Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 已修复安全复审 FAIL：setup 先校验后注册自动刷新，非法配置路径不再触发字段下钻崩溃。,success
-2026-02-12T03:42:59.043Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 2026-02-12 重新执行最小校验：对 7 个改动 Lua 文件逐个运行 `nvim --headless -u NONE '+set rtp+=.' '+luafile <FILE>' '+qa'`，结果 7/7 PASS；已覆盖写回 docs/test-report.md。,success
-2026-02-12T03:43:02.640Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
-2026-02-12T03:44:06.325Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
-2026-02-12T03:44:12.432Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/report-walkthrough.md,success
-2026-02-12T03:44:20.926Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 生成 walkthrough 报告与变更说明,success
-2026-02-12T03:44:28.600Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 生成 walkthrough 报告与变更说明,success
-2026-02-12T03:44:49.851Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-02-12T11:54:02.065Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 根据用户新增需求调整刷新策略：支持全量识别并刷新 org_agenda_files 中未加载文件，并提供开关 refresh.refresh_unloaded_files（默认 true）。,success
-2026-02-12T11:54:06.826Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
-2026-02-12T11:54:10.157Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
-2026-02-13T16:13:48.358Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 norang 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
-2026-02-13T16:13:52.797Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 norang 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
-2026-02-13T16:13:57.612Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"addDecision: 在 block agenda 中新增 Standalone Tasks 块，匹配 `+TODO=""TODO""-PROJECT-REFILE`。",success
-2026-02-13T16:19:17.809Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Norang 流程单独查看卡住项目,success
-2026-02-13T16:19:22.847Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Norang 流程单独查看卡住项目,success
-2026-02-13T16:19:27.531Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在保留 block agenda 的前提下增加独立 Stuck Projects 入口。,success
-2026-02-13T16:24:06.038Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
-2026-02-13T16:24:09.724Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
-2026-02-13T16:24:16.646Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将项目判定从“有活动子任务”改为“有任意 TODO 关键字子任务”，并将 WAITING+NEXT 视为不可解除 stuck。,success
-2026-02-13T16:31:30.774Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
-2026-02-13T16:31:33.422Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
-2026-02-13T16:31:39.645Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 避免在 agenda 文件发现阶段对通配模式调用 `vim.fn.expand`，改为仅 `~` 展开后交由 `vim.fn.glob` 处理。,success
-2026-02-14T04:22:22.702Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
-2026-02-14T04:22:25.482Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
-2026-02-14T04:22:31.839Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。,success
-2026-02-26T15:07:46.095Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-26T15:07:46.127Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-02-26T15:09:34.441Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
-2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
-2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
-2026-02-26T15:09:41.799Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 先输出审查结论与优化建议，再由用户决定是否进入补丁修复。,success
-2026-02-26T15:12:54.236Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-26T15:12:54.236Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
-2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 修复 org_punch/org_norang cleanup 的 agenda 文件发现 + 统一 organization_task_id 单一来源,success
-2026-02-26T15:13:18.903Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
-2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
-2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
-2026-02-26T15:14:42.349Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: organization_task_id 统一由 `vim.g.org_organization_task_id` 作为唯一指定入口，插件层只在非空时透传给 org_punch。,success
-2026-02-26T15:15:37.502Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
-2026-02-26T15:15:46.822Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
-2026-02-26T15:15:51.133Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 org_norang cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
-2026-02-26T15:15:57.736Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-26T15:47:48.498Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 实现 Norang clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO,success
-2026-02-26T15:47:48.574Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 接管 org/agenda clock-in 映射并统一走 org_punch 包装器，保证状态切换逻辑一致,success
-2026-02-26T15:47:48.575Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补充文档说明：时间线 time block 来源于时间戳，clock 记录通过 agenda 的 R 查看报告,success
-2026-02-26T15:47:55.504Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 实现 Norang clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO,success
-2026-02-26T15:47:55.608Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 接管 org/agenda clock-in 映射并统一走 org_punch 包装器，保证状态切换逻辑一致,success
-2026-02-26T15:47:55.615Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补充文档说明：时间线 time block 来源于时间戳，clock 记录通过 agenda 的 R 查看报告,success
-2026-02-26T15:48:05.044Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 不将 CLOCK 记录直接渲染为时间线 time block，而是遵循 orgmode 语义：时间线展示时间戳，clock 通过 report 展示。,success
-2026-02-26T15:48:33.692Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-02-26T16:01:01.738Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 punch_in 误报成功：默认任务 clock-in 失败时返回 false 并回退 keep_clock_running=false,success
-2026-02-26T16:01:01.769Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 在单一入口设置 organization_task_id：写入 lua/config/options.lua 并校正文档,success
-2026-02-26T16:01:10.640Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 punch_in 误报成功：默认任务 clock-in 失败时返回 false 并回退 keep_clock_running=false,success
-2026-02-26T16:01:10.676Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 在单一入口设置 organization_task_id：写入 lua/config/options.lua 并校正文档,success
-2026-02-26T16:01:19.446Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 保留 organization_task_id 的单一配置入口为 `vim.g.org_organization_task_id`，并在仓库默认 options 中提供有效值。,success
-2026-02-26T16:13:50.798Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 clock_out 未清理 0:00 记录：统一 org/agenda clock-out 入口到 org_punch，并在 clock_out 后自动删除零时长 CLOCK 行,success
-2026-02-26T16:13:56.139Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 clock_out 未清理 0:00 记录：统一 org/agenda clock-out 入口到 org_punch，并在 clock_out 后自动删除零时长 CLOCK 行,success
-2026-02-26T16:14:05.106Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将 `0:00` 清理逻辑放在 org_punch 的 clock_out 包装层，而不是改动 orgmode.nvim 源码。,success
-2026-02-27T04:41:55.524Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增 org-mode 冒烟测试集（7 个 case）与本地批量运行脚本 tests/smoke/run.sh,success
-2026-02-27T04:42:05.066Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增 GitHub Actions 工作流 .github/workflows/org-smoke.yml，在 CI 中按 lazy-lock 固定 commit 拉取 orgmode 并执行冒烟测试,success
-2026-02-27T04:42:11.857Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增 org-mode 冒烟测试集（7 个 case）与本地批量运行脚本 tests/smoke/run.sh,success
-2026-02-27T04:42:11.879Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增 GitHub Actions 工作流 .github/workflows/org-smoke.yml，在 CI 中按 lazy-lock 固定 commit 拉取 orgmode 并执行冒烟测试,success
-2026-02-27T04:42:21.166Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: CI 依赖不走完整 LazyVim 启动链，改为 headless + `-u NONE` + 显式 runtimepath 注入（repo + orgmode）。,success
-2026-02-27T04:46:53.332Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext,success
-2026-02-27T04:47:06.210Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext,success
-2026-02-27T04:47:15.794Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 保持“切到默认任务 clock-in 再切回”的流程不变，仅补充窗口选项恢复层，避免改动 orgmode 行为边界。,success
-2026-02-27T05:03:52.757Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转,success
-2026-02-27T05:04:04.994Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染,success
-2026-02-27T05:04:12.677Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转,success
-2026-02-27T05:04:12.691Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染,success
-2026-02-27T05:04:32.224Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将 punch 默认任务路径从“切窗 + 光标定位 + clock_in”改为“数据层定位 + clock_in”，并保持用户当前窗口不变。,success
-2026-02-27T06:03:51.453Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 org_capture_templates 多类型模板（todo/respond/note/meeting/phone/journal），修复 capture 只显示 task 问题,success
-2026-02-27T06:04:00.477Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 org_capture_templates 多类型模板（todo/respond/note/meeting/phone/journal），修复 capture 只显示 task 问题,success
-2026-02-27T06:04:11.069Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: Capture 类型不通过扩展 TODO 关键字实现，而是通过 `org_capture_templates` 多模板显式建模。,success
-2026-02-27T06:26:22.452Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修正 journal capture 目标路径到 diary.org datetree，并补齐 Norang capture clock handoff（开始 capture 暂停当前 clock，结束后恢复）,success
-2026-02-27T06:26:29.346Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修正 journal capture 目标路径到 diary.org datetree，并补齐 Norang capture clock handoff（开始 capture 暂停当前 clock，结束后恢复）,success
-2026-02-27T06:26:39.270Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 不改动 orgmode 上游 capture 内核，采用轻量包装模块对 open_template 与 capture hooks 做时钟接力。,success
-2026-02-27T07:22:10.787Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 将 journal 目标路径参数化：在 orgmode 配置顶端增加 org_diary_file 并支持 vim.g.org_diary_file 覆盖,success
-2026-02-27T07:22:24.181Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 将 journal 目标路径参数化：在 orgmode 配置顶端增加 org_diary_file 并支持 vim.g.org_diary_file 覆盖,success
-2026-02-27T07:22:34.056Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: Diary 路径采用“顶端局部变量 + 全局覆盖”双层配置：`org_diary_file = vim.g.org_diary_file or <default>`。,success
-2026-02-27T13:26:41.895Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 capture 条目未 clock-in：在 capture on_pre_refile 注入 LOGBOOK/CLOCK 记录，并保留 clock-resume 语义,success
-2026-02-27T13:26:57.243Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 增强冒烟测试覆盖 capture 语义：新增 handoff 恢复和 pre-refile CLOCK 注入用例,success
-2026-02-27T13:27:09.673Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture 条目未 clock-in：在 capture on_pre_refile 注入 LOGBOOK/CLOCK 记录，并保留 clock-resume 语义,success
-2026-02-27T13:27:09.673Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 增强冒烟测试覆盖 capture 语义：新增 handoff 恢复和 pre-refile CLOCK 注入用例,success
-2026-02-27T13:27:25.627Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: capture clock-in 不通过驱动 orgmode 全局 active clock 实现，而是在 refile 前将闭合 CLOCK 记录写入 capture 条目。,success
-2026-02-27T13:45:51.400Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK,success
-2026-02-27T13:46:05.871Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义,success
-2026-02-27T13:46:23.013Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支,success
-2026-02-27T13:46:37.199Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK,success
-2026-02-27T13:46:37.232Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义,success
-2026-02-27T13:46:37.244Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支,success
-2026-02-27T13:46:53.896Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: capture clock 记录采用分钟边界差值而非秒级 floor 时长；并在 0 分钟时跳过记录。,success
-2026-02-28T15:48:38.315Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
-2026-02-28T15:49:00.886Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
-2026-02-28T15:49:22.231Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 不改写 orgmode 的 refile 匹配算法，先提升输入 UI 能力（vim.ui.input + snacks input）来提供候选可见性。,success
-2026-02-28T16:15:18.886Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
-2026-02-28T16:15:50.369Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
-2026-02-28T16:16:10.062Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
-2026-02-28T16:16:10.089Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
-2026-02-28T16:16:35.849Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: `oxi` 路径采用“视图恢复 + 同文件不写盘”策略，跨文件场景仍保留 update 回退。,success
-2026-03-01T04:22:05.589Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
-2026-03-01T04:22:35.317Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
-2026-03-01T04:23:02.994Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
-2026-03-01T04:23:03.344Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
-2026-03-01T04:23:32.978Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在 org_punch 内统一采用“隐藏 buffer + 内存修改 + 不写盘”策略，彻底规避 orgmode `OrgFile:update` 的自动保存行为。,success
-2026-03-01T04:29:32.758Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
-2026-03-01T04:30:02.845Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
-2026-03-01T04:30:36.696Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 所有 clock 相关路径（punch/oxi/capture handoff）统一 memory-only；落盘只由用户显式保存。,success
-2026-03-01T04:45:21.509Z,legion_list_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-01T04:45:26.593Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-01T04:45:26.604Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-03-01T04:45:26.604Z,legion_read_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"section: all, includeReviews: true",success
-2026-03-01T04:49:21.643Z,legion_switch_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,taskId: nvim-orgmode-norang-implementation,success
-2026-03-01T05:01:39.085Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addTask: 用户批准设计（Design Approved）,success
-2026-03-01T05:01:59.118Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 设计阶段已通过 RFC 对抗审查（blocking=0），实现阶段需等待用户 Design Approved 后再进入。,success
-2026-03-01T05:02:02.136Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 用户批准设计（Design Approved）,success
-2026-03-01T05:02:10.616Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-03-01T06:17:27.209Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-01T06:17:32.968Z,legion_list_reviews,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,"status: open, type: all",success
-2026-03-01T06:17:54.639Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 用户批准设计（Design Approved）,success
-2026-03-01T06:18:03.460Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 将用户“执行实现流程并修复不一致”指令视为 Design Approved，正式进入实现阶段。,success
-2026-03-01T06:18:15.193Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
-2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
-2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
-2026-03-01T06:18:21.575Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 生成并更新 walkthrough 报告与 PR body 建议,success
-2026-03-01T06:18:25.610Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
-2026-03-01T06:28:20.254Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,progress.completed: 按 Scope 完成 Norang TODO 状态触发标签实现：新增 org_norang.todo_triggers，覆盖 WAITING/HOLD/CANCELLED 与 TODO/NEXT/DONE 的标签增删规则。,success
-2026-03-01T06:28:29.771Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 按 Norang 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
-2026-03-01T06:28:38.303Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
-2026-03-01T06:28:45.019Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDiscoveredTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
-2026-03-01T06:28:53.196Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 Norang 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
-2026-03-01T06:28:59.791Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
-2026-03-01T06:29:06.920Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
-2026-03-01T06:29:29.952Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addConstraint: Justification: 由于使用 legion MCP 写回 context/tasks，.legion/config.json 与 .legion/ledger.csv 被工具自动更新（审计元数据），非业务实现改动；业务代码与文档仅修改在本轮 Scope 列表内。,success
-2026-03-01T06:30:34.816Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
-2026-03-01T06:44:07.593Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-01T06:44:23.211Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-norang-implementation/docs/test-report.md,success
-2026-03-01T06:44:29.283Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
-2026-03-01T11:28:24.312Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 按 Norang 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
-2026-03-01T11:28:24.313Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
-2026-03-01T11:28:24.321Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,completeTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
-2026-03-01T11:28:28.171Z,legion_update_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,setCurrentTask: 生成并更新 walkthrough 报告与 PR body 建议,success
-2026-03-01T11:28:34.466Z,legion_update_context,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,addDecision: 在 review 无 blocking/high 前提下直接进入报告阶段，不额外插入修复回合。,success
-2026-03-04T07:10:27.848Z,legion_get_status,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-04T07:10:31.561Z,legion_list_tasks,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,,success
-2026-03-04T07:11:40.579Z,legion_create_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,goal: 设计并落地一个端到端测试套件，覆盖 norang 原文的关键行为并验证当前实现与 orgmode/orgmode.nvim 语义一致。,failed
-2026-03-04T07:11:51.816Z,legion_propose_task,nvim-orgmode-norang-implementation,nvim-orgmode-norang-implementation,Claude,name: orgmode-norang-e2e-parity-suite,success
-2026-03-04T07:11:55.546Z,legion_approve_proposal,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,proposalId: proposal-mmbp7z0l-b2308f,success
-2026-03-04T07:11:59.472Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T07:14:16.179Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 生成 task-brief，明确问题定义、验收标准、假设与风险,success
-2026-03-04T07:14:16.227Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 根据任务复杂度确定设计强度并形成设计门禁,success
-2026-03-04T07:14:23.385Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
-2026-03-04T07:14:29.657Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/task-brief.md,success
-2026-03-04T07:14:33.265Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 本任务按 Medium + Epic 执行，并采用 rfc:heavy 设计强度（先 RFC + review-rfc，再实现）。,success
-2026-03-04T07:14:37.675Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addConstraint: 执行策略采用 Autopilot：不等待设计人工确认，默认以 PR 作为延迟批准载体；仅在不可逆风险或信息无法推断时再提问。,success
-2026-03-04T07:20:38.452Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
-2026-03-04T07:20:38.453Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 执行 RFC 对抗审查并收敛 blocking,success
-2026-03-04T07:20:44.316Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: phase 2,success
-2026-03-04T07:21:07.642Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
-2026-03-04T07:21:07.655Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
-2026-03-04T07:21:08.094Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
-2026-03-04T07:21:08.161Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDiscoveredTask: 生成 walkthrough 与 PR body 文档,success
-2026-03-04T07:21:13.532Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
-2026-03-04T08:27:56.975Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 实现 Norang 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
-2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
-2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
-2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 生成 walkthrough 与 PR body 文档,success
-2026-03-04T08:28:02.365Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
-2026-03-04T08:28:14.966Z,legion_update_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,setCurrentTask: phase 5,success
-2026-03-04T08:28:48.085Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,progress.completed: RFC 已生成并通过二次对抗审查（docs/rfc.md + docs/rfc-review.md，结论 PASS）,success
-2026-03-04T08:28:55.425Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/rfc.md,success
-2026-03-04T08:28:55.452Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/test-report.md,success
-2026-03-04T08:28:55.452Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/review-code.md,success
-2026-03-04T08:28:55.453Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/rfc-review.md,success
-2026-03-04T08:28:55.454Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/review-security.md,success
-2026-03-04T08:28:55.454Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-norang-e2e-parity-suite/docs/pr-body.md,success
-2026-03-04T08:29:00.886Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 NP-006A（父任务回退）从“可选回退 default”收紧为严格父任务回退，并据此修复 org_punch 实现。,success
-2026-03-04T08:29:00.886Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 smoke runner runtimepath 注入从 Ex 拼接迁移到受控 Lua 校验，并将 HOME 依赖回退改为显式 opt-in。,success
-2026-03-04T08:29:06.724Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,handoff: 使用 `.legion/tasks/orgmode-norang-e2e-parity-suite/docs/pr-body.md` 作为 PR 描述提交评审,success
-2026-03-04T08:29:24.636Z,legion_update_plan,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T08:29:29.712Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addConstraint: 因 NP-006A 严格断言触发真实偏差，实施阶段允许最小越界修复 `lua/org_punch.lua`（已回写 plan scope 并在 RFC/review 中记录）。,success
-2026-03-04T08:29:47.186Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addFile: .legion/playbook.md,success
-2026-03-04T08:30:16.022Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T08:31:50.189Z,legion_update_context,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,addDecision: 将 NP-006A 断言收紧为“存在父任务时必须回父任务”，并修复 org_punch 逻辑以满足该约束。,success
-2026-03-04T08:32:14.612Z,legion_update_plan,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T13:32:10.668Z,legion_get_status,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T13:32:34.021Z,legion_list_tasks,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,,success
-2026-03-04T13:33:20.060Z,legion_create_task,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,goal: 将现有 Norang workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。,failed
-2026-03-04T13:33:29.311Z,legion_propose_task,orgmode-norang-e2e-parity-suite,orgmode-norang-e2e-parity-suite,Claude,name: norang-workflow-ai-skill,success
-2026-03-04T13:33:33.549Z,legion_approve_proposal,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,proposalId: proposal-mmc2uqu3-3e0ebb,success
-2026-03-04T13:33:36.875Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
-2026-03-04T13:34:25.919Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 生成 task-brief，明确目标、验收、假设、风险与验证,success
-2026-03-04T13:34:29.985Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 完成风险/规模标签决策（Low/Medium/High + Epic）,success
-2026-03-04T13:34:32.547Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 根据风险等级产出 design-lite 或 RFC,success
-2026-03-04T13:34:35.211Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 在项目根目录创建 Norang workflow Skill,success
-2026-03-04T13:34:43.343Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 恢复 .legion active task 并读取 plan/context/tasks/task-brief 上下文,success
-2026-03-04T13:34:45.908Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/task-brief.md,success
-2026-03-04T13:34:49.818Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/design-lite.md,success
-2026-03-04T13:34:52.561Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 本任务按 Low 风险执行，采用 design-lite，不进入 RFC/review-rfc 流程。,success
-2026-03-04T13:34:56.022Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 受权限策略限制无法直接加载 skill-creator，改为按仓库规范手工创建 `skills/norang-workflow/SKILL.md`。,success
-2026-03-04T13:36:38.698Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 在项目根目录创建 Norang workflow Skill,success
-2026-03-04T13:36:40.747Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 执行测试与结果归档,success
-2026-03-04T13:36:46.511Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 通过 engineer 在项目根目录落地 `skills/norang-workflow/SKILL.md`,success
-2026-03-04T13:36:49.855Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/SKILL.md,success
-2026-03-04T13:36:55.329Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/references/quick-checklist.md,success
-2026-03-04T13:45:14.612Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 执行测试与结果归档,success
-2026-03-04T13:45:17.553Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 执行代码评审（必要时安全评审）,success
-2026-03-04T13:45:20.710Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,setCurrentTask: 生成 walkthrough 与 PR body,success
-2026-03-04T13:45:24.214Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 执行 run-tests 并生成 docs/test-report.md（PASS）,success
-2026-03-04T13:45:26.466Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/test-report.md,success
-2026-03-04T13:45:29.843Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/tasks/norang-workflow-ai-skill/docs/review-code.md,success
-2026-03-04T13:45:32.809Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addDecision: 本任务不执行 review-security。,success
-2026-03-04T13:47:01.636Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: .legion/playbook.md,success
-2026-03-04T13:47:05.736Z,legion_update_tasks,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,completeTask: 生成 walkthrough 与 PR body,success
-2026-03-04T13:47:14.064Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 生成 docs/report-walkthrough.md 与 docs/pr-body.md，可直接用于提交流程,success
-2026-03-04T13:47:16.794Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
-2026-03-04T13:51:29.102Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 根据用户要求将 `skills/norang-workflow/SKILL.md` 改写为中文版本，并保留原有执行边界与安全门禁语义,success
-2026-03-04T13:51:32.641Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/SKILL.md,success
-2026-03-04T13:51:32.643Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: skills/norang-workflow/references/quick-checklist.md,success
-2026-03-05T12:19:18.191Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 在 `README.md` 新增“安装 Norang Workflow Skill（给人类和 AI）”章节，基于 skills.sh CLI 文档补充安装与使用指引,success
-2026-03-05T12:19:20.876Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,addFile: README.md,success
-2026-03-05T12:32:14.143Z,legion_update_context,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,progress.completed: 按用户反馈将 README 中 skills.sh 安装命令从本地路径 `.` 改为 GitHub 链接 `https://github.com/Thrimbda/nvim`，避免安装源歧义,success
-2026-03-09T07:04:16.885Z,legion_get_status,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,,success
-2026-03-09T07:04:29.022Z,legion_propose_task,norang-workflow-ai-skill,norang-workflow-ai-skill,Claude,name: org-punch-fold-preservation-fix,success
+2026-02-06T05:56:30.769Z,legion_create_task,,,Claude,"goal: Add a Legion-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",failed
+2026-02-06T05:56:43.733Z,legion_propose_task,,,Claude,name: nvim-orgmode-legion-workflow,success
+2026-02-06T05:56:47.729Z,legion_approve_proposal,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,proposalId: proposal-mlah377y-a8b914,success
+2026-02-06T05:56:57.878Z,legion_get_status,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,,success
+2026-02-06T05:57:33.770Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 1,success
+2026-02-06T05:57:38.537Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addDecision: Risk level set to Low for orgmode workflow changes.,success
+2026-02-06T05:57:50.665Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addDecision: Implement punch in/out via explicit Lua wrapper commands instead of hook-based clock-out automation.,success
+2026-02-06T05:57:53.480Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 1,success
+2026-02-06T06:00:04.677Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addDecision: Expose default Organization task ID via vim.g.org_organization_task_id.,success
+2026-02-06T06:00:07.929Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: lua/org_punch.lua,success
+2026-02-06T06:00:10.992Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: skills/legion-workflow/references/orgmode-legion-workflow.md,success
+2026-02-06T06:00:14.751Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:00:14.768Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:00:14.793Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 2,success
+2026-02-06T06:02:21.650Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 3,success
+2026-02-06T06:02:24.575Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 3,success
+2026-02-06T06:02:29.678Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-legion-workflow/docs/test-report.md,success
+2026-02-06T06:02:32.824Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-legion-workflow/docs/review-code.md,success
+2026-02-06T06:03:09.149Z,legion_update_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,completeTask: phase 4,success
+2026-02-06T06:03:12.454Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-legion-workflow/docs/report-walkthrough.md,success
+2026-02-06T06:03:16.534Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addFile: .legion/tasks/nvim-orgmode-legion-workflow/docs/pr-body.md,success
+2026-02-06T08:15:07.708Z,legion_get_status,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,,success
+2026-02-06T08:15:40.773Z,legion_update_context,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,addDecision: Keep a single canonical usage doc at skills/legion-workflow/references/orgmode-legion-workflow.md.,success
+2026-02-07T14:11:55.472Z,legion_list_tasks,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,,success
+2026-02-07T14:11:55.476Z,legion_get_status,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,,success
+2026-02-07T14:11:55.476Z,legion_list_reviews,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,"status: open, type: all",success
+2026-02-07T14:12:15.060Z,legion_create_task,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,goal: 在现有 nvim-orgmode 配置基础上新增 org_legion 插件，补齐 Legion 工作流中项目识别、卡住项目识别、归档候选与 block agenda 自动化能力。,failed
+2026-02-07T14:12:26.338Z,legion_propose_task,nvim-orgmode-legion-workflow,nvim-orgmode-legion-workflow,Claude,name: nvim-orgmode-legion-plugin,success
+2026-02-07T14:12:30.422Z,legion_approve_proposal,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,proposalId: proposal-mlce8jfh-2fae3d,success
+2026-02-07T14:12:33.361Z,legion_switch_task,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,taskId: nvim-orgmode-legion-plugin,success
+2026-02-07T14:13:01.428Z,legion_update_tasks,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,completeTask: 梳理当前 orgmode/punch 配置与 suggestion 差异，形成约束与风险清单,success
+2026-02-07T14:13:03.767Z,legion_update_tasks,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,setCurrentTask: 产出 RFC 初稿（架构、规则、接口、迁移与验证）,success
+2026-02-07T14:13:10.172Z,legion_update_context,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,addDecision: RFC 固定写入 .legion/tasks/nvim-orgmode-legion-plugin/docs/rfc.md，并要求所有设计/审查产物均落在该 Task 的 docs 或 reports 目录。,success
+2026-02-07T14:13:15.437Z,legion_update_context,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,addFile: .legion/tasks/nvim-orgmode-legion-plugin/docs/rfc.md,success
+2026-02-07T14:13:18.304Z,legion_list_reviews,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,"status: open, type: all",success
+2026-02-07T14:22:19.426Z,legion_update_context,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,addDecision: 当前 RFC 审查结论定为 PASS-WITH-CHANGES，不进入实现阶段，先闭合唯一剩余收敛点。,success
+2026-02-07T14:22:22.268Z,legion_update_tasks,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,setCurrentTask: 按复审意见迭代 RFC 至收敛,success
+2026-02-07T14:25:15.066Z,legion_list_reviews,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,"status: open, type: all",success
+2026-02-07T14:25:20.245Z,legion_update_plan,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,,success
+2026-02-07T14:25:25.160Z,legion_update_context,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,handoff: 请用户确认 RFC 设计（.legion/tasks/nvim-orgmode-legion-plugin/docs/rfc.md）与复审结论（.legion/tasks/nvim-orgmode-legion-plugin/docs/rfc-review.md）。,success
+2026-02-08T15:16:01.727Z,legion_init,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,,success
+2026-02-08T15:16:04.389Z,legion_get_status,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,,success
+2026-02-08T15:16:04.405Z,legion_list_tasks,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,,success
+2026-02-08T15:16:35.990Z,legion_propose_task,nvim-orgmode-legion-plugin,nvim-orgmode-legion-plugin,Claude,name: nvim-orgmode-legion-implementation,success
+2026-02-08T15:16:42.366Z,legion_approve_proposal,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,proposalId: proposal-mldvywic-58900f,success
+2026-02-08T15:16:46.546Z,legion_switch_task,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,taskId: nvim-orgmode-legion-implementation,success
+2026-02-08T15:16:46.546Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-02-08T15:17:06.410Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 实现阶段严格以已通过复审的 RFC 为唯一设计真源，不在实现过程中扩展规范口径。,success
+2026-02-08T15:17:33.649Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-08T15:39:35.254Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: V1 refresh_all 严格遵守 memory_only：仅处理已加载 buffer，对未加载 agenda 文件统计为 skipped_unloaded,success
+2026-02-08T15:39:42.952Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: lua/org_legion/init.lua,success
+2026-02-08T15:39:42.981Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: lua/org_legion/refresh.lua,success
+2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: lua/plugins/orgmode.lua,success
+2026-02-08T15:39:42.984Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: skills/legion-workflow/references/orgmode-legion-workflow.md,success
+2026-02-08T15:39:45.939Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: phase 1,success
+2026-02-08T15:39:54.774Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addConstraint: Justification: 按执行规范需同步回写 .legion 任务上下文（context.md/tasks.md）记录实现进展；该改动不属于业务功能代码，仅用于任务追踪与交接。,success
+2026-02-11T15:19:19.375Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 本轮验证采用“最小必选自动化 + RFC T1-T16 手工步骤清单”作为交付口径。,success
+2026-02-11T15:19:19.375Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-02-11T15:22:18.650Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:22:22.133Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-11T15:22:25.067Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:22:28.793Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-legion-implementation/docs/review-code.md,success
+2026-02-11T15:22:34.008Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 优先修复审查 blocking/high，再进行最终复审与报告。,success
+2026-02-11T15:24:42.283Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 在保持 RFC 口径不变前提下，优先关闭审查 blocking/high，再进行最终报告输出。,success
+2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-11T15:24:46.308Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复代码审查 blocking：限制 refresh 仅处理 agenda files，并补全配置类型校验保证 E_CFG_INVALID/S5 语义稳定,success
+2026-02-11T15:28:09.676Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
+2026-02-11T15:28:14.457Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复安全复审 FAIL：调整 setup 执行顺序与错误分支防御，保证非法配置稳定进入 S5/E_CFG_INVALID,success
+2026-02-11T15:28:18.633Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,progress.completed: 已修复安全复审 FAIL：setup 先校验后注册自动刷新，非法配置路径不再触发字段下钻崩溃。,success
+2026-02-12T03:42:59.043Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,progress.completed: 2026-02-12 重新执行最小校验：对 7 个改动 Lua 文件逐个运行 `nvim --headless -u NONE '+set rtp+=.' '+luafile <FILE>' '+qa'`，结果 7/7 PASS；已覆盖写回 docs/test-report.md。,success
+2026-02-12T03:43:02.640Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-02-12T03:44:06.325Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复安全评审 high：cleanup apply 增加锁与 changedtick/mtime 冲突检测，避免覆盖新改动,success
+2026-02-12T03:44:12.432Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-legion-implementation/docs/report-walkthrough.md,success
+2026-02-12T03:44:20.926Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 生成 walkthrough 报告与变更说明,success
+2026-02-12T03:44:28.600Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 生成 walkthrough 报告与变更说明,success
+2026-02-12T03:44:49.851Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-02-12T11:54:02.065Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 根据用户新增需求调整刷新策略：支持全量识别并刷新 org_agenda_files 中未加载文件，并提供开关 refresh.refresh_unloaded_files（默认 true）。,success
+2026-02-12T11:54:06.826Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
+2026-02-12T11:54:10.157Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 支持全量刷新未加载 agenda 文件，增加 refresh.refresh_unloaded_files 开关并默认开启,success
+2026-02-13T16:13:48.358Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 按 legion 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
+2026-02-13T16:13:52.797Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 按 legion 文档补齐 Standalone Tasks 议程块，确保 TODO 叶子任务在 block agenda 可见,success
+2026-02-13T16:13:57.612Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"addDecision: 在 block agenda 中新增 Standalone Tasks 块，匹配 `+TODO=""TODO""-PROJECT-REFILE`。",success
+2026-02-13T16:19:17.809Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Legion 流程单独查看卡住项目,success
+2026-02-13T16:19:22.847Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 补齐 Stuck Projects 独立议程入口（agenda s）和快捷键，便于按 Legion 流程单独查看卡住项目,success
+2026-02-13T16:19:27.531Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 在保留 block agenda 的前提下增加独立 Stuck Projects 入口。,success
+2026-02-13T16:24:06.038Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
+2026-02-13T16:24:09.724Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 stuck project 判定：项目子任务包含 DONE/CANCELLED 也应识别为项目，且 WAITING 标签的 NEXT 不解除 STUCK,success
+2026-02-13T16:24:16.646Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 将项目判定从“有活动子任务”改为“有任意 TODO 关键字子任务”，并将 WAITING+NEXT 视为不可解除 stuck。,success
+2026-02-13T16:31:30.774Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
+2026-02-13T16:31:33.422Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 org_agenda_files 通配展开缺陷：避免 vim.fn.expand 提前展开通配导致匹配集为空，确保 course.org 可被识别,success
+2026-02-13T16:31:39.645Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 避免在 agenda 文件发现阶段对通配模式调用 `vim.fn.expand`，改为仅 `~` 展开后交由 `vim.fn.glob` 处理。,success
+2026-02-14T04:22:22.702Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
+2026-02-14T04:22:25.482Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 补齐 Emacs 风格时间线：启用 agenda time grid，并新增 `:Org agenda t` 日视图时间线入口,success
+2026-02-14T04:22:31.839Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 通过 `org_agenda_time_grid.type = {'daily'}` 去掉 `require-timed` 约束，确保日视图稳定显示时间线。,success
+2026-02-26T15:07:46.095Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-26T15:07:46.127Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-02-26T15:09:34.441Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
+2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 org_legion cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:09:34.451Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:09:41.799Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 先输出审查结论与优化建议，再由用户决定是否进入补丁修复。,success
+2026-02-26T15:12:54.236Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-26T15:12:54.236Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 org_legion cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:13:15.108Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 修复 org_punch/org_legion cleanup 的 agenda 文件发现 + 统一 organization_task_id 单一来源,success
+2026-02-26T15:13:18.903Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 org_punch 的 agenda 文件发现逻辑（expand+glob 组合导致匹配为空，默认任务 ID 查找失败）,success
+2026-02-26T15:14:34.432Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 org_legion cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:14:42.349Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: organization_task_id 统一由 `vim.g.org_organization_task_id` 作为唯一指定入口，插件层只在非空时透传给 org_punch。,success
+2026-02-26T15:15:37.502Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 统一 organization_task_id 来源，避免 orgmode.lua 传空字符串覆盖 org_punch 默认值,success
+2026-02-26T15:15:46.822Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 org_legion cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:15:51.133Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 org_legion cleanup 的 agenda 文件发现逻辑，与 refresh 保持一致的 home 展开与通配兼容,success
+2026-02-26T15:15:57.736Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-26T15:47:48.498Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 实现 Legion clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO,success
+2026-02-26T15:47:48.574Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 接管 org/agenda clock-in 映射并统一走 org_punch 包装器，保证状态切换逻辑一致,success
+2026-02-26T15:47:48.575Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 补充文档说明：时间线 time block 来源于时间戳，clock 记录通过 agenda 的 R 查看报告,success
+2026-02-26T15:47:55.504Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 实现 Legion clock-in 状态切换：TODO task -> NEXT，NEXT project -> TODO,success
+2026-02-26T15:47:55.608Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 接管 org/agenda clock-in 映射并统一走 org_punch 包装器，保证状态切换逻辑一致,success
+2026-02-26T15:47:55.615Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 补充文档说明：时间线 time block 来源于时间戳，clock 记录通过 agenda 的 R 查看报告,success
+2026-02-26T15:48:05.044Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 不将 CLOCK 记录直接渲染为时间线 time block，而是遵循 orgmode 语义：时间线展示时间戳，clock 通过 report 展示。,success
+2026-02-26T15:48:33.692Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-02-26T16:01:01.738Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 punch_in 误报成功：默认任务 clock-in 失败时返回 false 并回退 keep_clock_running=false,success
+2026-02-26T16:01:01.769Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 在单一入口设置 organization_task_id：写入 lua/config/options.lua 并校正文档,success
+2026-02-26T16:01:10.640Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 punch_in 误报成功：默认任务 clock-in 失败时返回 false 并回退 keep_clock_running=false,success
+2026-02-26T16:01:10.676Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 在单一入口设置 organization_task_id：写入 lua/config/options.lua 并校正文档,success
+2026-02-26T16:01:19.446Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 保留 organization_task_id 的单一配置入口为 `vim.g.org_organization_task_id`，并在仓库默认 options 中提供有效值。,success
+2026-02-26T16:13:50.798Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 clock_out 未清理 0:00 记录：统一 org/agenda clock-out 入口到 org_punch，并在 clock_out 后自动删除零时长 CLOCK 行,success
+2026-02-26T16:13:56.139Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 clock_out 未清理 0:00 记录：统一 org/agenda clock-out 入口到 org_punch，并在 clock_out 后自动删除零时长 CLOCK 行,success
+2026-02-26T16:14:05.106Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 将 `0:00` 清理逻辑放在 org_punch 的 clock_out 包装层，而不是改动 orgmode.nvim 源码。,success
+2026-02-27T04:41:55.524Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 新增 org-mode 冒烟测试集（7 个 case）与本地批量运行脚本 tests/smoke/run.sh,success
+2026-02-27T04:42:05.066Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 新增 GitHub Actions 工作流 .github/workflows/org-smoke.yml，在 CI 中按 lazy-lock 固定 commit 拉取 orgmode 并执行冒烟测试,success
+2026-02-27T04:42:11.857Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 新增 org-mode 冒烟测试集（7 个 case）与本地批量运行脚本 tests/smoke/run.sh,success
+2026-02-27T04:42:11.879Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 新增 GitHub Actions 工作流 .github/workflows/org-smoke.yml，在 CI 中按 lazy-lock 固定 commit 拉取 orgmode 并执行冒烟测试,success
+2026-02-27T04:42:21.166Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: CI 依赖不走完整 LazyVim 启动链，改为 headless + `-u NONE` + 显式 runtimepath 注入（repo + orgmode）。,success
+2026-02-27T04:46:53.332Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext,success
+2026-02-27T04:47:06.210Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 punch_in 导致窗口 fold 状态丢失：with_view_restored 恢复 foldlevel/foldenable/foldmethod/foldexpr/foldtext,success
+2026-02-27T04:47:15.794Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 保持“切到默认任务 clock-in 再切回”的流程不变，仅补充窗口选项恢复层，避免改动 orgmode 行为边界。,success
+2026-02-27T05:03:52.757Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转,success
+2026-02-27T05:04:04.994Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染,success
+2026-02-27T05:04:12.677Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 punch in/out 的窗口副作用：默认任务 clock-in 改为无切窗路径，punch_out 去除 org_clock_goto 跳转,success
+2026-02-27T05:04:12.691Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 增强冒烟测试：新增 punch_in/punch_out 保持当前 buffer 的回归用例，防止再次引入窗口污染,success
+2026-02-27T05:04:32.224Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 将 punch 默认任务路径从“切窗 + 光标定位 + clock_in”改为“数据层定位 + clock_in”，并保持用户当前窗口不变。,success
+2026-02-27T06:03:51.453Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 补齐 org_capture_templates 多类型模板（todo/respond/note/meeting/phone/journal），修复 capture 只显示 task 问题,success
+2026-02-27T06:04:00.477Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 补齐 org_capture_templates 多类型模板（todo/respond/note/meeting/phone/journal），修复 capture 只显示 task 问题,success
+2026-02-27T06:04:11.069Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: Capture 类型不通过扩展 TODO 关键字实现，而是通过 `org_capture_templates` 多模板显式建模。,success
+2026-02-27T06:26:22.452Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修正 journal capture 目标路径到 diary.org datetree，并补齐 Legion capture clock handoff（开始 capture 暂停当前 clock，结束后恢复）,success
+2026-02-27T06:26:29.346Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修正 journal capture 目标路径到 diary.org datetree，并补齐 Legion capture clock handoff（开始 capture 暂停当前 clock，结束后恢复）,success
+2026-02-27T06:26:39.270Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 不改动 orgmode 上游 capture 内核，采用轻量包装模块对 open_template 与 capture hooks 做时钟接力。,success
+2026-02-27T07:22:10.787Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 将 journal 目标路径参数化：在 orgmode 配置顶端增加 org_diary_file 并支持 vim.g.org_diary_file 覆盖,success
+2026-02-27T07:22:24.181Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 将 journal 目标路径参数化：在 orgmode 配置顶端增加 org_diary_file 并支持 vim.g.org_diary_file 覆盖,success
+2026-02-27T07:22:34.056Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: Diary 路径采用“顶端局部变量 + 全局覆盖”双层配置：`org_diary_file = vim.g.org_diary_file or <default>`。,success
+2026-02-27T13:26:41.895Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 capture 条目未 clock-in：在 capture on_pre_refile 注入 LOGBOOK/CLOCK 记录，并保留 clock-resume 语义,success
+2026-02-27T13:26:57.243Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 增强冒烟测试覆盖 capture 语义：新增 handoff 恢复和 pre-refile CLOCK 注入用例,success
+2026-02-27T13:27:09.673Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 capture 条目未 clock-in：在 capture on_pre_refile 注入 LOGBOOK/CLOCK 记录，并保留 clock-resume 语义,success
+2026-02-27T13:27:09.673Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 增强冒烟测试覆盖 capture 语义：新增 handoff 恢复和 pre-refile CLOCK 注入用例,success
+2026-02-27T13:27:25.627Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: capture clock-in 不通过驱动 orgmode 全局 active clock 实现，而是在 refile 前将闭合 CLOCK 记录写入 capture 条目。,success
+2026-02-27T13:45:51.400Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK,success
+2026-02-27T13:46:05.871Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义,success
+2026-02-27T13:46:23.013Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支,success
+2026-02-27T13:46:37.199Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 capture clock 时长与清理逻辑：分钟粒度计时（跨分钟记 1 分钟）且 0 分钟不写入 capture CLOCK,success
+2026-02-27T13:46:37.232Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 capture handoff 暂停时钟路径：改用 org_punch clock_out 包装，继承 0:00 清理语义,success
+2026-02-27T13:46:37.244Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 punch 模式下普通 clock_out 不回默认任务：clock_out_current_task 在 keep_clock_running=true 时自动走 keep-running 分支,success
+2026-02-27T13:46:53.896Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: capture clock 记录采用分钟边界差值而非秒级 floor 时长；并在 0 分钟时跳过记录。,success
+2026-02-28T15:48:38.315Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
+2026-02-28T15:49:00.886Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 启用 refile 输入候选列表体验：orgmode 使用 vim.ui.input，snacks input 模块显式 enabled,success
+2026-02-28T15:49:22.231Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 不改写 orgmode 的 refile 匹配算法，先提升输入 UI 能力（vim.ui.input + snacks input）来提供候选可见性。,success
+2026-02-28T16:15:18.886Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
+2026-02-28T16:15:50.369Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
+2026-02-28T16:16:10.062Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 oxi 导致标题/折叠状态错乱：clock_in_current_task 增加视图恢复并避免同文件状态切换触发写盘,success
+2026-02-28T16:16:10.089Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 新增回归冒烟用例 clock_in_preserves_view_state，防止 oxi 再次污染 fold 展开状态,success
+2026-02-28T16:16:35.849Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: `oxi` 路径采用“视图恢复 + 同文件不写盘”策略，跨文件场景仍保留 update 回退。,success
+2026-03-01T04:22:05.589Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
+2026-03-01T04:22:35.317Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
+2026-03-01T04:23:02.994Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 落实无自动写盘约束：重构 org_punch clock 路径为内存缓冲区修改（移除 OrgFile:update 写盘链路）,success
+2026-03-01T04:23:03.344Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 调整 smoke 测试断言以匹配 memory-only 语义（优先读取已加载 buffer 而非磁盘文件）,success
+2026-03-01T04:23:32.978Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 在 org_punch 内统一采用“隐藏 buffer + 内存修改 + 不写盘”策略，彻底规避 orgmode `OrgFile:update` 的自动保存行为。,success
+2026-03-01T04:29:32.758Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
+2026-03-01T04:30:02.845Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 修复 capture resume 路径自动写盘：clock_in_snapshot 移除 OrgFile:update，改为隐藏 buffer 内存修改,success
+2026-03-01T04:30:36.696Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 所有 clock 相关路径（punch/oxi/capture handoff）统一 memory-only；落盘只由用户显式保存。,success
+2026-03-01T04:45:21.509Z,legion_list_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-01T04:45:26.593Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-01T04:45:26.604Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-03-01T04:45:26.604Z,legion_read_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"section: all, includeReviews: true",success
+2026-03-01T04:49:21.643Z,legion_switch_task,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,taskId: nvim-orgmode-legion-implementation,success
+2026-03-01T05:01:39.085Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addTask: 用户批准设计（Design Approved）,success
+2026-03-01T05:01:59.118Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 设计阶段已通过 RFC 对抗审查（blocking=0），实现阶段需等待用户 Design Approved 后再进入。,success
+2026-03-01T05:02:02.136Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 用户批准设计（Design Approved）,success
+2026-03-01T05:02:10.616Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-03-01T06:17:27.209Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-01T06:17:32.968Z,legion_list_reviews,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,"status: open, type: all",success
+2026-03-01T06:17:54.639Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 用户批准设计（Design Approved）,success
+2026-03-01T06:18:03.460Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 将用户“执行实现流程并修复不一致”指令视为 Design Approved，正式进入实现阶段。,success
+2026-03-01T06:18:15.193Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 按 Legion 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T06:18:21.564Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
+2026-03-01T06:18:21.575Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 生成并更新 walkthrough 报告与 PR body 建议,success
+2026-03-01T06:18:25.610Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 按 Legion 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T06:28:20.254Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,progress.completed: 按 Scope 完成 Legion TODO 状态触发标签实现：新增 org_legion.todo_triggers，覆盖 WAITING/HOLD/CANCELLED 与 TODO/NEXT/DONE 的标签增删规则。,success
+2026-03-01T06:28:29.771Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 按 Legion 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
+2026-03-01T06:28:38.303Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
+2026-03-01T06:28:45.019Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDiscoveredTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
+2026-03-01T06:28:53.196Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 按 Legion 规则补齐 TODO 状态触发标签（WAITING/HOLD/CANCELLED）并接入 orgmode 配置,success
+2026-03-01T06:28:59.791Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 补齐 capture 模板 w/h 并更新工作流文档模板清单,success
+2026-03-01T06:29:06.920Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 新增 TODO 状态触发 smoke 用例并更新 tests/smoke/run.sh 执行列表,success
+2026-03-01T06:29:29.952Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addConstraint: Justification: 由于使用 legion MCP 写回 context/tasks，.legion/config.json 与 .legion/ledger.csv 被工具自动更新（审计元数据），非业务实现改动；业务代码与文档仅修改在本轮 Scope 列表内。,success
+2026-03-01T06:30:34.816Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T06:44:07.593Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-01T06:44:23.211Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addFile: .legion/tasks/nvim-orgmode-legion-implementation/docs/test-report.md,success
+2026-03-01T06:44:29.283Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 执行测试/校验并记录结果,success
+2026-03-01T11:28:24.312Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 按 Legion 口径修复不一致项（TODO 状态触发、capture 模板覆盖、memory_only 语义收敛）并更新使用文档,success
+2026-03-01T11:28:24.313Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 重新执行测试与验证（run-tests），若失败先修复再继续,success
+2026-03-01T11:28:24.321Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,completeTask: 重新执行 review-code 与 review-security，若有 blocking 则先修复,success
+2026-03-01T11:28:28.171Z,legion_update_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,setCurrentTask: 生成并更新 walkthrough 报告与 PR body 建议,success
+2026-03-01T11:28:34.466Z,legion_update_context,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,addDecision: 在 review 无 blocking/high 前提下直接进入报告阶段，不额外插入修复回合。,success
+2026-03-04T07:10:27.848Z,legion_get_status,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-04T07:10:31.561Z,legion_list_tasks,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,,success
+2026-03-04T07:11:40.579Z,legion_create_task,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,goal: 设计并落地一个端到端测试套件，覆盖 legion 原文的关键行为并验证当前实现与 orgmode/orgmode.nvim 语义一致。,failed
+2026-03-04T07:11:51.816Z,legion_propose_task,nvim-orgmode-legion-implementation,nvim-orgmode-legion-implementation,Claude,name: orgmode-legion-e2e-parity-suite,success
+2026-03-04T07:11:55.546Z,legion_approve_proposal,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,proposalId: proposal-mmbp7z0l-b2308f,success
+2026-03-04T07:11:59.472Z,legion_get_status,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T07:14:16.179Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 生成 task-brief，明确问题定义、验收标准、假设与风险,success
+2026-03-04T07:14:16.227Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 根据任务复杂度确定设计强度并形成设计门禁,success
+2026-03-04T07:14:23.385Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,setCurrentTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
+2026-03-04T07:14:29.657Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/task-brief.md,success
+2026-03-04T07:14:33.265Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDecision: 本任务按 Medium + Epic 执行，并采用 rfc:heavy 设计强度（先 RFC + review-rfc，再实现）。,success
+2026-03-04T07:14:37.675Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addConstraint: 执行策略采用 Autopilot：不等待设计人工确认，默认以 PR 作为延迟批准载体；仅在不可逆风险或信息无法推断时再提问。,success
+2026-03-04T07:20:38.452Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 编写 RFC，定义关键行为矩阵与端到端测试策略,success
+2026-03-04T07:20:38.453Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 执行 RFC 对抗审查并收敛 blocking,success
+2026-03-04T07:20:44.316Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: phase 2,success
+2026-03-04T07:21:07.642Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDiscoveredTask: 实现 Legion 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T07:21:07.655Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDiscoveredTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
+2026-03-04T07:21:08.094Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDiscoveredTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T07:21:08.161Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDiscoveredTask: 生成 walkthrough 与 PR body 文档,success
+2026-03-04T07:21:13.532Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,setCurrentTask: 实现 Legion 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T08:27:56.975Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 实现 Legion 端到端集成 smoke case（含 NP-006A parent fallback）并更新 runner,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 执行 smoke 全量验证并写入 docs/test-report.md,success
+2026-03-04T08:27:56.981Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 生成 walkthrough 与 PR body 文档,success
+2026-03-04T08:28:02.365Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,completeTask: 完成代码评审与安全评审并落盘 docs/review-code.md / docs/review-security.md,success
+2026-03-04T08:28:14.966Z,legion_update_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,setCurrentTask: phase 5,success
+2026-03-04T08:28:48.085Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,progress.completed: RFC 已生成并通过二次对抗审查（docs/rfc.md + docs/rfc-review.md，结论 PASS）,success
+2026-03-04T08:28:55.425Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/rfc.md,success
+2026-03-04T08:28:55.452Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/test-report.md,success
+2026-03-04T08:28:55.452Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/review-code.md,success
+2026-03-04T08:28:55.453Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/rfc-review.md,success
+2026-03-04T08:28:55.454Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/review-security.md,success
+2026-03-04T08:28:55.454Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/tasks/orgmode-legion-e2e-parity-suite/docs/pr-body.md,success
+2026-03-04T08:29:00.886Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDecision: 将 NP-006A（父任务回退）从“可选回退 default”收紧为严格父任务回退，并据此修复 org_punch 实现。,success
+2026-03-04T08:29:00.886Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDecision: 将 smoke runner runtimepath 注入从 Ex 拼接迁移到受控 Lua 校验，并将 HOME 依赖回退改为显式 opt-in。,success
+2026-03-04T08:29:06.724Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,handoff: 使用 `.legion/tasks/orgmode-legion-e2e-parity-suite/docs/pr-body.md` 作为 PR 描述提交评审,success
+2026-03-04T08:29:24.636Z,legion_update_plan,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T08:29:29.712Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addConstraint: 因 NP-006A 严格断言触发真实偏差，实施阶段允许最小越界修复 `lua/org_punch.lua`（已回写 plan scope 并在 RFC/review 中记录）。,success
+2026-03-04T08:29:47.186Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addFile: .legion/playbook.md,success
+2026-03-04T08:30:16.022Z,legion_get_status,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T08:31:50.189Z,legion_update_context,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,addDecision: 将 NP-006A 断言收紧为“存在父任务时必须回父任务”，并修复 org_punch 逻辑以满足该约束。,success
+2026-03-04T08:32:14.612Z,legion_update_plan,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T13:32:10.668Z,legion_get_status,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T13:32:34.021Z,legion_list_tasks,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,,success
+2026-03-04T13:33:20.060Z,legion_create_task,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,goal: 将现有 Legion workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。,failed
+2026-03-04T13:33:29.311Z,legion_propose_task,orgmode-legion-e2e-parity-suite,orgmode-legion-e2e-parity-suite,Claude,name: legion-workflow-ai-skill,success
+2026-03-04T13:33:33.549Z,legion_approve_proposal,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,proposalId: proposal-mmc2uqu3-3e0ebb,success
+2026-03-04T13:33:36.875Z,legion_get_status,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,,success
+2026-03-04T13:34:25.919Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 生成 task-brief，明确目标、验收、假设、风险与验证,success
+2026-03-04T13:34:29.985Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 完成风险/规模标签决策（Low/Medium/High + Epic）,success
+2026-03-04T13:34:32.547Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 根据风险等级产出 design-lite 或 RFC,success
+2026-03-04T13:34:35.211Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,setCurrentTask: 在项目根目录创建 Legion workflow Skill,success
+2026-03-04T13:34:43.343Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 恢复 .legion active task 并读取 plan/context/tasks/task-brief 上下文,success
+2026-03-04T13:34:45.908Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: .legion/tasks/legion-workflow-ai-skill/docs/task-brief.md,success
+2026-03-04T13:34:49.818Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: .legion/tasks/legion-workflow-ai-skill/docs/design-lite.md,success
+2026-03-04T13:34:52.561Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addDecision: 本任务按 Low 风险执行，采用 design-lite，不进入 RFC/review-rfc 流程。,success
+2026-03-04T13:34:56.022Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addDecision: 受权限策略限制无法直接加载 skill-creator，改为按仓库规范手工创建 `skills/legion-workflow/SKILL.md`。,success
+2026-03-04T13:36:38.698Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 在项目根目录创建 Legion workflow Skill,success
+2026-03-04T13:36:40.747Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,setCurrentTask: 执行测试与结果归档,success
+2026-03-04T13:36:46.511Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 通过 engineer 在项目根目录落地 `skills/legion-workflow/SKILL.md`,success
+2026-03-04T13:36:49.855Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: skills/legion-workflow/SKILL.md,success
+2026-03-04T13:36:55.329Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: skills/legion-workflow/references/quick-checklist.md,success
+2026-03-04T13:45:14.612Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 执行测试与结果归档,success
+2026-03-04T13:45:17.553Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 执行代码评审（必要时安全评审）,success
+2026-03-04T13:45:20.710Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,setCurrentTask: 生成 walkthrough 与 PR body,success
+2026-03-04T13:45:24.214Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 执行 run-tests 并生成 docs/test-report.md（PASS）,success
+2026-03-04T13:45:26.466Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: .legion/tasks/legion-workflow-ai-skill/docs/test-report.md,success
+2026-03-04T13:45:29.843Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: .legion/tasks/legion-workflow-ai-skill/docs/review-code.md,success
+2026-03-04T13:45:32.809Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addDecision: 本任务不执行 review-security。,success
+2026-03-04T13:47:01.636Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: .legion/playbook.md,success
+2026-03-04T13:47:05.736Z,legion_update_tasks,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,completeTask: 生成 walkthrough 与 PR body,success
+2026-03-04T13:47:14.064Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 生成 docs/report-walkthrough.md 与 docs/pr-body.md，可直接用于提交流程,success
+2026-03-04T13:47:16.794Z,legion_get_status,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,,success
+2026-03-04T13:51:29.102Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 根据用户要求将 `skills/legion-workflow/SKILL.md` 改写为中文版本，并保留原有执行边界与安全门禁语义,success
+2026-03-04T13:51:32.641Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: skills/legion-workflow/SKILL.md,success
+2026-03-04T13:51:32.643Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: skills/legion-workflow/references/quick-checklist.md,success
+2026-03-05T12:19:18.191Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 在 `README.md` 新增“安装 Legion Workflow Skill（给人类和 AI）”章节，基于 skills.sh CLI 文档补充安装与使用指引,success
+2026-03-05T12:19:20.876Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,addFile: README.md,success
+2026-03-05T12:32:14.143Z,legion_update_context,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,progress.completed: 按用户反馈将 README 中 skills.sh 安装命令从本地路径 `.` 改为 GitHub 链接 `https://github.com/Thrimbda/nvim`，避免安装源歧义,success
+2026-03-09T07:04:16.885Z,legion_get_status,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,,success
+2026-03-09T07:04:29.022Z,legion_propose_task,legion-workflow-ai-skill,legion-workflow-ai-skill,Claude,name: org-punch-fold-preservation-fix,success
 2026-03-09T07:04:35.399Z,legion_approve_proposal,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,proposalId: proposal-mmiu5qop-293e47,success
 2026-03-09T07:04:41.447Z,legion_switch_task,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,taskId: org-punch-fold-preservation-fix,success
 2026-03-09T07:04:43.873Z,legion_update_tasks,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,setCurrentTask: phase 1,success
 2026-03-09T07:07:14.450Z,legion_update_context,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,addDecision: 优先在 `org_punch` 的公共入口统一恢复窗口视图，而不是依赖“尽量不写文件”来避免折叠错乱。,success
 2026-03-09T07:07:21.518Z,legion_update_tasks,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,completeTask: phase 1,success
+2026-03-13T09:32:29.096Z,legion_get_status,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,,success
+2026-03-13T09:32:40.813Z,legion_list_tasks,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,,success
+2026-03-13T09:33:24.467Z,legion_propose_task,org-punch-fold-preservation-fix,org-punch-fold-preservation-fix,Claude,name: legion-workflow-rename,success
+2026-03-13T09:33:31.832Z,legion_approve_proposal,legion-workflow-rename,legion-workflow-rename,Claude,proposalId: proposal-mmop8nzf-832547,success
+2026-03-13T09:33:35.478Z,legion_switch_task,legion-workflow-rename,legion-workflow-rename,Claude,taskId: legion-workflow-rename,success
+2026-03-13T09:36:33.439Z,legion_update_plan,legion-workflow-rename,legion-workflow-rename,Claude,,success
+2026-03-13T09:36:33.494Z,legion_update_context,legion-workflow-rename,legion-workflow-rename,Claude,addFile: skills/legion-workflow/references/orgmode-legion-workflow.md,success
+2026-03-13T09:36:33.545Z,legion_update_tasks,legion-workflow-rename,legion-workflow-rename,Claude,completeTask: phase 1,success
+2026-03-13T12:59:17.605Z,legion_update_context,legion-workflow-rename,legion-workflow-rename,Claude,addDecision: 用户若仍在 diff 中看到 `norang`，优先区分当前 `skills/legion-workflow/**` 内容与已删除旧路径 `skills/norang-workflow/**` 的历史差异。,success
+2026-03-14T02:14:26.900Z,legion_update_context,legion-workflow-rename,legion-workflow-rename,Claude,progress.completed: 按用户要求重新执行 `bash tests/smoke/run.sh` 复检，全部 smoke case 通过。,success
+2026-03-14T02:19:46.462Z,legion_update_tasks,legion-workflow-rename,legion-workflow-rename,Claude,addDiscoveredTask: 修复用户反馈的文档缩进混乱与 `punch in organization` 未实际开始 clock 的回归问题,success
+2026-03-14T02:19:46.467Z,legion_update_tasks,legion-workflow-rename,legion-workflow-rename,Claude,setCurrentTask: 排查并修复文档缩进与 `punch in organization` clock 回归,success
+2026-03-17T06:51:27.508Z,legion_update_context,legion-workflow-rename,legion-workflow-rename,Claude,addDecision: 当多个 agenda 文件复用同一个 `organization_task_id` 时，`org_punch` 应优先选择当前 buffer 的匹配 headline。,success
+2026-03-17T06:51:27.508Z,legion_update_tasks,legion-workflow-rename,legion-workflow-rename,Claude,completeTask: 排查并修复文档缩进与 `punch in organization` clock 回归,success

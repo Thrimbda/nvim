@@ -104,7 +104,7 @@ return {
         },
         org_agenda_custom_commands = {
           b = {
-            description = "Block agenda (Norang-style)",
+            description = "Block agenda (Legion-style)",
             types = {
               {
                 type = "tags_todo",
@@ -199,7 +199,7 @@ return {
         },
       })
 
-      require("org_norang.todo_triggers").setup()
+      require("org_legion.todo_triggers").setup()
 
       local agenda_right_group = vim.api.nvim_create_augroup("OrgAgendaRightSide", { clear = true })
       vim.api.nvim_create_autocmd("FileType", {
@@ -208,7 +208,7 @@ return {
         callback = function(args)
           vim.keymap.set("n", "I", function()
             require("org_punch").clock_in_current_task()
-          end, { buffer = args.buf, desc = "Clock in (Norang NEXT transition)" })
+          end, { buffer = args.buf, desc = "Clock in (Legion NEXT transition)" })
           vim.keymap.set("n", "O", function()
             require("org_punch").clock_out_current_task()
           end, { buffer = args.buf, desc = "Clock out (remove 0:00 entry)" })
@@ -275,7 +275,7 @@ return {
       end
       require("org_punch").setup(punch_cfg)
 
-      require("org_norang").setup({
+      require("org_legion").setup({
         org_agenda_files = org_agenda_files,
         refresh = {
           mode = "approx",
@@ -301,14 +301,14 @@ return {
       })
 
       local punch = require("org_punch")
-      local capture = require("org_capture_norang")
+      local capture = require("org_capture_legion")
       capture.setup()
       vim.keymap.set("n", "<Leader>opI", punch.punch_in, { desc = "Org Punch In" })
       vim.keymap.set("n", "<Leader>opO", punch.punch_out, { desc = "Org Punch Out" })
       vim.keymap.set("n", "<Leader>opo", punch.clock_out_keep_running, { desc = "Clock out (keep running)" })
-      vim.keymap.set("n", "<Leader>oxi", punch.clock_in_current_task, { desc = "Org Clock In (Norang NEXT transition)" })
+      vim.keymap.set("n", "<Leader>oxi", punch.clock_in_current_task, { desc = "Org Clock In (Legion NEXT transition)" })
       vim.keymap.set("n", "<Leader>oxo", punch.clock_out_current_task, { desc = "Org Clock Out (remove 0:00 entry)" })
-      vim.keymap.set("n", "<Leader>X", capture.capture_prompt, { desc = "Org Capture (Norang clock handoff)" })
+      vim.keymap.set("n", "<Leader>X", capture.capture_prompt, { desc = "Org Capture (Legion clock handoff)" })
 
       vim.keymap.set("n", "<F12>", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
       vim.keymap.set("n", "<Leader>oab", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })

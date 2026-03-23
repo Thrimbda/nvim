@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "currentTask": "org-punch-fold-preservation-fix",
+  "currentTask": "legion-workflow-rename",
   "settings": {
     "autoRemind": true,
     "remindBeforeReset": true,
@@ -8,36 +8,36 @@
   },
   "tasks": [
     {
-      "id": "nvim-orgmode-norang-workflow",
-      "name": "nvim-orgmode-norang-workflow",
+      "id": "nvim-orgmode-legion-workflow",
+      "name": "nvim-orgmode-legion-workflow",
       "status": "paused",
       "createdAt": "2026-02-06T05:56:47.725Z",
       "updatedAt": "2026-02-07T14:12:30.417Z"
     },
     {
-      "id": "nvim-orgmode-norang-plugin",
-      "name": "nvim-orgmode-norang-plugin",
+      "id": "nvim-orgmode-legion-plugin",
+      "name": "nvim-orgmode-legion-plugin",
       "status": "paused",
       "createdAt": "2026-02-07T14:12:30.417Z",
       "updatedAt": "2026-02-08T15:16:42.358Z"
     },
     {
-      "id": "nvim-orgmode-norang-implementation",
-      "name": "nvim-orgmode-norang-implementation",
+      "id": "nvim-orgmode-legion-implementation",
+      "name": "nvim-orgmode-legion-implementation",
       "status": "paused",
       "createdAt": "2026-02-08T15:16:42.358Z",
       "updatedAt": "2026-03-04T07:11:55.542Z"
     },
     {
-      "id": "orgmode-norang-e2e-parity-suite",
-      "name": "orgmode-norang-e2e-parity-suite",
+      "id": "orgmode-legion-e2e-parity-suite",
+      "name": "orgmode-legion-e2e-parity-suite",
       "status": "paused",
       "createdAt": "2026-03-04T07:11:55.542Z",
       "updatedAt": "2026-03-04T13:33:33.546Z"
     },
     {
-      "id": "norang-workflow-ai-skill",
-      "name": "norang-workflow-ai-skill",
+      "id": "legion-workflow-ai-skill",
+      "name": "legion-workflow-ai-skill",
       "status": "paused",
       "createdAt": "2026-03-04T13:33:33.546Z",
       "updatedAt": "2026-03-09T07:04:35.393Z"
@@ -45,17 +45,24 @@
     {
       "id": "org-punch-fold-preservation-fix",
       "name": "org-punch-fold-preservation-fix",
-      "status": "active",
+      "status": "paused",
       "createdAt": "2026-03-09T07:04:35.393Z",
-      "updatedAt": "2026-03-09T07:07:21.516Z"
+      "updatedAt": "2026-03-13T09:33:31.809Z"
+    },
+    {
+      "id": "legion-workflow-rename",
+      "name": "legion-workflow-rename",
+      "status": "active",
+      "createdAt": "2026-03-13T09:33:31.809Z",
+      "updatedAt": "2026-03-17T06:51:27.507Z"
     }
   ],
   "pendingProposals": [
     {
       "id": "proposal-mlah377y-a8b914",
-      "name": "nvim-orgmode-norang-workflow",
-      "goal": "Add a Norang-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",
-      "rationale": "User explicitly requested an end-to-end delivery that generates .legion artifacts and a PR-ready body for a Norang-style orgmode workflow in this repo.",
+      "name": "nvim-orgmode-legion-workflow",
+      "goal": "Add a Legion-style orgmode workflow for Neovim with custom agenda views, punch in/out continuous clocking, and supporting docs/PR body.",
+      "rationale": "User explicitly requested an end-to-end delivery that generates .legion artifacts and a PR-ready body for a Legion-style orgmode workflow in this repo.",
       "points": [
         "Define custom agenda views (block/NEXT/REFILE) in orgmode config",
         "Implement punch in/out glue to keep clocks running with default task/parent fallback",
@@ -65,7 +72,7 @@
       "scope": [
         "lua/plugins/orgmode.lua",
         "lua/org_punch.lua",
-        "docs/orgmode-norang-workflow.md"
+        "skills/legion-workflow/references/orgmode-legion-workflow.md"
       ],
       "phases": [
         {
@@ -94,7 +101,7 @@
             },
             {
               "description": "Write workflow usage documentation",
-              "acceptance": "docs/orgmode-norang-workflow.md added with setup and daily usage"
+              "acceptance": "skills/legion-workflow/references/orgmode-legion-workflow.md added with setup and daily usage"
             }
           ]
         },
@@ -126,13 +133,13 @@
       "status": "approved",
       "decidedAt": "2026-02-06T05:56:47.725Z",
       "decidedBy": "Claude",
-      "createdTaskId": "nvim-orgmode-norang-workflow"
+      "createdTaskId": "nvim-orgmode-legion-workflow"
     },
     {
       "id": "proposal-mlce8jfh-2fae3d",
-      "name": "nvim-orgmode-norang-plugin",
-      "goal": "在现有 nvim-orgmode 配置基础上新增 org_norang 插件，补齐 Norang 工作流中项目识别、卡住项目识别、归档候选与 block agenda 自动化能力。",
-      "rationale": "当前实现仅覆盖 Norang-lite（基础 block agenda + punch），缺少 suggestion 中定义的核心能力（PROJECT/STUCK/ARCHIVE_CANDIDATE 派生标签、自动刷新命令与保存触发、归档候选规则）。该任务需要跨文件设计与决策记录，属于复杂任务，必须进入 Legion 流程并通过设计门禁后再编码。",
+      "name": "nvim-orgmode-legion-plugin",
+      "goal": "在现有 nvim-orgmode 配置基础上新增 org_legion 插件，补齐 Legion 工作流中项目识别、卡住项目识别、归档候选与 block agenda 自动化能力。",
+      "rationale": "当前实现仅覆盖 Legion-lite（基础 block agenda + punch），缺少 suggestion 中定义的核心能力（PROJECT/STUCK/ARCHIVE_CANDIDATE 派生标签、自动刷新命令与保存触发、归档候选规则）。该任务需要跨文件设计与决策记录，属于复杂任务，必须进入 Legion 流程并通过设计门禁后再编码。",
       "points": [
         "对比 suggestion 与当前实现，明确能力缺口与兼容边界",
         "输出可落地 RFC（数据模型、匹配规则、更新触发、失败回退）",
@@ -142,9 +149,9 @@
       "scope": [
         "lua/plugins/orgmode.lua",
         "lua/org_punch.lua",
-        "lua/org_norang/**",
-        "docs/orgmode-norang-workflow.md",
-        ".legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md"
+        "lua/org_legion/**",
+        "skills/legion-workflow/references/orgmode-legion-workflow.md",
+        ".legion/tasks/nvim-orgmode-legion-plugin/docs/rfc.md"
       ],
       "phases": [
         {
@@ -184,37 +191,37 @@
       "status": "approved",
       "decidedAt": "2026-02-07T14:12:30.417Z",
       "decidedBy": "Claude",
-      "createdTaskId": "nvim-orgmode-norang-plugin"
+      "createdTaskId": "nvim-orgmode-legion-plugin"
     },
     {
       "id": "proposal-mldvywic-58900f",
-      "name": "nvim-orgmode-norang-implementation",
-      "goal": "基于已通过设计门禁的 RFC 实现 org_norang 插件并完成验证、代码审查、安全审查与交付报告。",
-      "rationale": "设计阶段任务 nvim-orgmode-norang-plugin 已完成并通过最终复审（PASS）。当前进入实现阶段，涉及多文件编码、验证与审查闭环，需独立任务跟踪实施进度与产物。",
+      "name": "nvim-orgmode-legion-implementation",
+      "goal": "基于已通过设计门禁的 RFC 实现 org_legion 插件并完成验证、代码审查、安全审查与交付报告。",
+      "rationale": "设计阶段任务 nvim-orgmode-legion-plugin 已完成并通过最终复审（PASS）。当前进入实现阶段，涉及多文件编码、验证与审查闭环，需独立任务跟踪实施进度与产物。",
       "points": [
-        "严格按 RFC（.legion/tasks/nvim-orgmode-norang-plugin/docs/rfc.md）实现，避免口径漂移",
-        "Scope 限定在 orgmode 配置、org_punch 协同点、新增 org_norang 模块与使用文档",
+        "严格按 RFC（.legion/tasks/nvim-orgmode-legion-plugin/docs/rfc.md）实现，避免口径漂移",
+        "Scope 限定在 orgmode 配置、org_punch 协同点、新增 org_legion 模块与使用文档",
         "实现后执行验证、review-code、review-security，并生成 walkthrough 报告",
         "任何偏离 RFC 的变更需先回写 context 决策"
       ],
       "scope": [
         "lua/plugins/orgmode.lua",
         "lua/org_punch.lua",
-        "lua/org_norang/**",
-        "docs/orgmode-norang-workflow.md",
-        ".legion/tasks/nvim-orgmode-norang-implementation/docs/*",
-        ".legion/tasks/nvim-orgmode-norang-implementation/reports/*"
+        "lua/org_legion/**",
+        "skills/legion-workflow/references/orgmode-legion-workflow.md",
+        ".legion/tasks/nvim-orgmode-legion-implementation/docs/*",
+        ".legion/tasks/nvim-orgmode-legion-implementation/reports/*"
       ],
       "phases": [
         {
           "name": "阶段 1: 实现",
           "tasks": [
             {
-              "description": "新增 org_norang 模块（init/parser/rules/refresh/cleanup）并接入命令与自动刷新",
+              "description": "新增 org_legion 模块（init/parser/rules/refresh/cleanup）并接入命令与自动刷新",
               "acceptance": "模块可加载，命令可注册，核心路径无语法错误"
             },
             {
-              "description": "更新 orgmode 配置接入 org_norang 与扩展 agenda blocks",
+              "description": "更新 orgmode 配置接入 org_legion 与扩展 agenda blocks",
               "acceptance": "保持 b/n/r 兼容并新增 PROJECT/STUCK/ARCHIVE_CANDIDATE 视图"
             },
             {
@@ -251,15 +258,15 @@
       "status": "approved",
       "decidedAt": "2026-02-08T15:16:42.358Z",
       "decidedBy": "Claude",
-      "createdTaskId": "nvim-orgmode-norang-implementation"
+      "createdTaskId": "nvim-orgmode-legion-implementation"
     },
     {
       "id": "proposal-mmbp7z0l-b2308f",
-      "name": "orgmode-norang-e2e-parity-suite",
-      "goal": "设计并落地一个端到端测试套件，覆盖 norang 原文的关键行为并验证当前实现与 orgmode/orgmode.nvim 语义一致。",
-      "rationale": "当前 active task 已完成既有修复并产出报告；本次用户请求是新的大范围交付（对照 Norang 原文+上游语义设计端到端测试），需要独立 task 以避免与既有 task 记录混淆并保证可追溯。",
+      "name": "orgmode-legion-e2e-parity-suite",
+      "goal": "设计并落地一个端到端测试套件，覆盖 legion 原文的关键行为并验证当前实现与 orgmode/orgmode.nvim 语义一致。",
+      "rationale": "当前 active task 已完成既有修复并产出报告；本次用户请求是新的大范围交付（对照 Legion 原文+上游语义设计端到端测试），需要独立 task 以避免与既有 task 记录混淆并保证可追溯。",
       "points": [
-        "基于 Norang 原文提炼 MUST 行为并映射到可执行断言",
+        "基于 Legion 原文提炼 MUST 行为并映射到可执行断言",
         "结合上游 orgmode/orgmode.nvim 能力边界，避免测试断言超出真实语义",
         "在现有 smoke 框架中新增端到端用例与执行入口",
         "产出可直接用于 PR 的说明文档"
@@ -267,8 +274,8 @@
       "scope": [
         "lua/tests/smoke/orgmode_smoke.lua",
         "tests/smoke/run.sh",
-        "docs/orgmode-norang-workflow.md",
-        ".legion/tasks/orgmode-norang-e2e-parity-suite/**"
+        "skills/legion-workflow/references/orgmode-legion-workflow.md",
+        ".legion/tasks/orgmode-legion-e2e-parity-suite/**"
       ],
       "phases": [
         {
@@ -334,23 +341,23 @@
       "status": "approved",
       "decidedAt": "2026-03-04T07:11:55.542Z",
       "decidedBy": "Claude",
-      "createdTaskId": "orgmode-norang-e2e-parity-suite"
+      "createdTaskId": "orgmode-legion-e2e-parity-suite"
     },
     {
       "id": "proposal-mmc2uqu3-3e0ebb",
-      "name": "norang-workflow-ai-skill",
-      "goal": "将现有 Norang workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。",
-      "rationale": "当前仓库已有 Norang 工作流文档，但缺少面向 AI agent 的标准化执行说明与可复用 skill 入口。将其产品化为根目录 skill 能降低后续任务中的重复解释成本，并支持最少人工打断的端到端交付流程。",
+      "name": "legion-workflow-ai-skill",
+      "goal": "将现有 Legion workflow 实践沉淀为面向 AI 的可复用 Skill，并生成可直接用于 PR 的交付文档。",
+      "rationale": "当前仓库已有 Legion 工作流文档，但缺少面向 AI agent 的标准化执行说明与可复用 skill 入口。将其产品化为根目录 skill 能降低后续任务中的重复解释成本，并支持最少人工打断的端到端交付流程。",
       "points": [
-        "复用 docs/orgmode-norang-workflow.md 的既有规则作为事实来源",
+        "复用 skills/legion-workflow/references/orgmode-legion-workflow.md 的既有规则作为事实来源",
         "输出 AI 可执行流程（前置检查、日常操作、异常处理、回滚）",
         "将 Skill 落地到项目根目录以便版本化协作",
         "补齐 test/review/report/pr-body 交付链路"
       ],
       "scope": [
-        "skills/norang-workflow/**",
-        ".legion/tasks/norang-workflow-ai-skill/**",
-        "docs/orgmode-norang-workflow.md"
+        "skills/legion-workflow/**",
+        ".legion/tasks/legion-workflow-ai-skill/**",
+        "skills/legion-workflow/references/orgmode-legion-workflow.md"
       ],
       "phases": [
         {
@@ -379,8 +386,8 @@
           "name": "阶段 2: 实现",
           "tasks": [
             {
-              "description": "在项目根目录创建 Norang workflow Skill",
-              "acceptance": "skills/norang-workflow/SKILL.md 存在且内容可指导 AI 执行"
+              "description": "在项目根目录创建 Legion workflow Skill",
+              "acceptance": "skills/legion-workflow/SKILL.md 存在且内容可指导 AI 执行"
             }
           ]
         },
@@ -412,13 +419,13 @@
       "status": "approved",
       "decidedAt": "2026-03-04T13:33:33.546Z",
       "decidedBy": "Claude",
-      "createdTaskId": "norang-workflow-ai-skill"
+      "createdTaskId": "legion-workflow-ai-skill"
     },
     {
       "id": "proposal-mmiu5qop-293e47",
       "name": "org-punch-fold-preservation-fix",
       "goal": "修复 org_punch 的 clock in/out 对折叠视图的破坏，并增加回归测试覆盖所有相关路径。",
-      "rationale": "用户报告 clock in/clock out 仍会打乱 fold，且之前两次修复未覆盖全部路径；需要一个独立任务记录根因、实现与测试，以避免与现有 Norang 任务混淆。",
+      "rationale": "用户报告 clock in/clock out 仍会打乱 fold，且之前两次修复未覆盖全部路径；需要一个独立任务记录根因、实现与测试，以避免与现有 Legion 任务混淆。",
       "points": [
         "找出所有未经过 view restore 的 clock/punch 路径",
         "统一在相关入口恢复窗口视图与折叠状态",
@@ -472,6 +479,32 @@
       "decidedAt": "2026-03-09T07:04:35.393Z",
       "decidedBy": "Claude",
       "createdTaskId": "org-punch-fold-preservation-fix"
+    },
+    {
+      "id": "proposal-mmop8nzf-832547",
+      "name": "legion-workflow-rename",
+      "goal": "将项目中现有旧工作流命名统一迁移为 `legion`，并把工作流真源移动到 Skill 内部。",
+      "rationale": "用户明确要求将项目统一收敛到 `legion-workflow` 体系，并避免 Skill 依赖 Skill 外部的真源文档。",
+      "points": [
+        "统一代码、文档、README 与 .legion 记录中的旧工作流命名",
+        "重命名相关文件与目录",
+        "将工作流说明文档移动到 `skills/legion-workflow/` 内部并更新引用"
+      ],
+      "scope": [
+        "README.md",
+        "skills/**",
+        "lua/**",
+        "docs/**",
+        ".legion/**",
+        "tests/**"
+      ],
+      "phases": [],
+      "proposedBy": "Claude",
+      "proposedAt": "2026-03-13T09:33:24.464Z",
+      "status": "approved",
+      "decidedAt": "2026-03-13T09:33:31.809Z",
+      "decidedBy": "Claude",
+      "createdTaskId": "legion-workflow-rename"
     }
   ]
 }

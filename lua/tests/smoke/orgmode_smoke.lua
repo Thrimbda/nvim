@@ -120,9 +120,9 @@ local function setup_punch(paths, organization_task_id)
   return punch
 end
 
-local function setup_norang(paths)
-  local norang = require("org_norang")
-  local ok, err = norang.setup({
+local function setup_legion(paths)
+  local legion = require("org_legion")
+  local ok, err = legion.setup({
     org_agenda_files = paths,
     refresh = {
       mode = "approx",
@@ -151,12 +151,12 @@ local function setup_norang(paths)
     },
   })
 
-  assert_true(ok == true, "org_norang setup failed: " .. tostring(err))
-  return norang
+  assert_true(ok == true, "org_legion setup failed: " .. tostring(err))
+  return legion
 end
 
 local function setup_todo_triggers()
-  local ok, err = require("org_norang.todo_triggers").setup()
+  local ok, err = require("org_legion.todo_triggers").setup()
   assert_true(ok == true, "todo trigger setup failed: " .. tostring(err))
 end
 
@@ -180,7 +180,7 @@ local function get_current_headline_state(line_nr)
 end
 
 local function apply_todo_trigger_now()
-  local trigger = require("org_norang.todo_triggers")
+  local trigger = require("org_legion.todo_triggers")
   local orgmode = require("orgmode")
   trigger._state.listener({ headline = orgmode.files:get_closest_headline() })
 end
@@ -201,6 +201,23 @@ local function get_active_clock_title()
     return nil
   end
   return orgmode.clock.clocked_headline:get_title()
+end
+
+local function has_active_clock_line(path)
+  local lines = read_buffer_lines_for_file(path)
+  for _, line in ipairs(lines) do
+    if line:match("^%s*CLOCK:%s*%[") and not line:match("%]%-%-%[") then
+      return true
+    end
+  end
+  return false
+end
+
+local function assert_no_zero_duration_clock(path, label)
+  local lines = read_buffer_lines_for_file(path)
+  for _, line in ipairs(lines) do
+    assert_true(not line:match("CLOCK:.*=>%s*0:00%s*$"), label .. " should not leave 0:00 clock entries")
+  end
 end
 
 local function find_line_number(path, pattern)
@@ -306,6 +323,36 @@ local function test_punch_in_clocks_default_task()
     end
   end
   assert_true(has_clock, "default task should have active CLOCK line after punch_in")
+  assert_true(get_active_clock_title() == "Organization", "active clock should point at the default task after punch_in")
+
+  punch.punch_out()
+end
+
+local function test_punch_in_prefers_current_buffer_when_id_is_duplicated()
+  local other_path = write_temp_org({
+    "* Tasks",
+    "** Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local current_path = write_temp_org({
+    "* Tasks",
+    "** Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+
+  setup_orgmode({ other_path, current_path })
+  local punch = setup_punch({ other_path, current_path }, DEFAULT_TASK_ID)
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(current_path))
+
+  assert_true(punch.punch_in() == true, "punch_in should succeed when duplicate IDs exist")
+  assert_true(get_active_clock_title() == "Organization", "duplicate IDs should still produce an active clock")
+  assert_true(has_active_clock_line(current_path), "current buffer should receive the active clock line")
+  assert_true(not has_active_clock_line(other_path), "non-current duplicate should not receive the active clock line")
 
   punch.punch_out()
 end
@@ -433,10 +480,55 @@ local function test_clock_out_removes_zero_duration_clock()
   assert_true(punch.clock_in_current_task() == true, "clock_in_current_task should succeed")
   assert_true(punch.clock_out_current_task() == true, "clock_out_current_task should succeed")
 
-  local lines = read_buffer_lines_for_file(path)
-  for _, line in ipairs(lines) do
-    assert_true(not line:match("CLOCK:.*=>%s*0:00%s*$"), "0:00 clock entry should be removed")
-  end
+  assert_no_zero_duration_clock(path, "clock_out_current_task")
+end
+
+local function test_clock_in_switch_removes_previous_zero_duration_clock()
+  local path = write_temp_org({
+    "* TODO First task",
+    "* TODO Second task",
+  })
+
+  setup_orgmode({ path })
+  local punch = setup_punch({ path }, "")
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(path))
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  assert_true(punch.clock_in_current_task() == true, "first clock_in_current_task should succeed")
+
+  local second_line = find_line_number(path, "^%* TODO Second task")
+  assert_true(second_line ~= nil, "second task line should be found after first clock in")
+  vim.api.nvim_win_set_cursor(0, { second_line, 0 })
+  assert_true(punch.clock_in_current_task() == true, "second clock_in_current_task should succeed")
+  assert_true(get_active_clock_title() == "Second task", "second task should become active clock")
+  assert_no_zero_duration_clock(path, "clock_in_current_task switch")
+
+  punch.clock_out_current_task()
+end
+
+local function test_punch_in_switch_removes_previous_zero_duration_clock()
+  local default_path = write_temp_org({
+    "* Tasks",
+    "** TODO Organization",
+    "   :PROPERTIES:",
+    "   :ID: " .. DEFAULT_TASK_ID,
+    "   :END:",
+  })
+  local task_path = write_temp_org({
+    "* TODO Focus task",
+  })
+
+  setup_orgmode({ task_path, default_path })
+  local punch = setup_punch({ task_path, default_path }, DEFAULT_TASK_ID)
+
+  vim.cmd("silent edit " .. vim.fn.fnameescape(task_path))
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+  assert_true(punch.clock_in_current_task() == true, "precondition clock_in_current_task should succeed")
+  assert_true(punch.punch_in() == true, "punch_in should succeed while another task is active")
+  assert_true(get_active_clock_title() == "Organization", "punch_in should switch active clock to Organization")
+  assert_no_zero_duration_clock(task_path, "punch_in switch")
+
+  punch.punch_out()
 end
 
 local function test_clock_out_in_punch_mode_returns_to_default()
@@ -578,29 +670,29 @@ local function test_clock_in_preserves_view_state()
   punch.punch_out()
 end
 
-local function test_norang_refresh_marks_stuck_project()
+local function test_legion_refresh_marks_stuck_project()
   local path = write_temp_org({
     "* TODO Dist Systems",
     "** DONE Read paper",
   })
 
-  setup_norang({ path })
-  local norang = require("org_norang")
-  local result = norang.refresh_file(path)
+  setup_legion({ path })
+  local legion = require("org_legion")
+  local result = legion.refresh_file(path)
 
   assert_true(result.ok == true, "refresh_file should succeed")
   assert_true(read_line(path, 1):match(":PROJECT:STUCK:") ~= nil, "project should receive :PROJECT:STUCK: tags")
 end
 
-local function test_norang_cleanup_apply_removes_derived_tags()
+local function test_legion_cleanup_apply_removes_derived_tags()
   local path = write_temp_org({
     "* TODO Dist Systems :PROJECT:STUCK:ARCHIVE_CANDIDATE:",
   })
 
-  setup_norang({ path })
+  setup_legion({ path })
   vim.cmd("silent edit " .. vim.fn.fnameescape(path))
-  local norang = require("org_norang")
-  local summary = norang.cleanup_derived_tags({ apply = true })
+  local legion = require("org_legion")
+  local summary = legion.cleanup_derived_tags({ apply = true })
 
   assert_true(summary.changed_files >= 1, "cleanup apply should change at least one file")
   local line = vim.fn.getline(1)
@@ -616,7 +708,7 @@ local function test_capture_clock_handoff_resumes_previous()
 
   setup_orgmode({ path })
   local orgmode = require("orgmode")
-  local capture = require("org_capture_norang")
+  local capture = require("org_capture_legion")
   capture.setup()
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(path))
@@ -651,7 +743,7 @@ local function test_capture_pre_refile_injects_clock_line()
 
   setup_orgmode({ path })
   local orgmode = require("orgmode")
-  local capture = require("org_capture_norang")
+  local capture = require("org_capture_legion")
   capture.setup()
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(path))
@@ -684,7 +776,7 @@ local function test_capture_pre_refile_injects_clock_line()
   capture.finish_capture_clock_handoff()
 end
 
-local function test_todo_state_tag_triggers_norang()
+local function test_todo_state_tag_triggers_legion()
   local path = write_temp_org({
     "* TODO Trigger task :WAITING:HOLD:CANCELLED:",
   })
@@ -738,8 +830,8 @@ local function test_todo_state_tag_triggers_norang()
   assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "TODO should remove CANCELLED tag")
 end
 
-local function test_norang_e2e_integrated_flow()
-  local case_name = "norang_e2e_integrated_flow"
+local function test_legion_e2e_integrated_flow()
+  local case_name = "legion_e2e_integrated_flow"
   local default_path = write_temp_org({
     "* Tasks",
     "** TODO Organization",
@@ -760,11 +852,11 @@ local function test_norang_e2e_integrated_flow()
 
   setup_orgmode({ workflow_path, default_path })
   local punch = setup_punch({ workflow_path, default_path }, DEFAULT_TASK_ID)
-  local norang = setup_norang({ workflow_path })
+  local legion = setup_legion({ workflow_path })
   setup_todo_triggers()
 
   local orgmode = require("orgmode")
-  local capture = require("org_capture_norang")
+  local capture = require("org_capture_legion")
   capture.setup()
 
   vim.cmd("silent edit " .. vim.fn.fnameescape(workflow_path))
@@ -1068,12 +1160,12 @@ local function test_norang_e2e_integrated_flow()
     actual = "tags=" .. table.concat(state.tags or {}, ","),
   })
 
-  local refresh_result = norang.refresh_file(workflow_path)
+  local refresh_result = legion.refresh_file(workflow_path)
   assert_parity(refresh_result.ok == true, {
     id = "NP-011",
     phase = "refresh",
     case_name = case_name,
-    expected = "norang refresh_file succeeds",
+    expected = "legion refresh_file succeeds",
     actual = "refresh ok=" .. tostring(refresh_result.ok),
   })
   local dist_line = find_line_number(workflow_path, "^%*%s+TODO%s+Dist Systems")
@@ -1092,7 +1184,7 @@ local function test_norang_e2e_integrated_flow()
     actual = "line=" .. tostring(read_line(workflow_path, dist_line)),
   })
 
-  local cleanup_result = norang.cleanup_derived_tags({ apply = true })
+  local cleanup_result = legion.cleanup_derived_tags({ apply = true })
   assert_parity(cleanup_result.changed_files >= 1, {
     id = "NP-012",
     phase = "cleanup",
@@ -1136,21 +1228,24 @@ end
 local CASES = {
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
+  punch_in_prefers_current_buffer_when_id_is_duplicated = test_punch_in_prefers_current_buffer_when_id_is_duplicated,
   punch_in_preserves_current_buffer = test_punch_in_preserves_current_buffer,
   punch_out_preserves_current_buffer = test_punch_out_preserves_current_buffer,
   clock_out_preserves_view_state = test_clock_out_preserves_view_state,
   clock_in_todo_task_switches_to_next = test_clock_in_todo_task_switches_to_next,
   clock_in_next_project_switches_to_todo = test_clock_in_next_project_switches_to_todo,
+  clock_in_switch_removes_previous_zero_duration_clock = test_clock_in_switch_removes_previous_zero_duration_clock,
   clock_in_preserves_view_state = test_clock_in_preserves_view_state,
   clock_out_removes_zero_duration_clock = test_clock_out_removes_zero_duration_clock,
+  punch_in_switch_removes_previous_zero_duration_clock = test_punch_in_switch_removes_previous_zero_duration_clock,
   clock_out_in_punch_mode_returns_to_parent = test_clock_out_in_punch_mode_returns_to_parent,
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
-  norang_refresh_marks_stuck_project = test_norang_refresh_marks_stuck_project,
-  norang_cleanup_apply_removes_derived_tags = test_norang_cleanup_apply_removes_derived_tags,
+  legion_refresh_marks_stuck_project = test_legion_refresh_marks_stuck_project,
+  legion_cleanup_apply_removes_derived_tags = test_legion_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
-  todo_state_tag_triggers_norang = test_todo_state_tag_triggers_norang,
-  norang_e2e_integrated_flow = test_norang_e2e_integrated_flow,
+  todo_state_tag_triggers_legion = test_todo_state_tag_triggers_legion,
+  legion_e2e_integrated_flow = test_legion_e2e_integrated_flow,
 }
 
 function M.run(case_name)
