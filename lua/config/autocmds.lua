@@ -7,12 +7,15 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
-local org_wrap_group = vim.api.nvim_create_augroup("cone_org_soft_wrap", { clear = true })
+local prose_wrap_group = vim.api.nvim_create_augroup("cone_prose_soft_wrap", { clear = true })
 
 vim.api.nvim_create_autocmd("FileType", {
-  group = org_wrap_group,
-  pattern = "org",
+  group = prose_wrap_group,
+  pattern = { "org", "markdown" },
   callback = function(args)
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = args.buf })
+    local label = filetype == "markdown" and "Markdown" or "Org"
+
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
     vim.opt_local.breakindent = true
@@ -23,7 +26,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
     vim.keymap.set("n", "<leader>oz", "<Cmd>ZenMode<CR>", {
       buffer = args.buf,
-      desc = "Org Zen (88 cols)",
+      desc = ("%s Zen (88 cols)"):format(label),
       silent = true,
     })
   end,
