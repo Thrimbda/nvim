@@ -37,6 +37,14 @@ require("lazy").setup({
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
   }, -- automatically check for plugin updates
+  pkg = {
+    sources = {
+      -- User-owned specs are the source of truth. Some third-party lazy.lua
+      -- package specs are fragments, not valid standalone plugin specs.
+      "rockspec",
+      "packspec",
+    },
+  },
   performance = {
     rtp = {
       -- disable some rtp plugins
