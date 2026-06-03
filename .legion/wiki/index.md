@@ -7,6 +7,7 @@ This wiki summarizes durable task outcomes and reusable patterns. Raw evidence r
 ## Task Summaries
 
 - [install-dadbod-grip-nvim](tasks/install-dadbod-grip-nvim.md)
+- [nvim-dadbod-grip-invalid-lazy-spec-fix](tasks/nvim-dadbod-grip-invalid-lazy-spec-fix.md)
 
 ## Current Knowledge Pages
 

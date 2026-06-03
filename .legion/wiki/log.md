@@ -4,3 +4,8 @@
 
 - Created wiki summary for `install-dadbod-grip-nvim`.
 - Added a reusable Neovim plugin installation pattern for external CLI-backed data tools.
+
+## 2026-06-03
+
+- Added wiki summary for `nvim-dadbod-grip-invalid-lazy-spec-fix`.
+- Added Lazy package spec ownership and isolated worktree validation patterns.
