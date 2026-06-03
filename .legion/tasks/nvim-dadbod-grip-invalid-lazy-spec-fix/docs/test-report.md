@@ -46,3 +46,34 @@
 ## Notes
 
 - Validation used repo-local `.legion/tmp/verify-*` paths for generated config/state/cache during execution. These temporary files are not part of the final change.
+
+## Follow-Up Verification: Stale Package Cache
+
+### Background
+
+- The first fix disabled the `lazy` package source by changing `pkg.sources`, but live `~/.local/state/nvim/lazy/pkg-cache.lua` still contained the old `dadbod-grip.nvim/lazy.lua` command-only package spec.
+- lazy.nvim can load an existing package cache before rebuilding it, so removing `lazy` from `pkg.sources` is not sufficient when a stale cache already exists.
+- The follow-up fix sets `pkg.enabled = false`, which makes lazy.nvim skip package-spec loading entirely.
+
+### Stale Live Package Cache Ignored
+
+- Command: `mkdir -p .legion/tmp/followup-config .legion/tmp/followup-cache && ln -sfn "$PWD" .legion/tmp/followup-config/nvim && XDG_CONFIG_HOME="$PWD/.legion/tmp/followup-config" XDG_CACHE_HOME="$PWD/.legion/tmp/followup-cache" nvim --headless '+lua local cfg=require("lazy.core.config"); assert(cfg.options.pkg.enabled == false, "pkg subsystem still enabled"); assert(vim.tbl_isempty(cfg.spec.meta.pkgs), "package specs were loaded"); local plugin=cfg.plugins["dadbod-grip.nvim"]; assert(plugin and plugin.cmd, "dadbod-grip missing"); local got={}; for _,cmd in ipairs(plugin.cmd) do got[cmd]=true end; assert(got.GripOpen, "GripOpen missing"); assert(not got.GripToggle, "GripToggle should not be declared")' '+qa'`
+- Result: PASS
+- Why: proves the worktree config ignores the existing live package cache and no package specs enter Lazy meta.
+
+### Lazy Reload With Stale Live Cache
+
+- Command: `XDG_CONFIG_HOME="$PWD/.legion/tmp/followup-config" XDG_CACHE_HOME="$PWD/.legion/tmp/followup-cache" nvim --headless '+Lazy! reload' '+qa'`
+- Result: PASS
+- Why: exercises the reload path while the stale live package cache remains present.
+
+### Grip Command Trigger After Package Disable
+
+- Command: `XDG_CONFIG_HOME="$PWD/.legion/tmp/followup-config" XDG_CACHE_HOME="$PWD/.legion/tmp/followup-cache" nvim --headless '+GripHome' '+qa'`
+- Result: PASS
+- Why: confirms explicit user-owned command triggers still lazy-load dadbod-grip after disabling package specs.
+
+### Follow-Up Diff Whitespace Check
+
+- Command: `git diff --check`
+- Result: PASS

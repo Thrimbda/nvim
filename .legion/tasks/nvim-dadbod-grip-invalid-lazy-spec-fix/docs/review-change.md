@@ -29,3 +29,11 @@
 ## Non-Blocking Notes
 
 - `stylua` was not installed in the current environment, so formatting was not checked by that tool. The modified Lua files are small table/config edits and were parsed by Neovim during validation.
+
+## Follow-Up Review: Stale Package Cache
+
+- Result: PASS
+- Blocking findings: none.
+- Scope check: changing `pkg.sources` to `pkg.enabled = false` remains within the approved goal of preventing invalid plugin-owned package specs from being consumed.
+- Correctness check: this specifically covers the previously missed path where live `~/.local/state/nvim/lazy/pkg-cache.lua` already contained the bad dadbod-grip command-only spec.
+- Evidence reviewed: follow-up test report commands proved package specs do not load into Lazy meta, `Lazy! reload` still passes, `GripHome` still lazy-loads dadbod-grip, and `git diff --check` passes.

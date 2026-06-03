@@ -2,7 +2,7 @@
 
 ## Status
 
-- Current stage: wiki writeback complete; PR lifecycle pending.
+- Current stage: follow-up review/wiki complete; PR lifecycle pending.
 - Execution mode: default implementation mode, low-risk config repair path.
 - Worktree: `.worktrees/nvim-dadbod-grip-invalid-lazy-spec-fix/`
 - Branch: `legion/nvim-dadbod-grip-invalid-lazy-spec-fix`
@@ -27,3 +27,4 @@
 - Reported error: `Invalid plugin spec { cmd = { "Grip", "GripStart", ... } }`.
 - Root-cause observation: `/home/c1/.local/share/nvim/lazy/dadbod-grip.nvim/lazy.lua` returns a command-only fragment without a plugin source.
 - User explicitly requested a real repository fix, not a cautious compatibility workaround, cache-only repair, or old-commit pin.
+- Follow-up root cause: `pkg.sources` excluded future `lazy.lua` scans but did not invalidate the already-existing live `pkg-cache.lua` containing the bad dadbod-grip package spec.

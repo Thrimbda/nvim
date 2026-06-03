@@ -37,6 +37,12 @@
 - `stylua` was unavailable in this environment, so formatting validation with Stylua was skipped.
 - Interactive UI behavior was not exercised beyond headless command-trigger validation.
 
+## Follow-Up
+
+- The original PR disabled future `lazy.lua` package-source scans but did not invalidate an existing live `pkg-cache.lua` that still contained the bad dadbod-grip spec.
+- The follow-up changes `pkg.sources = { "rockspec", "packspec" }` to `pkg.enabled = false`, preventing lazy.nvim from loading package specs or stale package cache entries at all.
+- Follow-up validation used the live stale package cache path and confirmed no package specs entered Lazy meta, `Lazy! reload` passed, and `GripHome` still lazy-loaded dadbod-grip.
+
 ## Evidence
 
 - `docs/test-report.md`

@@ -15,3 +15,9 @@
 ## Notes
 
 - `stylua` was unavailable in this environment.
+
+## Follow-Up Fix
+
+- The first fix excluded future `lazy.lua` package-source scans but did not stop lazy.nvim from loading the existing live `pkg-cache.lua` that already contained the invalid dadbod-grip command-only spec.
+- This follow-up sets `pkg.enabled = false` so package specs and stale package cache entries are not loaded at all.
+- Verified against the live stale package cache path: no package specs entered Lazy meta, `Lazy! reload` passed, and `GripHome` still lazy-loaded dadbod-grip.
