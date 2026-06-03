@@ -21,3 +21,10 @@
 - Review note: no security trigger was present; `stylua` absence is a non-blocking tooling gap because Neovim parsed the modified Lua files during validation.
 - Report stage: generated implementation-mode `docs/report-walkthrough.md` and `docs/pr-body.md` from existing validation and review evidence.
 - Wiki stage: added task summary plus Lazy package-spec ownership and isolated worktree validation patterns.
+
+## 2026-06-03 Follow-Up
+
+- User reported the same invalid `Grip` command-only plugin spec after PR #2 merged.
+- Diagnosed the missed path: live `~/.local/state/nvim/lazy/pkg-cache.lua` still contained the old `dadbod-grip.nvim/lazy.lua` package spec. Removing `lazy` from `pkg.sources` does not prevent lazy.nvim from loading an already-existing package cache.
+- Follow-up implementation: changed `lua/config/lazy.lua` from `pkg.sources = { "rockspec", "packspec" }` to `pkg.enabled = false` so Lazy skips package-spec loading entirely.
+- Follow-up verification passed with the live stale package cache still present: package specs were not loaded into Lazy meta, `Lazy! reload` passed, `GripHome` lazy-loaded, and `git diff --check` passed.

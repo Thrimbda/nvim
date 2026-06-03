@@ -9,3 +9,4 @@
 
 - Added wiki summary for `nvim-dadbod-grip-invalid-lazy-spec-fix`.
 - Added Lazy package spec ownership and isolated worktree validation patterns.
+- Updated Lazy package spec ownership after follow-up: `pkg.enabled = false` is required when stale `pkg-cache.lua` entries already exist.
