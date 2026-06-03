@@ -1,6 +1,8 @@
 return {
   {
     "nickjvandyke/opencode.nvim",
+    lazy = true,
+    event = "VeryLazy",
     config = function()
       local opencode_cmd = "opencode --port"
       local terminal_opts = {
