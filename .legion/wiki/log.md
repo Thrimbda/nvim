@@ -4,6 +4,7 @@
 
 - Added wiki summary for `install-sops-nvim`.
 - Added reusable SOPS/secret-editing plugin pattern: eager-load first-read BufReadCmd integrations, avoid credential defaults, and verify without touching real secret files.
+- Added wiki summary for `update-sops-nvim` and updated current `sops.nvim` lock pin to `1656dac4d893f2d96c7ccb6d3fa3259bde6004e5`.
 
 ## 2026-06-02
 
