@@ -8,6 +8,14 @@
 - Verify and document required external CLIs separately. For Parquet via `dadbod-grip.nvim`, the key runtime dependency is `duckdb`.
 - When `Lazy! install` modifies `lazy-lock.json`, review the lockfile and keep only entries authorized by scope.
 
+## SOPS And Secret Editing Plugins
+
+- Treat secret-editing plugin configuration as security-sensitive even when the repository change is only a Neovim plugin spec.
+- If a plugin needs `BufReadCmd` handlers before the first supported encrypted file read, use explicit eager loading. Do not lazy-load on `BufReadPre`, `BufEnter`, or similar file events unless upstream documents that it is safe.
+- Do not commit account-specific SOPS defaults such as `AWS_PROFILE`, `SOPS_AGE_KEY_FILE`, `GOOGLE_APPLICATION_CREDENTIALS`, key material, or credential paths.
+- Verify setup and autocmd registration without opening, decrypting, encrypting, or writing real secret files.
+- Document the external `sops` CLI separately; plugin installation does not install or configure SOPS keys.
+
 ## Lazy Package Spec Ownership
 
 - Treat repository-owned `lua/plugins/*.lua` specs as the durable source of plugin behavior. Do not rely on plugin-owned `lazy.lua` files for command triggers, dependencies, or setup behavior that this config must preserve.

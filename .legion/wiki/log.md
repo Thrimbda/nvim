@@ -1,5 +1,10 @@
 # Legion Wiki Log
 
+## 2026-06-08
+
+- Added wiki summary for `install-sops-nvim`.
+- Added reusable SOPS/secret-editing plugin pattern: eager-load first-read BufReadCmd integrations, avoid credential defaults, and verify without touching real secret files.
+
 ## 2026-06-02
 
 - Created wiki summary for `install-dadbod-grip-nvim`.
