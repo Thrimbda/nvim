@@ -4,15 +4,15 @@ Mode: implementation.
 
 ## What Changed
 
-- Synchronized the active Neovim plugin installation to the staged `lazy-lock.json` with `Lazy restore`.
-- Ran the `blink.cmp` build task after restore.
-- Added Legion task evidence documenting the lockfile hypothesis, verification, and review.
-
-No Lua configuration patch was added because the insert freeze was not consistently reproducible after plugin restore/build.
+- Forced `blink.cmp` to use the Lua fuzzy matcher instead of loading its native dylib on insert.
+- Added a macOS native-artifact signing helper for local parser/native outputs.
+- Pinned `nvim-treesitter` to the lockfile commit and added build-time signing for parser artifacts.
+- Re-signed the currently installed tree-sitter parsers, `orgmode` parser, and `blink.cmp` dylib.
+- Updated Legion task evidence for the reopened diagnosis, verification, review, and wiki notes.
 
 ## Why
 
-The user reported that insert mode started freezing after the staged `lazy-lock.json` took effect. The lockfile update touched several insert-path candidates, especially `LazyVim`, `blink.cmp`, `mini.pairs`, and `orgmode`. A stale or partially synchronized plugin checkout/build is a plausible failure mode after lockfile updates, so the repair focused on restoring installed plugin state to the lockfile and verifying insert behavior.
+The first restore/build pass was insufficient. macOS crash reports showed Neovim being killed by code signing enforcement while mapping native artifacts. Insert mode loads `blink.cmp`, and normal file editing loads tree-sitter parsers, so both native paths had to be addressed.
 
 ## Verification
 
@@ -20,17 +20,17 @@ See `docs/test-report.md`.
 
 Validated:
 
-- `nvim --headless '+Lazy! restore' '+Lazy! build blink.cmp' '+qa!'` exited 0.
-- Default TUI insert + typing smoke exited 0.
-- Org TUI insert + typing smoke exited 0.
-- Headless insert + typing assertion exited 0 with `mode=n line=hello world`.
+- `blink.cmp` config reports `fuzzy.implementation = lua`.
+- Markdown and org tree-sitter parsers start successfully.
+- TUI insert + typing smoke exits 0.
+- No new `nvim` DiagnosticReports appear after final verification.
 
 ## Review
 
 See `docs/review-change.md`.
 
-Verdict: PASS with caveat. There are no blocking findings, but the original freeze did not remain stable enough to claim a deterministic Lua root-cause patch.
+Verdict: PASS.
 
 ## Residual Risk
 
-If manual insert still freezes, the next debugging input should be the exact filetype/session path and whether it happens before typing, while typing, or when leaving insert mode.
+Restart existing embedded Neovim/VS Code Neovim sessions before retesting, because already-running processes will not reload this config.

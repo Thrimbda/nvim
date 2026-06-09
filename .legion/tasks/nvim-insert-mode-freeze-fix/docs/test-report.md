@@ -2,9 +2,11 @@
 
 ## Summary
 
-Result: PASS for the observed post-restore insert and typing paths.
+Result: PASS for the reopened native-artifact repair.
 
 The user suspected the issue started after `lazy-lock.json` took effect. The staged lockfile had updated many plugins, including insert-path candidates such as `LazyVim`, `blink.cmp`, `mini.pairs`, `opencode.nvim`, and `orgmode`. The implementation action was to synchronize the installed plugin state to the staged lockfile and rebuild/check `blink.cmp`.
+
+After the user reported the failure still reproduced, macOS DiagnosticReports showed the stronger root cause: repeated `SIGKILL (Code Signature Invalid)` / `CODESIGNING Invalid Page` crashes when Neovim mapped native artifacts. The mapped sizes matched `blink.cmp`'s native fuzzy dylib and tree-sitter parser `.so` files.
 
 ## Commands
 
@@ -41,5 +43,37 @@ Result: exit 0 with `mode=n line=hello world`.
 
 ## Limits
 
-- The original freeze was not consistently reproducible under automation after plugin restore/build. The fix is therefore validated as a runtime-state repair rather than a Lua configuration patch.
-- Manual verification in the user's terminal is still useful because terminal UI timing and restored sessions can affect symptoms that scripted checks may miss.
+- iTerm and Terminal could not be operated with Computer Use because the tool denied those bundle IDs. VS Code integrated terminal was used as the GUI terminal fallback.
+- The final fix is validated against the observed macOS crash reports and smoke checks; existing live Neovim/VSCodium extension processes may need restart to pick up the new Lua config.
+
+## Reopened Verification
+
+```sh
+nvim --headless '+lua require("lazy").load({plugins={"blink.cmp"}}); print("blink_fuzzy", require("blink.cmp.config").fuzzy.implementation)' '+qa!'
+```
+
+Result: exit 0, printed `blink_fuzzy lua`.
+
+```sh
+nvim --headless '+enew' '+set ft=markdown' '+lua local ok,err=pcall(function() vim.treesitter.start(0, "markdown") end); print("markdown_ts", ok, err or "")' '+qa!'
+```
+
+Result: exit 0, printed `markdown_ts true`.
+
+```sh
+nvim --headless '+enew' '+set ft=org' '+lua local ok,err=pcall(function() vim.treesitter.start(0, "org") end); print("org_ts", ok, err or "")' '+qa!'
+```
+
+Result: exit 0, printed `org_ts true`.
+
+```sh
+TERM=xterm-256color expect -c 'spawn nvim -n .legion/tasks/nvim-insert-mode-freeze-fix/tmp/final-insert-native-fix.txt; after 1600; send "iabc"; after 700; send "\033:qa!\r"; expect eof; set result [wait]; puts "wait_result=$result"; exit [lindex $result 3]'
+```
+
+Result: exit 0. Neovim entered insert mode, accepted text, left insert mode, and quit.
+
+```sh
+find ~/Library/Logs/DiagnosticReports -maxdepth 1 -iname 'nvim-2026-06-09*.ips' -type f -print | sort | tail -4
+```
+
+Result: latest report remained `nvim-2026-06-09-144416.ips`; no new report was produced by the final parser or insert smoke checks.

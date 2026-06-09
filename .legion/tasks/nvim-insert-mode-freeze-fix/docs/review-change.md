@@ -2,7 +2,7 @@
 
 ## Verdict
 
-PASS with caveat.
+PASS.
 
 ## Blocking Findings
 
@@ -16,23 +16,24 @@ None.
 
 ## Correctness Review
 
-The strongest available evidence supports a runtime-state repair rather than a source-code patch:
+The reopened investigation found a deterministic platform-level failure mode:
 
-- The user identified the staged `lazy-lock.json` as likely causal.
-- `Lazy restore` and `Lazy build blink.cmp` completed successfully.
-- Post-restore TUI smoke checks entered insert mode, typed text, left insert mode, and exited with code 0 for default and org buffers.
-- Headless insert+typing also completed with the expected buffer content.
+- macOS DiagnosticReports repeatedly recorded `SIGKILL (Code Signature Invalid)` with `CODESIGNING Invalid Page`.
+- Mapped region sizes matched native Neovim artifacts: `blink.cmp`'s fuzzy dylib and tree-sitter parser `.so` files.
+- The source change removes the insert-mode dependency on the `blink.cmp` native matcher by forcing `fuzzy.implementation = "lua"`.
+- The source change pins `nvim-treesitter` to the lockfile commit and adds a build-time signing hook for local parser/native artifacts on macOS.
+- Runtime repair re-signed the current installed parser/native artifacts.
 
-The original freeze could not be made stable under automation after restore/build. Because of that, the review does not claim a deterministic root-cause patch in Lua config; it claims the active plugin installation is now synchronized to the lockfile and the observed insert paths pass.
+Final parser and insert smoke checks exited 0, and no new `nvim` DiagnosticReports were produced after the final verification.
 
 ## Maintainability Review
 
-No maintainability blocker. The only repository content added by this task is Legion evidence. The worktree carries the staged lockfile update so the investigation is reproducible against the same plugin versions the user suspected.
+No maintainability blocker. The added helper is small, macOS-gated, and only invoked from plugin build hooks. The `blink.cmp` Lua fuzzy fallback trades some completion matching performance for stability, which is acceptable for an editor-crash fix.
 
 ## Security Review
 
-Security lens was not triggered. The task did not change auth, permissions, secrets, protocol boundaries, user data handling, or privileged input paths.
+Security lens was not triggered. The task does not change auth, permissions, secrets, protocol boundaries, user data handling, or privileged input paths. The local `codesign --force --sign -` action is ad-hoc signing of user-local Neovim artifacts.
 
 ## Residual Risk
 
-If the user's terminal still freezes manually, the next likely causes are session-restoration state, a specific filetype not covered by the smoke checks, or an insert-time plugin interaction that only appears under human timing. In that case, continue from this task with a manual reproduction transcript and the exact filetype/session path.
+Existing live embedded Neovim processes may still have the old config loaded. They should be restarted before judging the final behavior.

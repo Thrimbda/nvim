@@ -36,3 +36,11 @@
 - For insert-mode failures after LazyVim updates, inspect `InsertEnter` plugins first. In this config, `blink.cmp` and `copilot.vim` are the primary insert-entry candidates.
 - Validate TUI insert behavior with `expect` or another real PTY driver. Timer-only TUI scripts can look like Neovim hangs; prove the harness with `nvim --clean`.
 - If restore/build resolves the symptom but the original hang is no longer stable, document the result as a runtime-state repair rather than a deterministic source patch.
+
+## macOS Neovim Native Artifact Signing
+
+- When Neovim flash-exits on macOS with no Lua log, check `~/Library/Logs/DiagnosticReports/nvim-*.ips` before continuing plugin-level debugging.
+- `SIGKILL (Code Signature Invalid)` with `CODESIGNING Invalid Page` usually means macOS killed Neovim while mapping a native parser or plugin dylib.
+- Compare the report's mapped region size with local native files under `~/.local/share/nvim/site/parser/*.so` and plugin artifacts such as `blink.cmp/target/release/*.dylib`.
+- For insert-mode crashes involving `blink.cmp`, prefer `fuzzy.implementation = "lua"` when stability matters more than native fuzzy performance.
+- After parser/build updates on macOS, ad-hoc sign local artifacts with `codesign --force --sign -` and re-run tree-sitter/parser smoke tests.

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Current phase: Wiki writeback complete; local runtime repair verified.
+- Current phase: Reopened repair complete; native artifact code-sign path verified.
 - Task owner: Codex
 - Risk level: Low, with possible escalation if plugin dependency or lockfile changes are required.
 
@@ -20,6 +20,11 @@
 - [x] Run delivery review and write `docs/review-change.md`.
 - [x] Write reviewer-facing walkthrough.
 - [x] Update `.legion/wiki/**` if there is reusable knowledge.
+- [x] Reproduce the current deterministic flash-exit against the active config.
+- [x] Isolate whether the working-copy `nvim-treesitter` lock bump to `7caec274` is causal.
+- [x] Apply the minimal durable fix.
+- [x] Re-run insert-mode and startup crash verification.
+- [x] Update verification/review/report/wiki evidence for the reopened result.
 
 ## Out of Scope Checklist
 

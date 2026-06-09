@@ -55,6 +55,7 @@
 - Compare normal startup against `--clean` or minimal config where useful to distinguish Neovim core from local config.
 - Inspect `InsertEnter`, insert-mode keymaps, AI/completion plugins, and recent lazy-load changes before editing.
 - Prefer removing the problematic insert-mode trigger over adding sleeps, redraw hacks, or broad plugin disabling.
+- Reopened finding: macOS DiagnosticReports showed `SIGKILL (Code Signature Invalid)` for mapped native artifacts. The durable fix must avoid `blink.cmp`'s native fuzzy matcher on insert and re-sign local tree-sitter/native artifacts after parser builds.
 
 ## Phases
 

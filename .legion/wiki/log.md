@@ -4,6 +4,7 @@
 
 - Added wiki summary for `nvim-insert-mode-freeze-fix`.
 - Added Lazy lock runtime synchronization pattern: after lockfile changes, verify installed plugin checkouts/build artifacts with `Lazy restore` and targeted build tasks before changing Lua config.
+- Updated `nvim-insert-mode-freeze-fix` after reopened failure: root cause involved macOS code-sign kills for Neovim native artifacts; added native artifact signing pattern.
 
 ## 2026-06-08
 
