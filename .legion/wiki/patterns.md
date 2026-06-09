@@ -28,3 +28,11 @@
 - For plugins that are not needed to draw the first screen, add `lazy = true` and a concrete trigger such as `event`, `cmd`, `keys`, or `ft`.
 - Preserve command availability when delaying command-oriented plugins. Example: `copilot.vim` can use `event = "InsertEnter"` for suggestions while keeping `cmd = "Copilot"` for command-triggered loading.
 - Do not treat Neovim's startup `clear screen` log entry as a plugin bug. It is built into TUI initialization; optimize plugin work that happens after the clear instead.
+
+## Lazy Lock Runtime Synchronization
+
+- When a Neovim regression starts after `lazy-lock.json` changes, check both the lockfile diff and the installed plugin checkout/build state before editing Lua config.
+- Run `Lazy restore` to force installed plugin checkouts to the lockfile and run targeted build tasks for plugins with native artifacts, such as `blink.cmp`.
+- For insert-mode failures after LazyVim updates, inspect `InsertEnter` plugins first. In this config, `blink.cmp` and `copilot.vim` are the primary insert-entry candidates.
+- Validate TUI insert behavior with `expect` or another real PTY driver. Timer-only TUI scripts can look like Neovim hangs; prove the harness with `nvim --clean`.
+- If restore/build resolves the symptom but the original hang is no longer stable, document the result as a runtime-state repair rather than a deterministic source patch.

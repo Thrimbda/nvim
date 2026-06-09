@@ -1,5 +1,10 @@
 # Legion Wiki Log
 
+## 2026-06-09
+
+- Added wiki summary for `nvim-insert-mode-freeze-fix`.
+- Added Lazy lock runtime synchronization pattern: after lockfile changes, verify installed plugin checkouts/build artifacts with `Lazy restore` and targeted build tasks before changing Lua config.
+
 ## 2026-06-08
 
 - Added wiki summary for `install-sops-nvim`.
