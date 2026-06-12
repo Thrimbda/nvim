@@ -8,6 +8,13 @@
 - Verify and document required external CLIs separately. For Parquet via `dadbod-grip.nvim`, the key runtime dependency is `duckdb`.
 - When `Lazy! install` modifies `lazy-lock.json`, review the lockfile and keep only entries authorized by scope.
 
+## Startup-Critical File Handlers
+
+- Do not put first-read `BufReadCmd` handlers in LazyVim's `lua/config/autocmds.lua` when they must handle `nvim <file>` during startup; that file is loaded on `VeryLazy` and can be too late.
+- Register startup-critical file handlers from `init.lua` or another module required before `config.lazy`.
+- Verify direct startup behavior separately from post-startup `:edit` behavior.
+- For external viewer CLIs such as Tabiew's `tw`, provide a clear missing-executable fallback instead of trying to install the CLI from Neovim config.
+
 ## SOPS And Secret Editing Plugins
 
 - Treat secret-editing plugin configuration as security-sensitive even when the repository change is only a Neovim plugin spec.
