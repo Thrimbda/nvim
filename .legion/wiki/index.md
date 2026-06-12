@@ -11,6 +11,7 @@ This wiki summarizes durable task outcomes and reusable patterns. Raw evidence r
 - [nvim-dadbod-grip-invalid-lazy-spec-fix](tasks/nvim-dadbod-grip-invalid-lazy-spec-fix.md)
 - [nvim-insert-mode-freeze-fix](tasks/nvim-insert-mode-freeze-fix.md)
 - [nvim-startup-flash-fix](tasks/nvim-startup-flash-fix.md)
+- [tabiew-parquet-auto-open](tasks/tabiew-parquet-auto-open.md)
 - [update-sops-nvim](tasks/update-sops-nvim.md)
 
 ## Current Knowledge Pages

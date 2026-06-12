@@ -1,5 +1,10 @@
 # Legion Wiki Log
 
+## 2026-06-11
+
+- Added wiki summary for `tabiew-parquet-auto-open`.
+- Added startup-critical file handler pattern: first-read `BufReadCmd` integrations that must catch `nvim <file>` should load before `config.lazy`, not from LazyVim's `VeryLazy` autocmd file.
+
 ## 2026-06-09
 
 - Added wiki summary for `nvim-insert-mode-freeze-fix`.
