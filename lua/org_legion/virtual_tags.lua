@@ -57,6 +57,13 @@ local function configured_tag_set(cfg)
   return set
 end
 
+function M.is_archive_candidate_query(cfg, term)
+  if not cfg or cfg.enabled == false or type(term) ~= "string" then
+    return false
+  end
+  return vim.trim(term) == "-REFILE/"
+end
+
 local function config_signature(cfg)
   local parts = {}
   vim.list_extend(parts, configured_tags(cfg))
@@ -262,6 +269,10 @@ function M.has_virtual_query(cfg, term)
     return false
   end
 
+  if M.is_archive_candidate_query(cfg, term) then
+    return true
+  end
+
   local wanted = configured_tag_set(cfg)
   for token in term:gmatch("[%w_@#%%]+") do
     if wanted[token] then
@@ -439,6 +450,12 @@ local function searchable_item(cfg, index, headline)
   }
 end
 
+local function headline_has_virtual_tag(cfg, index, headline, tag)
+  local line_nr = headline_start_line(headline)
+  local tag_set = line_nr and index.tag_sets_by_line[line_nr] or nil
+  return tag_set and tag_set[tag] == true
+end
+
 function M.apply_search(cfg, file, search, todo_only)
   if file:is_archive_file() then
     return {}
@@ -449,8 +466,13 @@ function M.apply_search(cfg, file, search, todo_only)
     error(err and err.message or "failed to build org_legion virtual tag index")
   end
 
+  local archive_candidate_query = M.is_archive_candidate_query(cfg, search and search.term)
+
   return vim.tbl_filter(function(headline)
     if headline:is_archived() or (todo_only and not headline:is_todo()) then
+      return false
+    end
+    if archive_candidate_query and not headline_has_virtual_tag(cfg, index, headline, cfg.derived_tags.archive_candidate) then
       return false
     end
     return search:check(searchable_item(cfg, index, headline))
@@ -470,6 +492,9 @@ function M.match_headline(cfg, headline, query, opts)
     return false, err
   end
   if opts.todo_only and not headline:is_todo() then
+    return false
+  end
+  if M.is_archive_candidate_query(cfg, query) and not headline_has_virtual_tag(cfg, index, headline, cfg.derived_tags.archive_candidate) then
     return false
   end
   return search:check(searchable_item(cfg, index, headline))

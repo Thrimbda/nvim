@@ -165,7 +165,7 @@ return {
               },
               {
                 type = "tags",
-                match = "ARCHIVE_CANDIDATE",
+                match = "-REFILE/",
                 org_agenda_overriding_header = "Tasks to Archive",
               },
             },

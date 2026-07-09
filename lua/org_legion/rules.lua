@@ -10,21 +10,6 @@ local function setify(list)
   return out
 end
 
-local function parse_ymd(text)
-  local y, m, d = text:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)$")
-  if not y then
-    return nil
-  end
-  return os.time({
-    year = tonumber(y),
-    month = tonumber(m),
-    day = tonumber(d),
-    hour = 0,
-    min = 0,
-    sec = 0,
-  })
-end
-
 local function month_start(ts)
   local t = os.date("*t", ts)
   return os.time({ year = t.year, month = t.month, day = 1, hour = 0, min = 0, sec = 0 })
@@ -56,18 +41,25 @@ local function maybe_warn_precise(cfg)
   end
 end
 
-local function find_last_activity_ts(lines, start_line, end_line)
-  local latest = nil
+local function archive_month_prefixes(now)
+  local this_month = month_start(now)
+  local last_month = shift_month(this_month, -1)
+  return {
+    os.date("%Y-%m-", this_month),
+    os.date("%Y-%m-", last_month),
+  }
+end
+
+local function subtree_has_current_archive_timestamp(lines, start_line, end_line, month_prefixes)
   for i = start_line, end_line do
     local line = lines[i] or ""
-    for ymd in line:gmatch("%d%d%d%d%-%d%d%-%d%d") do
-      local ts = parse_ymd(ymd)
-      if ts and (not latest or ts > latest) then
-        latest = ts
+    for _, prefix in ipairs(month_prefixes) do
+      if line:find(prefix, 1, true) then
+        return true
       end
     end
   end
-  return latest
+  return false
 end
 
 local function for_each_descendant(nodes, node, cb)
@@ -87,12 +79,7 @@ function M.compute(lines, nodes, cfg)
   local done_set = setify(cfg.todo.done)
   local todo_set = setify(vim.list_extend(vim.deepcopy(cfg.todo.active or {}), cfg.todo.done or {}))
   local next_kw = cfg.todo.next
-  local stale_days = cfg.archive.stale_days
-  local recent_month_window = cfg.archive.recent_month_window
-
-  local now = os.time()
-  local stale_before = now - (stale_days * 24 * 60 * 60)
-  local recent_cutoff = shift_month(month_start(now), -(recent_month_window - 1))
+  local archive_current_months = archive_month_prefixes(os.time())
 
   local out = {}
   local project_by_index = {}
@@ -117,10 +104,7 @@ function M.compute(lines, nodes, cfg)
 
     local archive_candidate = false
     if done_set[node.todo] then
-      local last_activity = find_last_activity_ts(lines, node.line_nr, node.end_line)
-      local stale = (not last_activity) or (last_activity <= stale_before)
-      local has_recent_activity = last_activity and (last_activity >= recent_cutoff)
-      archive_candidate = stale and (not has_recent_activity)
+      archive_candidate = not subtree_has_current_archive_timestamp(lines, node.line_nr + 1, node.end_line, archive_current_months)
     end
 
     project_by_index[node.index] = is_project

@@ -6,6 +6,7 @@
 - Inject virtual tags through the orgmode search boundary instead of writing maintenance tags into org text. Ordinary org files should stay free of `PROJECT/STUCK/PROJECT_TASK/ARCHIVE_CANDIDATE` unless those are legacy materialized tags awaiting cleanup.
 - Open agenda views that depend on virtual tags through a refresh wrapper. Running `org_legion.refresh_all()` before `b`, `n`, or `s` agenda views prevents stale files from drifting back into Standalone or missing Stuck Projects.
 - Verify both the static agenda command structure and the virtual refresh rules. A narrow config-capture test can prove order/header/matcher behavior without real private org files; a separate refresh test should prove parent and child virtual tags are distinct and refresh does not mutate org text.
+- For Norang archive parity, do not use a day-count stale approximation. `Tasks to Archive` should expose `-REFILE/` and internally filter to done-state subtrees that lack this-month or last-month `YYYY-MM-` timestamps.
 
 ## Orgmode Refile Destination Picker
 
