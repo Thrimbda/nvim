@@ -60,7 +60,7 @@ local function apply_legion_trigger(headline, todo)
     return
   end
 
-  if todo == "TODO" or todo == "NEXT" or todo == "DONE" then
+  if todo == "TODO" or todo == "NEXT" or todo == "DONE" or todo == "PHONE" or todo == "MEETING" then
     apply_tag_delta(headline, nil, { "WAITING", "HOLD", "CANCELLED" })
   end
 end

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Org Agenda Archive and Refresh Diagnostics | Walkthrough</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: oklch(96% 0.014 95);
+      --surface: oklch(99% 0.006 96);
+      --surface-2: oklch(94% 0.018 110);
+      --ink: oklch(24% 0.024 130);
+      --muted: oklch(48% 0.032 128);
+      --line: oklch(82% 0.02 112);
+      --accent: oklch(48% 0.13 154);
+      --accent-2: oklch(45% 0.11 235);
+      --ok: oklch(88% 0.08 145);
+      --warn: oklch(90% 0.08 86);
+      --shadow: oklch(70% 0.022 120 / 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.64;
+    }
+
+    main {
+      width: min(1180px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.18em;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 370px);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 30px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 760;
+      letter-spacing: 0.08em;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+      margin: 0;
+      max-width: 11ch;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 68ch;
+      margin: 20px 0 0;
+    }
+
+    .status {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      padding: 22px;
+      box-shadow: 0 18px 46px var(--shadow);
+    }
+
+    .status h2 {
+      font-size: 1rem;
+      margin: 0 0 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--line);
+      padding: 11px 0;
+    }
+
+    .status-row span:first-child {
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--ok);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 760;
+      padding: 0.13rem 0.62rem;
+      white-space: nowrap;
+    }
+
+    .pill.pending {
+      background: var(--warn);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 30px;
+      align-items: start;
+    }
+
+    nav {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      padding: 16px;
+    }
+
+    nav a {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
+      padding: 8px 0;
+      text-decoration: none;
+    }
+
+    section {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      padding: 26px;
+      margin-bottom: 22px;
+      box-shadow: 0 12px 32px var(--shadow);
+    }
+
+    section h2 {
+      font-size: 1.22rem;
+      margin: 0 0 14px;
+    }
+
+    p,
+    li {
+      max-width: 72ch;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.25rem;
+    }
+
+    code {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface-2);
+      padding: 0.08rem 0.28rem;
+      font-size: 0.92em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .subtle {
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      main {
+        width: min(100% - 28px, 760px);
+        padding-top: 30px;
+      }
+
+      .hero,
+      .layout,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        position: static;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+
+    @media print {
+      body {
+        background: var(--surface);
+      }
+
+      main {
+        width: auto;
+        padding: 0;
+      }
+
+      nav {
+        display: none;
+      }
+
+      section,
+      .status {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <p class="kicker">Legion Implementation Walkthrough</p>
+        <h1>Org Agenda Archive Fix</h1>
+        <p class="lead">本交付让 nvim org agenda 的 archive section 对齐 Emacs/Norang baseline，并把 agenda 前 refresh failure 从两条含糊 warning 收敛为一条可定位 warning。</p>
+      </div>
+      <aside class="status" aria-label="交付终态">
+        <h2>交付状态</h2>
+        <div class="status-row"><span>Profile</span><span class="pill">implementation</span></div>
+        <div class="status-row"><span>Review</span><span class="pill">PASS</span></div>
+        <div class="status-row"><span>Tests</span><span class="pill">PASS</span></div>
+        <div class="status-row"><span>PR</span><span class="pill pending">pending</span></div>
+        <div class="status-row"><span>Render</span><span class="pill pending">artifact/local-only</span></div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <nav aria-label="Walkthrough navigation">
+        <a href="#summary">摘要</a>
+        <a href="#scope">范围</a>
+        <a href="#evidence">证据</a>
+        <a href="#path">交付路径</a>
+        <a href="#render">渲染</a>
+        <a href="#decisions">改动</a>
+        <a href="#verification">验证</a>
+        <a href="#risks">风险</a>
+        <a href="#checklist">检查清单</a>
+        <a href="#final">下一阶段</a>
+      </nav>
+
+      <div>
+        <section id="summary">
+          <h2>Reviewer Summary</h2>
+          <ul>
+            <li>Archive 缺项根因是配置层只把 <code>DONE/CANCELLED</code> 当完成态，未把 capture templates 中已有的 <code>PHONE/MEETING</code> 纳入 done keyword 集合。</li>
+            <li>Warning 重复根因是 <code>refresh_all()</code> 自己通知一次，agenda wrapper 又按 fail 数通知一次，而且 wrapper 没有文件级失败详情。</li>
+            <li>本轮不同于 PR #11 的 section order/virtual tag 展示，也不同于 PR #12 的 archive matcher/月度窗口。这里补的是 done keyword parity 和 refresh diagnostics。</li>
+            <li>当前验证结论为 PASS，真实 agenda 文件 refresh 输出 <code>total=22 ok=22 fail=0 skipped_conflict=0 skipped_unloaded=0</code>。</li>
+          </ul>
+        </section>
+
+        <section id="scope">
+          <h2>Scope</h2>
+          <div class="two-col">
+            <div>
+              <h3>In scope</h3>
+              <ul>
+                <li><code>lua/plugins/orgmode.lua</code> 的 keyword parity 和 agenda refresh wrapper。</li>
+                <li><code>lua/org_legion/init.lua</code> 的 done defaults 和 failure formatter。</li>
+                <li><code>lua/org_legion/todo_triggers.lua</code> 的 done-state cleanup。</li>
+                <li>Smoke tests 与 Legion evidence docs。</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Out of scope</h3>
+              <ul>
+                <li>不修改真实 org 文件内容。</li>
+                <li>不重做 agenda renderer 或 section 结构。</li>
+                <li>不处理外部同步状态或 OneDrive 文件系统问题本身。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="evidence">
+          <h2>Evidence Map</h2>
+          <table>
+            <thead>
+              <tr><th>Claim</th><th>Evidence</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>PHONE/MEETING</code> 进入 done-state 配置</td><td><code>agenda_block_matches_norang_baseline</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>旧 <code>PHONE/MEETING</code> 条目匹配 archive query</td><td><code>legion_archive_candidates_match_norang_month_boundary</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>agenda refresh failure 只有一条带详情 warning</td><td><code>agenda_refresh_failure_warning_includes_details</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>manual refresh summary 带 failure details</td><td><code>legion_refresh_failure_summary_formats_paths</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>done-state trigger 清理 stale tags</td><td><code>todo_state_tag_triggers_legion</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>全量 org workflow 未回归</td><td><code>docs/test-report.md</code></td><td><span class="pill">PASS</span></td></tr>
+              <tr><td>只读交付审查无阻塞项</td><td><code>docs/review-change.md</code></td><td><span class="pill">PASS</span></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="path">
+          <h2>Delivery Path</h2>
+          <ol>
+            <li>收敛用户反馈为 archive completeness 和 refresh diagnostics 两个验收点。</li>
+            <li>选择低风险 design-lite：补 done keyword parity，新增统一 failure formatter。</li>
+            <li>实现配置、诊断和 trigger cleanup，并补 smoke coverage。</li>
+            <li>完成 targeted smoke、full smoke、真实 agenda refresh 和只读 review。</li>
+            <li>当前生成 reviewer walkthrough 和 PR body，下一步进入 render、wiki 和 PR lifecycle。</li>
+          </ol>
+        </section>
+
+        <section id="render">
+          <h2>Render Handoff</h2>
+          <p>当前状态：<span class="pill pending">artifact/local-only</span>。仓库目前没有 Pages 或 PR preview workflow，本轮不新增发布面。Reviewer 可以直接打开 checked-in HTML artifact；若未来需要稳定 rendered URL，应另开任务设计 Pages 或 authenticated internal preview。</p>
+        </section>
+
+        <section id="decisions">
+          <h2>What Changed / What Was Decided</h2>
+          <ul>
+            <li><code>org_todo_keywords</code> 现在包含 <code>TODO/NEXT/WAITING/HOLD | DONE/CANCELLED/PHONE/MEETING</code>。</li>
+            <li><code>org_legion.todo.done</code> 默认值和插件配置同步包含 <code>PHONE/MEETING</code>。</li>
+            <li><code>open_agenda_after_legion_refresh()</code> 调用 <code>refresh_all({ notify = false })</code>，失败时由 wrapper 发一条带详情 warning。</li>
+            <li><code>format_refresh_failures()</code> 和 <code>format_refresh_summary()</code> 输出失败路径、错误 code 和错误 message。</li>
+            <li><code>todo_triggers</code> 将 <code>PHONE/MEETING</code> 视为 done-state cleanup 目标。</li>
+          </ul>
+        </section>
+
+        <section id="verification">
+          <h2>Verification / Review Status</h2>
+          <ul>
+            <li>Targeted smoke: PASS。</li>
+            <li>Full smoke: PASS，输出 <code>All smoke cases passed.</code></li>
+            <li><code>git diff --check</code>: PASS。</li>
+            <li><code>stylua</code>: 本机未安装，未运行。</li>
+            <li>真实 agenda refresh: <code>org_legion refresh: total=22 ok=22 fail=0 skipped_conflict=0 skipped_unloaded=0</code>。</li>
+            <li><code>review-change</code>: PASS，无阻塞项，未命中 security trigger。</li>
+          </ul>
+        </section>
+
+        <section id="risks">
+          <h2>Risks and Limits</h2>
+          <ul>
+            <li>本机 smoke 使用现有 opt-in unpinned orgmode fallback：<code>/Users/c1/.local/share/nvim/lazy/orgmode</code>。</li>
+            <li>如果后续交互态 loaded buffer 仍有 transient refresh failure，新 warning 会定位失败文件和错误摘要，但不会自动修复 org 文件内容。</li>
+            <li>PR lifecycle 仍未完成，当前文档不代表 checks、review、merge、cleanup 或主工作区 refresh 已完成。</li>
+          </ul>
+        </section>
+
+        <section id="checklist">
+          <h2>Reviewer Checklist</h2>
+          <ul>
+            <li>确认 <code>PHONE/MEETING</code> 作为 Norang done-state keyword 与 Emacs baseline 一致。</li>
+            <li>确认 agenda pre-refresh failure 只产生一条 warning。</li>
+            <li>确认 failure formatter 足够定位问题且不输出文件正文。</li>
+            <li>确认新增 smoke 覆盖用户截图中的 archive 缺项。</li>
+          </ul>
+        </section>
+
+        <section id="final">
+          <h2>Final State / Next Stage</h2>
+          <p>当前阶段产物已生成，render handoff 选择 artifact/local-only。下一步：写回 <code>legion-wiki</code>，之后进入 commit、push、PR、checks/review、merge、cleanup 和主工作区 refresh。</p>
+          <p class="subtle">PR body 和 walkthrough 只是 PR lifecycle 的输入，不代表 PR 已完成。</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

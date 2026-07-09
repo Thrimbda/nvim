@@ -22,7 +22,7 @@ local defaults = {
   },
   todo = {
     active = { "TODO", "NEXT", "WAITING", "HOLD" },
-    done = { "DONE", "CANCELLED" },
+    done = { "DONE", "CANCELLED", "PHONE", "MEETING" },
     next = "NEXT",
   },
   archive = {
@@ -49,6 +49,31 @@ local function notify(cfg, msg, level)
     return
   end
   vim.notify(msg, level)
+end
+
+local function compact_text(value, max_len)
+  local text = tostring(value or "")
+  text = text:gsub("%s+", " ")
+  if text == "" then
+    return "(no message)"
+  end
+  max_len = max_len or 160
+  if #text > max_len then
+    return text:sub(1, max_len - 3) .. "..."
+  end
+  return text
+end
+
+local function short_path(path)
+  if type(path) ~= "string" or path == "" then
+    return "(unknown file)"
+  end
+
+  local ok, shortened = pcall(vim.fn.fnamemodify, path, ":~:.")
+  if ok and type(shortened) == "string" and shortened ~= "" then
+    return shortened
+  end
+  return path
 end
 
 local function is_string_list(value)
@@ -348,7 +373,56 @@ function M.refresh_file(path_or_bufnr)
   return result
 end
 
-function M.refresh_all()
+function M.format_refresh_failures(summary, limit)
+  if type(summary) ~= "table" then
+    return ""
+  end
+
+  limit = limit or 3
+  local failures = {}
+  for _, result in ipairs(summary.results or {}) do
+    if type(result) == "table" and result.ok == false and not result.skipped then
+      local err = type(result.error) == "table" and result.error or {}
+      local code = compact_text(err.code or "E_UNKNOWN", 80)
+      local message = compact_text(err.message or "refresh failed", 180)
+      table.insert(failures, ("%s %s: %s"):format(short_path(result.path), code, message))
+      if #failures >= limit then
+        break
+      end
+    end
+  end
+
+  if #failures == 0 then
+    return ""
+  end
+
+  local remaining = math.max((summary.fail or #failures) - #failures, 0)
+  local suffix = remaining > 0 and ("; +" .. tostring(remaining) .. " more") or ""
+  return "failures: " .. table.concat(failures, "; ") .. suffix
+end
+
+function M.format_refresh_summary(summary)
+  if type(summary) ~= "table" then
+    return "org_legion refresh: invalid summary"
+  end
+
+  local message = string.format(
+    "org_legion refresh: total=%d ok=%d fail=%d skipped_conflict=%d skipped_unloaded=%d",
+    summary.total or 0,
+    summary.ok or 0,
+    summary.fail or 0,
+    summary.skipped_conflict or 0,
+    summary.skipped_unloaded or 0
+  )
+  local failures = M.format_refresh_failures(summary)
+  if failures ~= "" then
+    message = message .. " | " .. failures
+  end
+  return message
+end
+
+function M.refresh_all(opts)
+  opts = type(opts) == "table" and opts or {}
   local cfg = M._cfg or defaults
   if not command_guard(cfg, false) then
     return { ok = false, error = { code = "E_CFG_INVALID", message = M.state.cfg_error } }
@@ -361,18 +435,9 @@ function M.refresh_all()
   local summary = refresh.refresh_all(cfg)
   M.state.phase = (summary.fail > 0 or summary.skipped_conflict > 0) and "S4" or "S1"
 
-  notify(
-    cfg,
-    string.format(
-      "org_legion refresh: total=%d ok=%d fail=%d skipped_conflict=%d skipped_unloaded=%d",
-      summary.total,
-      summary.ok,
-      summary.fail,
-      summary.skipped_conflict,
-      summary.skipped_unloaded
-    ),
-    summary.fail > 0 and vim.log.levels.WARN or vim.log.levels.INFO
-  )
+  if opts.notify ~= false then
+    notify(cfg, M.format_refresh_summary(summary), summary.fail > 0 and vim.log.levels.WARN or vim.log.levels.INFO)
+  end
 
   return summary
 end

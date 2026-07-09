@@ -20,6 +20,7 @@ RTP_SETUP_LUA="local function safe_path(name) local p=vim.fn.getenv(name); if ty
 
 CASES=(
 	agenda_block_matches_norang_baseline
+	agenda_refresh_failure_warning_includes_details
 	punch_in_requires_id
 	punch_in_clocks_default_task
 	punch_in_prefers_current_buffer_when_id_is_duplicated
@@ -36,6 +37,7 @@ CASES=(
 	clock_out_in_punch_mode_returns_to_default
 	legion_refresh_indexes_stuck_project
 	legion_refresh_indexes_project_tasks
+	legion_refresh_failure_summary_formats_paths
 	legion_archive_candidates_match_norang_month_boundary
 	legion_cleanup_apply_removes_derived_tags
 	capture_clock_handoff_resumes_previous

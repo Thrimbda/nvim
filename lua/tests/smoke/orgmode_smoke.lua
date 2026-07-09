@@ -1,8 +1,8 @@
 local M = {}
 
-local DEFAULT_TODOS = { "TODO", "NEXT", "WAITING", "HOLD", "|", "DONE", "CANCELLED" }
+local DEFAULT_TODOS = { "TODO", "NEXT", "WAITING", "HOLD", "|", "DONE", "CANCELLED", "PHONE", "MEETING" }
 local DEFAULT_ACTIVE = { "TODO", "NEXT", "WAITING", "HOLD" }
-local DEFAULT_DONE = { "DONE", "CANCELLED" }
+local DEFAULT_DONE = { "DONE", "CANCELLED", "PHONE", "MEETING" }
 local DEFAULT_TASK_ID = "3CA66213-50ED-48B9-8E24-310B0959DA75"
 
 local function assert_true(value, message)
@@ -175,11 +175,34 @@ local function setup_todo_triggers()
   assert_true(ok == true, "todo trigger setup failed: " .. tostring(err))
 end
 
-local function capture_orgmode_plugin_setup()
+local function capture_orgmode_plugin_setup(opts)
+  opts = opts or {}
   local captured_setup = nil
+  local captured_legion_setup = nil
   local refresh_calls = 0
+  local refresh_call_opts = {}
   local commands = {}
   local keymaps = {}
+  local notifications = {}
+  local refresh_summary = opts.refresh_summary or { fail = 0 }
+  local format_refresh_failures = opts.format_refresh_failures
+    or function()
+      return ""
+    end
+
+  local function build_mock_legion()
+    return {
+      setup = function(setup_opts)
+        captured_legion_setup = setup_opts
+      end,
+      refresh_all = function(refresh_opts)
+        refresh_calls = refresh_calls + 1
+        table.insert(refresh_call_opts, refresh_opts)
+        return refresh_summary
+      end,
+      format_refresh_failures = format_refresh_failures,
+    }
+  end
 
   local mock_modules = {
     orgmode = {
@@ -209,13 +232,7 @@ local function capture_orgmode_plugin_setup()
     org_refile_picker = {
       setup = function() end,
     },
-    org_legion = {
-      setup = function() end,
-      refresh_all = function()
-        refresh_calls = refresh_calls + 1
-        return { fail = 0 }
-      end,
-    },
+    org_legion = build_mock_legion(),
   }
 
   local original_loaded = {}
@@ -228,6 +245,7 @@ local function capture_orgmode_plugin_setup()
 
   local original_keymap_set = vim.keymap.set
   local original_cmd = vim.cmd
+  local original_notify = vim.notify
   vim.keymap.set = function(mode, lhs, rhs, opts)
     table.insert(keymaps, {
       mode = mode,
@@ -239,6 +257,13 @@ local function capture_orgmode_plugin_setup()
   vim.cmd = function(command)
     table.insert(commands, command)
   end
+  vim.notify = function(message, level, notify_opts)
+    table.insert(notifications, {
+      message = message,
+      level = level,
+      opts = notify_opts,
+    })
+  end
 
   local ok, result = xpcall(function()
     local spec = require("plugins.orgmode")
@@ -249,6 +274,7 @@ local function capture_orgmode_plugin_setup()
 
   vim.keymap.set = original_keymap_set
   vim.cmd = original_cmd
+  vim.notify = original_notify
   for name, original in pairs(original_loaded) do
     package.loaded[name] = original
   end
@@ -264,27 +290,36 @@ local function capture_orgmode_plugin_setup()
 
   return {
     setup = captured_setup,
+    legion_setup = captured_legion_setup,
     keymaps = keymaps,
     commands = commands,
+    notifications = notifications,
     refresh_calls = function()
       return refresh_calls
+    end,
+    refresh_call_opts = function()
+      return refresh_call_opts
     end,
     invoke_keymap = function(keymap)
       local original_legion = package.loaded.org_legion
       local original_cmd_for_invoke = vim.cmd
-      package.loaded.org_legion = {
-        refresh_all = function()
-          refresh_calls = refresh_calls + 1
-          return { fail = 0 }
-        end,
-      }
+      local original_notify_for_invoke = vim.notify
+      package.loaded.org_legion = build_mock_legion()
       vim.cmd = function(command)
         table.insert(commands, command)
+      end
+      vim.notify = function(message, level, notify_opts)
+        table.insert(notifications, {
+          message = message,
+          level = level,
+          opts = notify_opts,
+        })
       end
 
       local ok_invoke, invoke_err = pcall(keymap.rhs)
 
       vim.cmd = original_cmd_for_invoke
+      vim.notify = original_notify_for_invoke
       package.loaded.org_legion = original_legion
 
       if not ok_invoke then
@@ -453,6 +488,24 @@ local function test_agenda_block_matches_norang_baseline()
     "PROJECT,STUCK,PROJECT_TASK,ARCHIVE_CANDIDATE",
     "virtual and legacy materialized tags should not leak through tag inheritance"
   )
+  assert_true(
+    table.concat(setup.org_todo_keywords or {}, ","):find("PHONE", 1, true) ~= nil,
+    "orgmode todo keywords should include PHONE done state"
+  )
+  assert_true(
+    table.concat(setup.org_todo_keywords or {}, ","):find("MEETING", 1, true) ~= nil,
+    "orgmode todo keywords should include MEETING done state"
+  )
+  assert_true(setup.org_todo_keyword_faces.PHONE ~= nil, "PHONE should have a todo keyword face")
+  assert_true(setup.org_todo_keyword_faces.MEETING ~= nil, "MEETING should have a todo keyword face")
+
+  local legion_setup = captured.legion_setup
+  assert_true(type(legion_setup) == "table", "org_legion.setup should be called")
+  assert_equal(
+    table.concat(legion_setup.todo.done or {}, ","),
+    "DONE,CANCELLED,PHONE,MEETING",
+    "org_legion done keywords should include Norang capture done states"
+  )
 
   local expected = {
     { type = "agenda", match = nil, header = nil },
@@ -479,7 +532,55 @@ local function test_agenda_block_matches_norang_baseline()
   assert_true(f12 and type(f12.rhs) == "function", "F12 block agenda keymap should refresh before opening")
   captured.invoke_keymap(f12)
   assert_equal(captured.refresh_calls(), 1, "F12 should refresh virtual agenda index before agenda")
+  assert_true(captured.refresh_call_opts()[1].notify == false, "agenda refresh should suppress duplicate refresh notification")
   assert_equal(captured.commands[1], "Org agenda b", "F12 should open block agenda after refresh")
+end
+
+local function test_agenda_refresh_failure_warning_includes_details()
+  local captured = capture_orgmode_plugin_setup({
+    refresh_summary = {
+      total = 2,
+      ok = 1,
+      fail = 1,
+      skipped_conflict = 0,
+      skipped_unloaded = 0,
+      results = {
+        {
+          path = "/tmp/broken.org",
+          ok = false,
+          error = { code = "E_PARSE_HEADLINE", message = "bad headline" },
+        },
+      },
+    },
+    format_refresh_failures = function()
+      return "failures: /tmp/broken.org E_PARSE_HEADLINE: bad headline"
+    end,
+  })
+
+  local f12 = find_keymap(captured.keymaps, "<F12>")
+  assert_true(f12 and type(f12.rhs) == "function", "F12 block agenda keymap should exist")
+  captured.invoke_keymap(f12)
+
+  assert_equal(captured.refresh_calls(), 1, "F12 should refresh once")
+  assert_true(captured.refresh_call_opts()[1].notify == false, "agenda refresh should suppress refresh_all notify")
+  assert_equal(#captured.notifications, 1, "agenda refresh failure should produce one warning")
+  assert_true(
+    captured.notifications[1].message:find("org_legion refresh had 1 failures before agenda", 1, true) ~= nil,
+    "warning should explain agenda pre-refresh failure"
+  )
+  assert_true(
+    captured.notifications[1].message:find("broken.org", 1, true) ~= nil,
+    "warning should include failing file path"
+  )
+  assert_true(
+    captured.notifications[1].message:find("E_PARSE_HEADLINE", 1, true) ~= nil,
+    "warning should include failure code"
+  )
+  assert_true(
+    captured.notifications[1].message:find("bad headline", 1, true) ~= nil,
+    "warning should include failure message"
+  )
+  assert_equal(captured.commands[1], "Org agenda b", "agenda should still open after refresh warning")
 end
 
 local function test_punch_in_clocks_default_task()
@@ -914,6 +1015,40 @@ local function test_legion_refresh_indexes_project_tasks()
   )
 end
 
+local function test_legion_refresh_failure_summary_formats_paths()
+  local legion = require("org_legion")
+  local summary = {
+    total = 4,
+    ok = 2,
+    fail = 2,
+    skipped_conflict = 0,
+    skipped_unloaded = 0,
+    results = {
+      {
+        path = "/tmp/broken-one.org",
+        ok = false,
+        error = { code = "E_PARSE_HEADLINE", message = "bad headline\nnear line 2" },
+      },
+      {
+        path = "/tmp/broken-two.org",
+        ok = false,
+        error = { code = "E_FILE_UNREADABLE", message = "permission denied" },
+      },
+    },
+  }
+
+  local details = legion.format_refresh_failures(summary, 3)
+  assert_true(details:find("broken-one.org", 1, true) ~= nil, "failure details should include first file")
+  assert_true(details:find("E_PARSE_HEADLINE", 1, true) ~= nil, "failure details should include first error code")
+  assert_true(details:find("bad headline near line 2", 1, true) ~= nil, "failure details should compact multiline messages")
+  assert_true(details:find("broken-two.org", 1, true) ~= nil, "failure details should include second file")
+  assert_true(details:find("E_FILE_UNREADABLE", 1, true) ~= nil, "failure details should include second error code")
+
+  local full = legion.format_refresh_summary(summary)
+  assert_true(full:find("org_legion refresh: total=4 ok=2 fail=2", 1, true) ~= nil, "summary should keep counts")
+  assert_true(full:find("failures:", 1, true) ~= nil, "summary should append failure details")
+end
+
 local function test_legion_archive_candidates_match_norang_month_boundary()
   local function month_string(delta)
     local t = os.date("*t")
@@ -947,6 +1082,10 @@ local function test_legion_archive_candidates_match_norang_month_boundary()
     "* DONE Refile old :REFILE:",
     "CLOSED: [" .. old_month .. "-05 Sun]",
     "* DONE No timestamp",
+    "* PHONE Old call :PHONE:",
+    "CLOSED: [" .. old_month .. "-06 Mon]",
+    "* MEETING Old meeting :MEETING:",
+    "CLOSED: [" .. old_month .. "-07 Tue]",
   })
 
   setup_orgmode({ path })
@@ -969,6 +1108,8 @@ local function test_legion_archive_candidates_match_norang_month_boundary()
   assert_true(not has_archive_tag(9), "open TODO task should not be an archive candidate")
   assert_true(has_archive_tag(11), "old REFILE DONE task can be internally archivable before agenda tag filtering")
   assert_true(has_archive_tag(13), "DONE task with no subtree timestamps should be an archive candidate")
+  assert_true(has_archive_tag(14), "old PHONE task should be a virtual archive candidate")
+  assert_true(has_archive_tag(16), "old MEETING task should be a virtual archive candidate")
 
   assert_true(matches_archive_query(1), "old DONE task should match Norang archive agenda query")
   assert_true(not matches_archive_query(3), "this-month DONE task should be skipped by Norang archive query")
@@ -976,6 +1117,8 @@ local function test_legion_archive_candidates_match_norang_month_boundary()
   assert_true(not matches_archive_query(9), "open TODO task should be skipped by Norang archive query")
   assert_true(not matches_archive_query(11), "REFILE DONE task should be excluded by -REFILE/ archive query")
   assert_true(matches_archive_query(13), "DONE task with no timestamps should match Norang archive agenda query")
+  assert_true(matches_archive_query(14), "old PHONE task should match Norang archive agenda query")
+  assert_true(matches_archive_query(16), "old MEETING task should match Norang archive agenda query")
   assert_true(read_line(path, 1):match("ARCHIVE_CANDIDATE") == nil, "archive candidate tag should not be materialized")
 end
 
@@ -1186,6 +1329,14 @@ local function test_todo_state_tag_triggers_legion()
   assert_true(has_tag_in_list(state.tags, "CANCELLED"), "CANCELLED should add CANCELLED tag")
   assert_true(not has_tag_in_list(state.tags, "WAITING"), "CANCELLED should remove WAITING tag")
   assert_true(not has_tag_in_list(state.tags, "HOLD"), "CANCELLED should remove HOLD tag")
+
+  require("orgmode").files:get_closest_headline():set_todo("PHONE")
+  apply_todo_trigger_now()
+  state = get_current_headline_state(1)
+  assert_true(state.line:match("^%*%s+PHONE%s+") ~= nil, "todo should switch to PHONE")
+  assert_true(not has_tag_in_list(state.tags, "WAITING"), "PHONE should remove WAITING tag")
+  assert_true(not has_tag_in_list(state.tags, "HOLD"), "PHONE should remove HOLD tag")
+  assert_true(not has_tag_in_list(state.tags, "CANCELLED"), "PHONE should remove CANCELLED tag")
 
   require("orgmode").files:get_closest_headline():set_todo("TODO")
   apply_todo_trigger_now()
@@ -1614,6 +1765,7 @@ end
 
 local CASES = {
   agenda_block_matches_norang_baseline = test_agenda_block_matches_norang_baseline,
+  agenda_refresh_failure_warning_includes_details = test_agenda_refresh_failure_warning_includes_details,
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
   punch_in_prefers_current_buffer_when_id_is_duplicated = test_punch_in_prefers_current_buffer_when_id_is_duplicated,
@@ -1630,6 +1782,7 @@ local CASES = {
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
   legion_refresh_indexes_stuck_project = test_legion_refresh_indexes_stuck_project,
   legion_refresh_indexes_project_tasks = test_legion_refresh_indexes_project_tasks,
+  legion_refresh_failure_summary_formats_paths = test_legion_refresh_failure_summary_formats_paths,
   legion_archive_candidates_match_norang_month_boundary = test_legion_archive_candidates_match_norang_month_boundary,
   legion_cleanup_apply_removes_derived_tags = test_legion_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,

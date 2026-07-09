@@ -2,6 +2,9 @@
 
 ## 2026-07-09
 
+- Added wiki summary for `org-agenda-refresh-archive-fix`.
+- Updated orgmode agenda parity pattern with done keyword parity for capture-specific `PHONE` / `MEETING` states and single detailed pre-agenda refresh warnings.
+- Marked `org-agenda-archive-parity-fix` as superseded for done keyword coverage only.
 - Added wiki summary for `org-agenda-archive-parity-fix`.
 - Updated orgmode agenda parity pattern with Norang archive semantics: `-REFILE/` plus internal done-state and month-prefix filtering, not a stale-days approximation.
 - Added wiki summary for `org-agenda-norang-parity-fix`.
