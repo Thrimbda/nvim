@@ -8,7 +8,7 @@
 - `schema-version`: `2026-07-09`
 - `historical`: `false`
 - `supersedes`: `org-agenda-norang-parity-fix` archive candidate behavior only
-- `superseded-by`: `(none)`
+- `superseded-by`: `org-agenda-refresh-archive-fix` done keyword coverage only
 
 ## Outcome Summary
 
@@ -16,6 +16,7 @@
 - 当前有效结论：archive candidate 不是 day-count stale 规则，而是 done-state todo 子树中没有本月或上月 `YYYY-MM-` 时间戳。
 - `b` agenda 的 archive section 应使用 `-REFILE/` 作为用户可见 matcher，由 org_legion virtual search adapter 内部叠加 `ARCHIVE_CANDIDATE` 过滤。
 - `ARCHIVE_CANDIDATE` 仍是内部虚拟标签，不应写回 org 文本；旧物化标签由 cleanup 显式清理。
+- 后续 `org-agenda-refresh-archive-fix` 补充了本任务未覆盖的 done keyword 集合：`PHONE` / `MEETING` 也必须作为 archive candidate 的完成态。
 
 ## Reusable Decisions
 

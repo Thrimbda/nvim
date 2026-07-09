@@ -5,8 +5,10 @@
 - When porting Emacs org-agenda skip-function views to orgmode.nvim matchers, split project parent and project child context into separate virtual agenda tags. In this config, `PROJECT` marks project parents and `PROJECT_TASK` marks active tasks inside a project.
 - Inject virtual tags through the orgmode search boundary instead of writing maintenance tags into org text. Ordinary org files should stay free of `PROJECT/STUCK/PROJECT_TASK/ARCHIVE_CANDIDATE` unless those are legacy materialized tags awaiting cleanup.
 - Open agenda views that depend on virtual tags through a refresh wrapper. Running `org_legion.refresh_all()` before `b`, `n`, or `s` agenda views prevents stale files from drifting back into Standalone or missing Stuck Projects.
+- Suppress duplicate refresh notifications inside agenda wrappers. Call `org_legion.refresh_all({ notify = false })`, then emit one agenda-context warning with failure path plus `error.code/message` when `summary.fail > 0`.
 - Verify both the static agenda command structure and the virtual refresh rules. A narrow config-capture test can prove order/header/matcher behavior without real private org files; a separate refresh test should prove parent and child virtual tags are distinct and refresh does not mutate org text.
 - For Norang archive parity, do not use a day-count stale approximation. `Tasks to Archive` should expose `-REFILE/` and internally filter to done-state subtrees that lack this-month or last-month `YYYY-MM-` timestamps.
+- Keep capture-specific done keywords in sync across `org_todo_keywords`, `org_legion.todo.done`, tests, and capture templates. In this config, `PHONE` and `MEETING` are done-state keywords for archive parity, not merely ordinary tags.
 
 ## Orgmode Refile Destination Picker
 

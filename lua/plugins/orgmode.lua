@@ -1,11 +1,18 @@
 local function open_agenda_after_legion_refresh(command)
   local ok, legion = pcall(require, "org_legion")
   if ok and type(legion.refresh_all) == "function" then
-    local refresh_ok, summary = pcall(legion.refresh_all)
+    local refresh_ok, summary = pcall(legion.refresh_all, { notify = false })
     if not refresh_ok then
-      vim.notify("org_legion refresh failed before agenda", vim.log.levels.WARN)
+      vim.notify(("org_legion refresh failed before agenda: %s"):format(tostring(summary)), vim.log.levels.WARN)
     elseif type(summary) == "table" and (summary.fail or 0) > 0 then
-      vim.notify(("org_legion refresh had %d failures before agenda"):format(summary.fail), vim.log.levels.WARN)
+      local detail = ""
+      if type(legion.format_refresh_failures) == "function" then
+        local detail_ok, formatted = pcall(legion.format_refresh_failures, summary)
+        if detail_ok and type(formatted) == "string" and formatted ~= "" then
+          detail = ": " .. formatted
+        end
+      end
+      vim.notify(("org_legion refresh had %d failures before agenda%s"):format(summary.fail, detail), vim.log.levels.WARN)
     end
   end
 
@@ -63,6 +70,8 @@ return {
           "|",
           "DONE(d)",
           "CANCELLED(c)",
+          "PHONE(p)",
+          "MEETING(m)",
         },
         org_todo_keyword_faces = {
           TODO = ":foreground #e86671 :weight bold",
@@ -71,6 +80,8 @@ return {
           HOLD = ":foreground #d19a66 :weight bold",
           DONE = ":foreground #98c379 :weight bold :slant italic",
           CANCELLED = ":foreground #5c6370 :slant italic",
+          PHONE = ":foreground #98c379 :weight bold",
+          MEETING = ":foreground #98c379 :weight bold",
         },
         org_log_into_drawer = "LOGBOOK",
         org_log_done = "note",
@@ -306,7 +317,7 @@ return {
         },
         todo = {
           active = { "TODO", "NEXT", "WAITING", "HOLD" },
-          done = { "DONE", "CANCELLED" },
+          done = { "DONE", "CANCELLED", "PHONE", "MEETING" },
           next = "NEXT",
         },
         archive = {
