@@ -298,6 +298,7 @@ return {
       local punch = require("org_punch")
       local capture = require("org_capture_legion")
       capture.setup()
+      require("org_refile_picker").setup(require("orgmode").capture)
       vim.keymap.set("n", "<Leader>opI", punch.punch_in, { desc = "Org Punch In" })
       vim.keymap.set("n", "<Leader>opO", punch.punch_out, { desc = "Org Punch Out" })
       vim.keymap.set("n", "<Leader>opo", punch.clock_out_keep_running, { desc = "Clock out (keep running)" })

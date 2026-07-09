@@ -11,7 +11,7 @@ Artifact-only / local render。
 
 ## Reason
 
-当前仓库只有 `.github/workflows/org-smoke.yml`，没有现成 GitHub Pages、internal static host 或 HTML preview workflow。新增 Pages preview workflow 会扩大本次 refile input 修复 scope，并需要仓库 Pages setting、权限与 fork PR trust model 决策。
+当前仓库只有 `.github/workflows/org-smoke.yml`，没有现成 GitHub Pages、internal static host 或 HTML preview workflow。新增 Pages preview workflow 会扩大本次 refile picker 修复 scope，并需要仓库 Pages setting、权限与 fork PR trust model 决策。
 
 ## Reviewer Path
 

@@ -1,53 +1,72 @@
-# Design-lite: Org refile fuzzy prompt
+# RFC: Org refile fuzzy picker
 
 ## Context
 
-orgmode.nvim 的 refile destination 选择通过 `Capture:get_destination()` 调用 `orgmode.ui.input.open()`。该输入函数会把 completion 注册为 `customlist,v:lua.orgmode.__input_completion`，其中 refile 的 completion 来源是 `Capture:autocomplete_refile()`。
-
-本仓库当前覆盖了 orgmode 配置：
+上一轮修复删除了 `ui.input.use_vim_ui = true` 覆盖，运行时也确认 `orgmode.config.ui.input.use_vim_ui=false`。这说明配置已生效，但用户仍看到单输入框，因为 orgmode.nvim 的原生 refile 入口是：
 
 ```lua
-ui = {
-  input = {
-    use_vim_ui = true,
-  },
-},
+Input.open('Enter destination: ', '', function(arg_lead)
+  return self:autocomplete_refile(arg_lead, valid_destinations)
+end)
 ```
 
-这会把输入转交给 `vim.ui.input`，实际由 Snacks input 呈现为单行浮窗。用户截图显示该路径没有提供期望的 fuzzy 候选提示。
+这个路径有 completion function，但 UI 仍是 input prompt，不等于用户截图中有候选列表的 fuzzy picker。
+
+## Goal
+
+让 `<Leader>or` / agenda refile / capture refile 在选择 destination 时打开可见候选列表，并支持输入过滤；选择结果仍交给 orgmode 原有 refile 移动逻辑。
+
+## Options
+
+### Option A: 继续依赖 orgmode 原生 `Input.open`
+
+- 优点：不 patch 上游内部方法。
+- 缺点：已经被用户验证为不满足“候选列表提示”体验。
+- 结论：拒绝。
+
+### Option B: 调整 Snacks input completion 自动弹出
+
+- 优点：改动可能较小。
+- 缺点：仍受 `vim.ui.input` / completion popup 行为限制；不能自然展示完整 file + headline destination 列表。
+- 结论：拒绝。
+
+### Option C: 覆盖 `orgmode.capture.get_destination()` 使用 `vim.ui.select`
+
+- 优点：直接得到可见候选列表；Snacks picker 已接管 `vim.ui.select`，可提供 fuzzy filtering；返回值 shape 可保持 `{ file, headline? }`，从而保留 orgmode refile 移动逻辑。
+- 缺点：依赖 orgmode capture object 的内部方法 `_get_autocompletion_files()` 和 headline API，需要测试保护。
+- 结论：采用。
 
 ## Decision
 
-恢复 orgmode 默认输入路径：移除本仓库对 `ui.input.use_vim_ui = true` 的覆盖。
+新增本地模块 `lua/org_refile_picker.lua`：
 
-选择这个方案的原因：
+- `setup(capture)` 接收 `orgmode.capture` 对象。
+- 保存原始 `capture.get_destination` 作为 fallback。
+- 新的 `get_destination()` 使用 `capture:_get_autocompletion_files()` 取合法 agenda destination files。
+- 候选包含：
+  - 文件 root destination：`path/to/file.org/`
+  - 未完成 headline destination：`path/to/file.org/<headline title>`
+- 通过 `vim.ui.select(items, { prompt = "Refile subtree to", format_item = ... }, callback)` 打开 picker。
+- callback 选择 item 时 resolve `{ file = item.file, headline = item.headline }`；取消时 resolve `false`。
+- 若 `vim.ui.select` 不可用或候选构建失败，fallback 到原始 `get_destination()`。
 
-- 使用 orgmode.nvim 已有 refile fuzzy completion，不引入新逻辑。
-- 改动极小，回滚简单。
-- 避免把 refile 迁移到自定义 picker 后偏离上游 refile 行为。
-
-## Alternatives Considered
-
-- 保持 `vim.ui.input`，改 Snacks input 配置：风险是仍依赖 Snacks 对 completion 的弹窗触发行为，且用户已实际遇到候选不可见。
-- 新增 Snacks picker refile：可以获得完整 picker UI，但需要复制 destination 解析、headline 过滤和 refile 调用路径，改动面明显变大。
+`lua/plugins/orgmode.lua` 在 `capture.setup()` 之后调用 `require("org_refile_picker").setup(orgmode.capture)`。
 
 ## Verification
 
-- 断言 orgmode 配置不再设置 `ui.input.use_vim_ui = true`。
-- 断言本地 orgmode 默认值仍为 `false`。
-- 运行与 capture/refile hook 相关的 smoke 用例，确保 capture clock handoff 行为未被破坏。
-- 运行完整 smoke suite 或可行子集作为回归证据。
+- Headless 单元式断言：
+  - `org_refile_picker.build_items()` 为文件和 unfinished headline 都生成候选。
+  - patch 后 `capture.get_destination()` 调用 `vim.ui.select`，选择 headline 后返回 `{ file, headline }`。
+  - 取消 picker 返回 `false`。
+- 运行完整 smoke suite，确保 capture handoff、pre-refile hook、punch/clock、Legion integrated flow 不回归。
+- 运行 runtime 断言确认 `<Leader>or` 仍映射到 orgmode refile action。
 
 ## Rollback
 
-如需要恢复 Snacks input 浮窗，可重新添加：
+删除 `require("org_refile_picker").setup(orgmode.capture)` 调用和 `lua/org_refile_picker.lua`，即可回到 orgmode 默认 `get_destination()`。由于 refile 移动逻辑没有被替换，rollback 不涉及数据迁移。
 
-```lua
-ui = {
-  input = {
-    use_vim_ui = true,
-  },
-},
-```
+## Risks
 
-但在恢复前需要另行解决 Snacks input 对 refile completion 候选可见性的要求。
+- orgmode.nvim 内部 API 变化会影响 patch。缓解：模块保留 fallback，并用测试覆盖 candidate shape。
+- 真实 UI 截图验证仍可能受 headless 环境限制。缓解：直接断言 `vim.ui.select` 被调用，且选择结果进入 orgmode 期望 return shape。
+- 多个 headline 同名时，和 orgmode 原逻辑一样只靠 title 可能有歧义。当前任务不扩展 disambiguation，候选 label 会包含文件路径以降低混淆。
