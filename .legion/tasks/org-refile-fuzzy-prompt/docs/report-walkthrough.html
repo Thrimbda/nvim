@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>org-refile-fuzzy-prompt | Walkthrough</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: oklch(96% 0.018 92);
+      --surface: oklch(99% 0.007 95);
+      --surface-strong: oklch(93% 0.026 112);
+      --ink: oklch(23% 0.018 130);
+      --muted: oklch(48% 0.028 132);
+      --line: oklch(82% 0.02 112);
+      --accent: oklch(43% 0.12 153);
+      --accent-soft: oklch(88% 0.072 151);
+      --warn-soft: oklch(90% 0.065 82);
+      --shadow: 0 18px 44px oklch(42% 0.032 120 / 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.64;
+    }
+
+    main {
+      width: min(1160px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 44px 0 72px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .kicker {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 780;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 13ch;
+      margin: 0;
+      font-size: clamp(2.1rem, 5vw, 4.2rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.18rem;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    p {
+      max-width: 72ch;
+      margin: 0 0 12px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    code {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface-strong);
+      padding: 0.05rem 0.3rem;
+      font-size: 0.92em;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: oklch(95% 0.018 110);
+      padding: 14px;
+    }
+
+    pre code {
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .lead {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 1.04rem;
+    }
+
+    .status {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .status h2 {
+      margin-bottom: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      border-top: 1px solid var(--line);
+      padding: 11px 0;
+    }
+
+    .status-row:first-of-type {
+      border-top: 0;
+    }
+
+    .label {
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.62rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      padding: 0.06rem 0.62rem;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .pill.warn {
+      background: var(--warn-soft);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    nav {
+      position: sticky;
+      top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    nav a {
+      display: block;
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      background: var(--surface-strong);
+    }
+
+    section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 28px oklch(42% 0.032 120 / 0.07);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin: 0.36rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-wrap: anywhere;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 760;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: oklch(97% 0.012 103);
+      padding: 16px;
+    }
+
+    .mini h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .next {
+      background: oklch(93% 0.045 151);
+    }
+
+    @media (max-width: 900px) {
+      header,
+      .layout,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        position: static;
+      }
+
+      h1 {
+        max-width: 100%;
+      }
+    }
+
+    @media print {
+      body {
+        background: var(--surface);
+      }
+
+      main {
+        width: auto;
+        padding: 0;
+      }
+
+      nav {
+        display: none;
+      }
+
+      section,
+      .status {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="kicker">Legion implementation walkthrough</p>
+        <h1>org-refile-fuzzy-prompt</h1>
+        <p class="lead">恢复 orgmode refile 的原生 fuzzy completion 路径，让 refile destination 输入不再停留在只有单行输入框的 Snacks input 体验。</p>
+      </div>
+      <aside class="status" aria-label="交付终态">
+        <h2>当前状态</h2>
+        <div class="status-row"><span class="label">Profile</span><span class="pill">implementation</span></div>
+        <div class="status-row"><span class="label">Verification</span><span class="pill">PASS</span></div>
+        <div class="status-row"><span class="label">Review</span><span class="pill">PASS</span></div>
+        <div class="status-row"><span class="label">PR lifecycle</span><span class="pill warn">pending</span></div>
+        <div class="status-row"><span class="label">Render</span><span class="pill warn">artifact-only</span></div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <nav aria-label="Walkthrough navigation">
+        <a href="#summary">摘要</a>
+        <a href="#scope">范围</a>
+        <a href="#evidence">证据</a>
+        <a href="#path">交付路径</a>
+        <a href="#decisions">改动</a>
+        <a href="#verification">验证</a>
+        <a href="#risks">风险</a>
+        <a href="#final">下一步</a>
+      </nav>
+
+      <div>
+        <section id="summary">
+          <h2>Reviewer Summary</h2>
+          <ul>
+            <li>问题：refile destination 当前走 Snacks <code>vim.ui.input</code>，用户看到只有输入框，没有期望的 fuzzy 候选。</li>
+            <li>方案：删除本仓库的 <code>ui.input.use_vim_ui = true</code> 覆盖，恢复 orgmode 默认 input completion。</li>
+            <li>影响：不改 refile 移动语义，不改 agenda、capture、punch、clock 或 TODO 行为。</li>
+            <li>结论：验证 PASS，审查 PASS，PR lifecycle 尚未完成。</li>
+          </ul>
+        </section>
+
+        <section id="scope">
+          <h2>Scope</h2>
+          <div class="split">
+            <div class="mini">
+              <h3>In scope</h3>
+              <ul>
+                <li><code>lua/plugins/orgmode.lua</code></li>
+                <li><code>skills/legion-workflow/references/orgmode-legion-workflow.md</code></li>
+                <li><code>.legion/tasks/org-refile-fuzzy-prompt/**</code></li>
+              </ul>
+            </div>
+            <div class="mini">
+              <h3>Out of scope</h3>
+              <ul>
+                <li>重写 orgmode.nvim refile。</li>
+                <li>新增 Telescope/Snacks picker refile。</li>
+                <li>改 agenda、capture、punch、clock 或 TODO 行为。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="evidence">
+          <h2>Evidence Map</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Claim</th>
+                <th>Evidence</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>任务 contract 稳定且低风险。</td>
+                <td><code>plan.md</code>, <code>docs/rfc.md</code></td>
+                <td><span class="pill">PASS</span></td>
+              </tr>
+              <tr>
+                <td>orgmode 不再强制走 <code>vim.ui.input</code>。</td>
+                <td><code>lua/plugins/orgmode.lua</code>, <code>docs/test-report.md</code></td>
+                <td><span class="pill">PASS</span></td>
+              </tr>
+              <tr>
+                <td>refile fuzzy 候选函数可用。</td>
+                <td><code>Capture.autocomplete_refile("ntl")</code> 断言返回 <code>/org/ntnl.org/</code></td>
+                <td><span class="pill">PASS</span></td>
+              </tr>
+              <tr>
+                <td>既有 orgmode 行为未见回归。</td>
+                <td>完整 smoke suite 20 个 case 通过。</td>
+                <td><span class="pill">PASS</span></td>
+              </tr>
+              <tr>
+                <td>无 blocking review finding。</td>
+                <td><code>docs/review-change.md</code></td>
+                <td><span class="pill">PASS</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="path">
+          <h2>Delivery Path</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Result</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>brainstorm</td><td>contract materialized</td><td><code>plan.md</code>, <code>tasks.md</code></td></tr>
+              <tr><td>design-lite</td><td>low-risk fast track</td><td><code>docs/rfc.md</code></td></tr>
+              <tr><td>engineer</td><td>minimal config and doc change</td><td><code>git diff</code></td></tr>
+              <tr><td>verify-change</td><td>PASS</td><td><code>docs/test-report.md</code></td></tr>
+              <tr><td>review-change</td><td>PASS</td><td><code>docs/review-change.md</code></td></tr>
+              <tr><td>git-worktree-pr</td><td>in progress</td><td>branch <code>codex/org-refile-fuzzy-prompt</code></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="render">
+          <h2>Render Handoff</h2>
+          <p><code>docs/report-walkthrough.html</code> 已生成。<code>pr-html-render</code> 判定本仓库无现成 HTML preview workflow，新增 Pages preview 超出本次 refile 修复 scope，因此本次采用 artifact-only / local render。当前页面本身不代表 PR 已创建、checks 已过、review 已完成或 merge 已完成。</p>
+        </section>
+
+        <section id="decisions">
+          <h2>What Changed / What Was Decided</h2>
+          <p>本任务删除下面这段本地覆盖，让 orgmode refile 回到默认 input completion。</p>
+          <pre><code>ui = {
+  input = {
+    use_vim_ui = true,
+  },
+},</code></pre>
+          <p>这个决定保留 orgmode.nvim 上游 <code>Capture:get_destination()</code> 与 <code>Capture:autocomplete_refile()</code> 行为，避免复制 refile 解析和移动逻辑。</p>
+        </section>
+
+        <section id="verification">
+          <h2>Verification / Review Status</h2>
+          <ul>
+            <li><code>rg</code> 断言 <code>use_vim_ui = true</code> 覆盖已消失。</li>
+            <li>orgmode 默认值断言输出 <code>orgmode_default_use_vim_ui false</code>。</li>
+            <li>worktree spec-level 断言输出 <code>worktree_spec_ui nil</code>。</li>
+            <li><code>Capture.autocomplete_refile("ntl")</code> 返回 <code>/org/ntnl.org/</code>。</li>
+            <li><code>ALLOW_UNPINNED_ORGMODE=1 bash tests/smoke/run.sh</code> exit 0，20 个 smoke case 全部通过。</li>
+            <li><code>docs/review-change.md</code> 结论 PASS，无 blocking findings。</li>
+          </ul>
+        </section>
+
+        <section id="risks">
+          <h2>Risks and Limits</h2>
+          <ul>
+            <li>未做交互式像素截图验证；当前证据覆盖配置路径、上游 fuzzy function 和 smoke 行为。</li>
+            <li>smoke 使用 unpinned 本地 orgmode runtime，因为仓库没有 <code>.tests/deps/orgmode</code>。</li>
+            <li>真实 TUI 候选弹窗仍取决于 Neovim 原生 input completion 设置。</li>
+          </ul>
+        </section>
+
+        <section id="checklist">
+          <h2>Reviewer Checklist</h2>
+          <ul>
+            <li>变更是否保持在 refile input UI scope 内？</li>
+            <li>是否接受恢复 orgmode 原生 input completion，而不是新增 picker？</li>
+            <li>验证证据是否足以替代交互式截图？</li>
+            <li>文档是否清楚暴露了 smoke 的 unpinned runtime 限制？</li>
+          </ul>
+        </section>
+
+        <section id="final" class="next">
+          <h2>Final State / Next Stage</h2>
+          <p>当前阶段结果为 walkthrough artifact ready，render handoff 为 artifact-only / local render。下一步执行 <code>legion-wiki</code> 写回。PR body 已准备，但 PR lifecycle 仍需 commit、rebase、push、PR、checks/review、auto-merge、cleanup 和主工作区 refresh。</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

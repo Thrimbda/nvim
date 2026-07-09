@@ -12,11 +12,6 @@ return {
         org_agenda_files = org_agenda_files,
         org_default_notes_file = org_default_notes_file,
         org_startup_indented = true,
-        ui = {
-          input = {
-            use_vim_ui = true,
-          },
-        },
         org_agenda_use_time_grid = true,
         mappings = {
           global = {

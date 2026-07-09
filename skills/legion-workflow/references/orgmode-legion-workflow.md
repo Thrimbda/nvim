@@ -177,7 +177,7 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
 - `<Leader>or`：refile 到指定位置
 - `<Leader>ok`：kill（不保存关闭）
 - `g?`：显示 capture 帮助
-- refile 输入框已切换到 `vim.ui.input`（snacks input），可用 `<Tab>`/`<C-n>` 看补全候选
+- refile 目标输入使用 orgmode 原生 input completion，可通过输入文本 fuzzy 过滤候选目标
 
 ### 4.7 Closing Note 窗口
 

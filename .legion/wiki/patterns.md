@@ -1,5 +1,12 @@
 # Patterns
 
+## Orgmode Refile Input Completion
+
+- For orgmode.nvim refile destination prompts, keep the native orgmode input completion path unless a replacement UI proves that candidates are visible and fuzzy filtering still works.
+- Do not set `ui.input.use_vim_ui = true` as a refile UX fix by itself. In this config, that routed refile through Snacks `vim.ui.input` and produced a single input box without the expected candidate list.
+- Prefer preserving upstream `Capture:get_destination()` and `Capture:autocomplete_refile()` behavior over copying refile destination parsing into a custom picker.
+- If a future task wants a Snacks/Telescope picker for refile, treat it as a separate design task with explicit verification for file/headline destinations, capture buffer refile, org file refile, and cancellation behavior.
+
 ## Neovim Data Tool Plugins With External CLIs
 
 - Add data tooling plugins as focused `lua/plugins/<name>.lua` lazy.nvim specs instead of changing central LazyVim bootstrap files.
