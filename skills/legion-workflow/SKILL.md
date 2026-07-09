@@ -6,7 +6,7 @@
 
 - 主真源：`skills/legion-workflow/references/orgmode-legion-workflow.md`
 - 若本 Skill 与真源文档或运行时行为冲突，以 `skills/legion-workflow/references/orgmode-legion-workflow.md` 为准，并将本文件视为过期。
-- Last verified: 2026-03-04。
+- Last verified: 2026-07-09。
 - 当真源文档更新时，需要同步更新本 Skill 与 `Last verified`。
 
 ## 适用范围与目标
@@ -17,7 +17,7 @@
 - 任务级 clock in/out
 - Capture 的 clock handoff
 - Agenda 视图（`b/n/t/s/r`）与日常执行顺序
-- Legion refresh/cleanup/reload 排错
+- Legion 虚拟 agenda 索引 refresh、旧物化标签 cleanup、reload 排错
 
 目标：
 
@@ -100,24 +100,24 @@
 1. 有新输入时用 `<Leader>X` capture，完成后 `<C-c>`。
 2. 切换任务时，先 `<Leader>oxo`，再对下个任务 clock in。
 3. 完成当前任务但不下班时，优先 `<Leader>opo` 保持连续记时。
-4. 若派生标签/状态看起来不一致，执行 `:OrgLegionRefresh`。
+4. 若 project/stuck/archive agenda 分类看起来不一致，执行 `:OrgLegionRefresh` 重建虚拟索引。
 
 ### 收工
 
 1. 回到安全状态（通常是默认任务）。
 2. 用 `<Leader>opO` 结束连续记时。
-3. 按需保存变更 buffer（memory-only 语义）。
+3. 按需保存 clock/capture/todo 造成的 buffer 变更；agenda 虚拟标签索引不会改 org 文本。
 4. 可选整理：检查 agenda `r`（refile）及 WAITING/HOLD 条目。
 
 ## 常见故障与恢复
 
 - `E_CFG_INVALID`：
-  - 修复配置关系（如 `todo.next` 必须属于 `todo.active`，writeback 必须为 `memory_only`）
+  - 修复配置关系（如 `todo.next` 必须属于 `todo.active`，writeback 必须为 `index_only`；旧配置名 `memory_only` 仍兼容）
   - 执行 `:OrgLegionReload`
 - 刷新时报 `E_CONFLICT_STALE_SNAPSHOT`：
-  - 说明事务期间文件有变化，重新执行 `:OrgLegionRefresh`
+  - 该错误只应来自 cleanup 等实际修改 buffer 的路径；refresh 索引路径不会写回 org 文件
 - `skipped_unloaded` 过高：
-  - 检查 `refresh.refresh_unloaded_files`，并确认文件可写、在覆盖范围内
+  - 检查 `refresh.refresh_unloaded_files`，并确认文件可读、在覆盖范围内
 - Punch in 未回到默认任务：
   - 检查 `vim.g.org_organization_task_id` 与对应 `:ID:` headline 是否可被 agenda 解析
 - `opo` 未回父任务：
@@ -129,7 +129,7 @@
 
 ## 回滚与安全边界
 
-当需要回滚派生标签影响时：
+当需要清理旧物化 Legion 标签时：
 
 1. 临时停用或停止 Legion 自动化路径。
 2. 执行 `:OrgLegionCleanupDerivedTags`（dry-run）。
@@ -138,7 +138,8 @@
 
 安全说明：
 
-- Cleanup 仅清理派生标签（`PROJECT`、`STUCK`、`ARCHIVE_CANDIDATE`），不应删除用户自定义标签。
+- Refresh 只重建内存 agenda 索引，不写 org 文本。
+- Cleanup 仅清理旧物化 Legion 标签（`PROJECT`、`STUCK`、`PROJECT_TASK`、`ARCHIVE_CANDIDATE`），不应删除用户自定义标签。
 - 不确定时一律先 dry-run，避免直接 apply。
 
 ## AI 执行边界

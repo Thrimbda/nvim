@@ -19,6 +19,7 @@ fi
 RTP_SETUP_LUA="local function safe_path(name) local p=vim.fn.getenv(name); if type(p)~='string' or p=='' then error(name .. ' is empty') end; if p:find('[|\\r\\n\\t]') then error(name .. ' contains forbidden characters') end; if vim.fn.isdirectory(p)~=1 then error(name .. ' is not a directory: ' .. p) end; return p end; vim.opt.rtp:prepend(safe_path('SMOKE_ROOT_DIR')); vim.opt.rtp:append(safe_path('ORGMODE_RTP'))"
 
 CASES=(
+	agenda_block_matches_norang_baseline
 	punch_in_requires_id
 	punch_in_clocks_default_task
 	punch_in_prefers_current_buffer_when_id_is_duplicated
@@ -33,7 +34,8 @@ CASES=(
 	punch_in_switch_removes_previous_zero_duration_clock
 	clock_out_in_punch_mode_returns_to_parent
 	clock_out_in_punch_mode_returns_to_default
-	legion_refresh_marks_stuck_project
+	legion_refresh_indexes_stuck_project
+	legion_refresh_indexes_project_tasks
 	legion_cleanup_apply_removes_derived_tags
 	capture_clock_handoff_resumes_previous
 	capture_pre_refile_injects_clock_line

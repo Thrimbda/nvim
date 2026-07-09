@@ -1,3 +1,17 @@
+local function open_agenda_after_legion_refresh(command)
+  local ok, legion = pcall(require, "org_legion")
+  if ok and type(legion.refresh_all) == "function" then
+    local refresh_ok, summary = pcall(legion.refresh_all)
+    if not refresh_ok then
+      vim.notify("org_legion refresh failed before agenda", vim.log.levels.WARN)
+    elseif type(summary) == "table" and (summary.fail or 0) > 0 then
+      vim.notify(("org_legion refresh had %d failures before agenda"):format(summary.fail), vim.log.levels.WARN)
+    end
+  end
+
+  vim.cmd(("Org agenda %s"):format(command))
+end
+
 return {
   {
     "nvim-orgmode/orgmode",
@@ -12,6 +26,12 @@ return {
         org_agenda_files = org_agenda_files,
         org_default_notes_file = org_default_notes_file,
         org_startup_indented = true,
+        org_tags_exclude_from_inheritance = {
+          "PROJECT",
+          "STUCK",
+          "PROJECT_TASK",
+          "ARCHIVE_CANDIDATE",
+        },
         org_agenda_use_time_grid = true,
         mappings = {
           global = {
@@ -99,35 +119,18 @@ return {
         },
         org_agenda_custom_commands = {
           b = {
-            description = "Block agenda (Legion-style)",
+            description = "Block agenda (Norang-style)",
             types = {
               {
-                type = "tags_todo",
-                match = "REFILE",
-                org_agenda_overriding_header = "Refile",
-                org_agenda_todo_ignore_scheduled = "all",
-                org_agenda_todo_ignore_deadlines = "all",
-              },
-              {
                 type = "agenda",
-                org_agenda_overriding_header = "Today",
                 org_agenda_span = "day",
               },
               {
                 type = "tags_todo",
-                match = '+TODO="NEXT"',
-                org_agenda_overriding_header = "Next actions",
-                org_agenda_sorting_strategy = { "priority-down", "todo-state-up" },
-              },
-              {
-                type = "tags_todo",
-                match = '+TODO="WAITING"',
-                org_agenda_overriding_header = "Waiting",
-              },
-              {
-                type = "tags_todo",
-                match = '+TODO="HOLD"',
-                org_agenda_overriding_header = "Hold",
+                match = "REFILE",
+                org_agenda_overriding_header = "Tasks to Refile",
+                org_agenda_todo_ignore_scheduled = "all",
+                org_agenda_todo_ignore_deadlines = "all",
               },
               {
                 type = "tags_todo",
@@ -141,13 +144,29 @@ return {
               },
               {
                 type = "tags_todo",
-                match = '+TODO="TODO"-PROJECT-REFILE',
+                match = '+TODO="NEXT"+PROJECT_TASK-REFILE',
+                org_agenda_overriding_header = "Project Next Tasks",
+                org_agenda_sorting_strategy = { "priority-down", "todo-state-up" },
+              },
+              {
+                type = "tags_todo",
+                match = '+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE',
+                org_agenda_overriding_header = "Project Subtasks",
+              },
+              {
+                type = "tags_todo",
+                match = '+TODO="TODO"-PROJECT-PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE',
                 org_agenda_overriding_header = "Standalone Tasks",
+              },
+              {
+                type = "tags_todo",
+                match = '+TODO="WAITING"-REFILE|+TODO="HOLD"-REFILE',
+                org_agenda_overriding_header = "Waiting and Postponed Tasks",
               },
               {
                 type = "tags",
                 match = "ARCHIVE_CANDIDATE",
-                org_agenda_overriding_header = "Archive Candidates",
+                org_agenda_overriding_header = "Tasks to Archive",
               },
             },
           },
@@ -276,12 +295,13 @@ return {
           mode = "approx",
           on_buf_write = true,
           debounce_ms = 120,
-          writeback = "memory_only",
+          writeback = "index_only",
           refresh_unloaded_files = true,
         },
         derived_tags = {
           project = "PROJECT",
           stuck = "STUCK",
+          project_task = "PROJECT_TASK",
           archive_candidate = "ARCHIVE_CANDIDATE",
         },
         todo = {
@@ -306,11 +326,19 @@ return {
       vim.keymap.set("n", "<Leader>oxo", punch.clock_out_current_task, { desc = "Org Clock Out (remove 0:00 entry)" })
       vim.keymap.set("n", "<Leader>X", capture.capture_prompt, { desc = "Org Capture (Legion clock handoff)" })
 
-      vim.keymap.set("n", "<F12>", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
-      vim.keymap.set("n", "<Leader>oab", "<Cmd>Org agenda b<CR>", { desc = "Org Block Agenda" })
-      vim.keymap.set("n", "<Leader>oan", "<Cmd>Org agenda n<CR>", { desc = "Org NEXT" })
+      vim.keymap.set("n", "<F12>", function()
+        open_agenda_after_legion_refresh("b")
+      end, { desc = "Org Block Agenda" })
+      vim.keymap.set("n", "<Leader>oab", function()
+        open_agenda_after_legion_refresh("b")
+      end, { desc = "Org Block Agenda" })
+      vim.keymap.set("n", "<Leader>oan", function()
+        open_agenda_after_legion_refresh("n")
+      end, { desc = "Org NEXT" })
       vim.keymap.set("n", "<Leader>oat", "<Cmd>Org agenda t<CR>", { desc = "Org Timeline" })
-      vim.keymap.set("n", "<Leader>oas", "<Cmd>Org agenda s<CR>", { desc = "Org Stuck Projects" })
+      vim.keymap.set("n", "<Leader>oas", function()
+        open_agenda_after_legion_refresh("s")
+      end, { desc = "Org Stuck Projects" })
       vim.keymap.set("n", "<Leader>oar", "<Cmd>Org agenda r<CR>", { desc = "Org Refile" })
     end,
   },

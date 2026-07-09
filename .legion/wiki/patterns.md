@@ -1,5 +1,12 @@
 # Patterns
 
+## Orgmode Agenda Parity With Virtual Tags
+
+- When porting Emacs org-agenda skip-function views to orgmode.nvim matchers, split project parent and project child context into separate virtual agenda tags. In this config, `PROJECT` marks project parents and `PROJECT_TASK` marks active tasks inside a project.
+- Inject virtual tags through the orgmode search boundary instead of writing maintenance tags into org text. Ordinary org files should stay free of `PROJECT/STUCK/PROJECT_TASK/ARCHIVE_CANDIDATE` unless those are legacy materialized tags awaiting cleanup.
+- Open agenda views that depend on virtual tags through a refresh wrapper. Running `org_legion.refresh_all()` before `b`, `n`, or `s` agenda views prevents stale files from drifting back into Standalone or missing Stuck Projects.
+- Verify both the static agenda command structure and the virtual refresh rules. A narrow config-capture test can prove order/header/matcher behavior without real private org files; a separate refresh test should prove parent and child virtual tags are distinct and refresh does not mutate org text.
+
 ## Orgmode Refile Destination Picker
 
 - Native orgmode `Input.open(... autocomplete_refile ...)` is not enough when the required UX is a visible fuzzy candidate list. It can still look like a single input prompt after restart.

@@ -2,6 +2,8 @@
 
 ## 2026-07-09
 
+- Added wiki summary for `org-agenda-norang-parity-fix`.
+- Added orgmode agenda parity pattern: split project parent and project child context into virtual agenda tags, inject them through search adapter, and refresh before virtual-tag agenda views.
 - Added wiki summary for `org-refile-fuzzy-prompt`.
 - Added orgmode refile input pattern: keep refile destination on orgmode native input completion unless a replacement UI proves candidate visibility and preserves upstream refile semantics.
 - Updated `org-refile-fuzzy-prompt` after follow-up failure: native input completion was insufficient for visible fuzzy candidates; current solution is a `vim.ui.select` / Snacks picker patch that preserves orgmode destination shape.

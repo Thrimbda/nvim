@@ -129,6 +129,7 @@ local function derived_set(cfg)
   return {
     [cfg.derived_tags.project] = true,
     [cfg.derived_tags.stuck] = true,
+    [cfg.derived_tags.project_task] = true,
     [cfg.derived_tags.archive_candidate] = true,
   }
 end

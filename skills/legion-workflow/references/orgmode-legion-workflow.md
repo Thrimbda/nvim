@@ -4,7 +4,7 @@
 
 - 自定义 agenda 视图（`b/n/t/s/r`）
 - Punch in/out 连续记时（不中断 clock）
-- `org_legion` 派生标签刷新与清理
+- `org_legion` 虚拟 agenda 标签索引与旧物化标签清理
 
 ## 1. 先准备默认任务（必须）
 
@@ -59,33 +59,47 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
   - Capture 期间会执行 clock handoff：打开模板时暂停当前 clock，完成/取消 capture 后恢复之前 clock
 - Clock/punch 状态切换默认只改内存 buffer，不自动写盘（由你手动保存）
 - 自定义 agenda：
-  - `:Org agenda b`：Block agenda（保留 Refile/Today/Next/Waiting/Hold，并新增派生视图）
+  - `:Org agenda b`：Norang-style Block agenda（日 agenda、refile、projects、project next/subtasks、standalone、waiting/hold、archive）
   - `:Org agenda n`：NEXT 列表
   - `:Org agenda t`：Timeline（日视图时间线）
   - `:Org agenda s`：Stuck Projects 列表
   - `:Org agenda r`：REFILE 列表
 
-`b` 视图新增：
+`b` 视图顺序：
 
+- day agenda
+- `REFILE`（Tasks to Refile，忽略 scheduled/deadline inbox）
 - `PROJECT+STUCK`（Stuck Projects）
 - `PROJECT-STUCK`（Projects）
-- `+TODO="TODO"-PROJECT-REFILE`（Standalone Tasks）
-- `ARCHIVE_CANDIDATE`（Archive Candidates）
+- `+TODO="NEXT"+PROJECT_TASK-REFILE`（Project Next Tasks）
+- `+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE`（Project Subtasks）
+- `+TODO="TODO"-PROJECT-PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE`（Standalone Tasks）
+- `+TODO="WAITING"-REFILE|+TODO="HOLD"-REFILE`（Waiting and Postponed Tasks）
+- `ARCHIVE_CANDIDATE`（Tasks to Archive）
+
+虚拟标签职责：
+
+- `PROJECT`：有 active todo 子任务的项目父任务
+- `STUCK`：没有可推进 `NEXT` 子任务的项目
+- `PROJECT_TASK`：项目内的可执行 active 子任务
+- `ARCHIVE_CANDIDATE`：可归档完成任务
+
+这些标签只在 agenda/search 过滤时临时注入，不写回 org 文件；旧版本已经物化到文件里的同名标签应通过 cleanup 迁移清理。
 
 ## 3. org_legion 命令
 
-- `:OrgLegionRefresh`：全量刷新（默认处理 `org_agenda_files` 内全部文件，包含未加载文件）
+- `:OrgLegionRefresh`：全量重建内存 agenda 索引（默认处理 `org_agenda_files` 内全部文件，包含未加载文件）
 - `:OrgLegionReload`：重载配置并尝试从 `E_CFG_INVALID` 恢复
-- `:OrgLegionCleanupDerivedTags`：清理派生标签 dry-run（默认不写）
-- `:OrgLegionCleanupDerivedTags!`：清理派生标签 apply（实际修改内存 buffer）
+- `:OrgLegionCleanupDerivedTags`：清理旧物化 Legion 标签 dry-run（默认不写）
+- `:OrgLegionCleanupDerivedTags!`：清理旧物化 Legion 标签 apply（实际修改内存 buffer）
 
 刷新语义（V1）：
 
 - 规则模式：`approx`
 - `mode=precise` 会降级到 `approx` 并给出 warning
-- 写回语义：`memory_only`（已加载 buffer 只改内存，不自动写盘）
-- 当 `refresh.refresh_unloaded_files = true`（默认）时，`OrgLegionRefresh` 会直接写回未加载文件
-- 保存触发刷新后，已加载 buffer 可能再次变脏，需要用户二次保存
+- 写回语义：`index_only`（兼容旧配置名 `memory_only`）；refresh 不修改 org 文本
+- 当 `refresh.refresh_unloaded_files = true`（默认）时，`OrgLegionRefresh` 会读取未加载文件并建立索引，但不会写回文件
+- 保存触发 refresh 后，已加载 buffer 不会因为虚拟标签索引而再次变脏
 - 若将 `refresh.refresh_unloaded_files = false`，未加载文件会计入 `skipped_unloaded`
 
 ## 4. 快捷键（完整清单）
@@ -99,10 +113,10 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
 ### 4.2 仓库自定义（Legion 增强）
 
 - `<Leader>X`：Org Capture（Legion clock handoff，替代默认 `<Leader>oc`）
-- `<F12>` / `<Leader>oab`：打开 block agenda
-- `<Leader>oan`：打开 NEXT 列表
+- `<F12>` / `<Leader>oab`：刷新虚拟 agenda 索引后打开 block agenda
+- `<Leader>oan`：刷新虚拟 agenda 索引后打开 NEXT 列表
 - `<Leader>oat`：打开 Timeline（日视图）
-- `<Leader>oas`：打开 Stuck Projects 列表
+- `<Leader>oas`：刷新虚拟 agenda 索引后打开 Stuck Projects 列表
 - `<Leader>oar`：打开 REFILE 列表
 - `<Leader>opI`：Punch In（开启连续记时，并 clock 到默认任务）
 - `<Leader>opo`：Clock out 但保持连续（自动回父任务或默认任务）
@@ -207,36 +221,36 @@ vim.g.org_diary_file = "~/OneDrive/cone/diary.org"
 ## 5. 推荐日常流程
 
 1. 上班后 `<Leader>opI` 进入连续记时。
-2. `<Leader>oab` 打开 block agenda。
+2. `<Leader>oab` 刷新虚拟 agenda 索引后打开 block agenda。
 3. 对具体任务执行 clock in。
 4. 完成当前任务时使用 `<Leader>opo`，优先保持连续 clock。
 5. 午休或下班 `<Leader>opO` 结束连续记时。
-6. 需要统一更新派生标签时执行 `:OrgLegionRefresh`。
+6. 需要统一更新虚拟 project/stuck/archive 分类时执行 `:OrgLegionRefresh`。
 
 ## 6. 回滚与 cleanup
 
-当需要回滚派生标签副作用时：
+当需要清理旧物化 Legion 标签时：
 
 1. 先停用 `org_legion.setup`（或临时 `enabled = false`）。
 2. 执行 `:OrgLegionCleanupDerivedTags` 查看 dry-run 结果。
 3. 确认后执行 `:OrgLegionCleanupDerivedTags!` 应用清理。
 4. 保存受影响 buffer。
 
-说明：cleanup 仅清理 `PROJECT/STUCK/ARCHIVE_CANDIDATE` 派生标签，不会删除用户标签。
+说明：refresh 不再产生标签副作用；cleanup 仅清理 `PROJECT/STUCK/PROJECT_TASK/ARCHIVE_CANDIDATE` 旧物化标签，不会删除用户标签。
 
 ## 7. 排错
 
 ### 7.1 `:OrgLegionRefresh` 后统计里 `skipped_unloaded` 很高
 
-通常是 `refresh.refresh_unloaded_files = false` 或文件不可写导致；默认配置下该值应较低。
+通常是 `refresh.refresh_unloaded_files = false` 或文件不在可读范围内导致；默认配置下该值应较低。
 
 ### 7.2 提示 `E_CONFLICT_STALE_SNAPSHOT`
 
-说明刷新事务期间 `changedtick` 或 `mtime` 发生变化，系统放弃写回以避免覆盖新改动。重新执行刷新即可。
+该错误只可能来自 cleanup 等实际修改 buffer 的路径；refresh 索引路径不会写回 org 文件。
 
 ### 7.3 `E_CFG_INVALID`（进入错误态）
 
-检查配置是否合法（例如 `todo.next` 必须属于 `todo.active`，`writeback` 必须是 `memory_only`），修复后执行 `:OrgLegionReload`。
+检查配置是否合法（例如 `todo.next` 必须属于 `todo.active`，`writeback` 必须是 `index_only`；旧配置名 `memory_only` 仍兼容），修复后执行 `:OrgLegionReload`。
 
 ### 7.4 `<Leader>opI` 没有 clock 到默认任务
 
@@ -274,9 +288,9 @@ capture 的时长按“分钟粒度”记录：不足 1 分钟不会写 CLOCK �
   - Clock in TODO -> NEXT、Clock in NEXT project -> TODO
   - Punch 模式 clock out 回父任务/默认任务
   - Capture handoff 暂停与恢复、pre-refile 注入非 0:00 CLOCK
-  - TODO 触发标签与派生标签 refresh/cleanup 语义
+  - TODO 触发标签与虚拟 agenda 分类 refresh/cleanup 语义
 - SHOULD（观测级）：
-  - `PROJECT/STUCK` 派生刷新稳定性（跨环境若有波动可单独追踪）
+  - `PROJECT/STUCK/PROJECT_TASK` 虚拟分类稳定性（跨环境若有波动可单独追踪）
   - orgmode clock API 生命周期一致性（active headline 可观测）
 - OUT-OF-SCOPE：
   - Agenda/Capture UI 像素级布局与动画

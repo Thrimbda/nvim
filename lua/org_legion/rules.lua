@@ -95,6 +95,9 @@ function M.compute(lines, nodes, cfg)
   local recent_cutoff = shift_month(month_start(now), -(recent_month_window - 1))
 
   local out = {}
+  local project_by_index = {}
+  local stuck_by_index = {}
+  local archive_by_index = {}
 
   for _, node in ipairs(nodes) do
     local has_todo_descendant = false
@@ -120,10 +123,29 @@ function M.compute(lines, nodes, cfg)
       archive_candidate = stale and (not has_recent_activity)
     end
 
+    project_by_index[node.index] = is_project
+    stuck_by_index[node.index] = is_stuck
+    archive_by_index[node.index] = archive_candidate
+  end
+
+  for _, node in ipairs(nodes) do
+    local has_project_ancestor = false
+    local parent_idx = node.parent
+    while parent_idx do
+      if project_by_index[parent_idx] then
+        has_project_ancestor = true
+        break
+      end
+      parent_idx = nodes[parent_idx] and nodes[parent_idx].parent or nil
+    end
+
+    local is_project_task = active_set[node.todo] and not project_by_index[node.index] and has_project_ancestor
+
     out[node.index] = {
-      [cfg.derived_tags.project] = is_project,
-      [cfg.derived_tags.stuck] = is_stuck,
-      [cfg.derived_tags.archive_candidate] = archive_candidate,
+      [cfg.derived_tags.project] = project_by_index[node.index],
+      [cfg.derived_tags.stuck] = stuck_by_index[node.index],
+      [cfg.derived_tags.project_task] = is_project_task,
+      [cfg.derived_tags.archive_candidate] = archive_by_index[node.index],
     }
   end
 
