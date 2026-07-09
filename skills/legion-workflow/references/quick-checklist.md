@@ -20,5 +20,5 @@
 ## 恢复顺序
 
 1. `:OrgLegionReload`（配置/错误态恢复）
-2. `:OrgLegionRefresh`（标签/状态对齐）
+2. `:OrgLegionRefresh`（虚拟 agenda 索引刷新）
 3. `:OrgLegionCleanupDerivedTags`，随后仅在用户明确确认后执行 `:OrgLegionCleanupDerivedTags!`

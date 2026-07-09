@@ -1,5 +1,6 @@
 local refresh = require("org_legion.refresh")
 local cleanup = require("org_legion.cleanup")
+local virtual_tags = require("org_legion.virtual_tags")
 
 local M = {}
 
@@ -10,12 +11,13 @@ local defaults = {
     mode = "approx",
     on_buf_write = true,
     debounce_ms = 120,
-    writeback = "memory_only",
+    writeback = "index_only",
     refresh_unloaded_files = true,
   },
   derived_tags = {
     project = "PROJECT",
     stuck = "STUCK",
+    project_task = "PROJECT_TASK",
     archive_candidate = "ARCHIVE_CANDIDATE",
   },
   todo = {
@@ -105,6 +107,9 @@ local function validate_cfg(cfg)
   if not is_valid_derived_tag(cfg.derived_tags.stuck) then
     return false, "derived_tags.stuck must match ^[A-Z][A-Z0-9_]*$"
   end
+  if not is_valid_derived_tag(cfg.derived_tags.project_task) then
+    return false, "derived_tags.project_task must match ^[A-Z][A-Z0-9_]*$"
+  end
   if not is_valid_derived_tag(cfg.derived_tags.archive_candidate) then
     return false, "derived_tags.archive_candidate must match ^[A-Z][A-Z0-9_]*$"
   end
@@ -142,15 +147,20 @@ local function validate_cfg(cfg)
     return false, "observability.log_level must be string"
   end
 
-  if cfg.refresh.writeback ~= "memory_only" then
-    return false, "refresh.writeback must be memory_only in V1"
+  if cfg.refresh.writeback ~= "index_only" and cfg.refresh.writeback ~= "memory_only" then
+    return false, "refresh.writeback must be index_only (memory_only is accepted for legacy configs)"
   end
   if cfg.refresh.mode ~= "approx" and cfg.refresh.mode ~= "precise" then
     return false, "refresh.mode must be approx or precise"
   end
 
   local uniq = {}
-  for _, tag in ipairs({ cfg.derived_tags.project, cfg.derived_tags.stuck, cfg.derived_tags.archive_candidate }) do
+  for _, tag in ipairs({
+    cfg.derived_tags.project,
+    cfg.derived_tags.stuck,
+    cfg.derived_tags.project_task,
+    cfg.derived_tags.archive_candidate,
+  }) do
     if uniq[tag] then
       return false, "derived tags must be distinct"
     end
@@ -164,7 +174,12 @@ local function validate_cfg(cfg)
   for _, kw in ipairs(cfg.todo.done) do
     todo_keywords[kw] = true
   end
-  for _, tag in ipairs({ cfg.derived_tags.project, cfg.derived_tags.stuck, cfg.derived_tags.archive_candidate }) do
+  for _, tag in ipairs({
+    cfg.derived_tags.project,
+    cfg.derived_tags.stuck,
+    cfg.derived_tags.project_task,
+    cfg.derived_tags.archive_candidate,
+  }) do
     if todo_keywords[tag] then
       return false, "derived tags must not overlap todo keywords"
     end
@@ -231,7 +246,7 @@ local function register_commands()
 
   vim.api.nvim_create_user_command("OrgLegionRefresh", function()
     M.refresh_all()
-  end, { desc = "Refresh derived Legion tags for org_agenda_files" })
+  end, { desc = "Refresh in-memory Legion agenda index for org_agenda_files" })
 
   vim.api.nvim_create_user_command("OrgLegionReload", function()
     M.reload()
@@ -241,7 +256,7 @@ local function register_commands()
     M.cleanup_derived_tags({ apply = args.bang })
   end, {
     bang = true,
-    desc = "Cleanup derived tags only (! applies changes; default dry-run)",
+    desc = "Cleanup legacy materialized Legion tags (! applies changes; default dry-run)",
   })
 end
 
@@ -282,6 +297,16 @@ function M.setup(opts)
     M.state.cfg_error = err
     notify(M._cfg, "org_legion: invalid config (E_CFG_INVALID): " .. err, vim.log.levels.ERROR)
     return false, err
+  end
+
+  local adapter_ok, adapter_err = virtual_tags.setup_search_adapter(function()
+    return M._cfg
+  end)
+  if not adapter_ok then
+    M.state.phase = "S5"
+    M.state.cfg_error = adapter_err
+    notify(M._cfg, "org_legion: failed to install virtual agenda adapter: " .. tostring(adapter_err), vim.log.levels.ERROR)
+    return false, adapter_err
   end
 
   setup_autocmd(M._cfg)
@@ -350,6 +375,16 @@ function M.refresh_all()
   )
 
   return summary
+end
+
+function M.match_headline(headline, query, opts)
+  local cfg = M._cfg or defaults
+  return virtual_tags.match_headline(cfg, headline, query, opts)
+end
+
+function M.get_virtual_tags_for_line(path_or_bufnr, line_nr)
+  local cfg = M._cfg or defaults
+  return virtual_tags.get_tags_for_line(cfg, path_or_bufnr, line_nr)
 end
 
 function M.cleanup_derived_tags(opts)

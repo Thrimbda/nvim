@@ -11,6 +11,12 @@ local function assert_true(value, message)
   end
 end
 
+local function assert_equal(actual, expected, message)
+  if actual ~= expected then
+    error(("%s (expected=%s actual=%s)"):format(message, vim.inspect(expected), vim.inspect(actual)), 0)
+  end
+end
+
 local function encode_json(payload)
   local ok_json, encoded = pcall(vim.json.encode, payload)
   if ok_json and type(encoded) == "string" then
@@ -134,6 +140,7 @@ local function setup_legion(paths)
     derived_tags = {
       project = "PROJECT",
       stuck = "STUCK",
+      project_task = "PROJECT_TASK",
       archive_candidate = "ARCHIVE_CANDIDATE",
     },
     todo = {
@@ -155,9 +162,145 @@ local function setup_legion(paths)
   return legion
 end
 
+local function get_org_headline_at(path, line_nr)
+  local orgmode = require("orgmode")
+  local file = orgmode.files:get(path):reload_sync()
+  local headline = file:get_closest_headline({ line_nr, 0 })
+  assert_true(headline ~= nil, ("headline should exist at line %d"):format(line_nr))
+  return headline
+end
+
 local function setup_todo_triggers()
   local ok, err = require("org_legion.todo_triggers").setup()
   assert_true(ok == true, "todo trigger setup failed: " .. tostring(err))
+end
+
+local function capture_orgmode_plugin_setup()
+  local captured_setup = nil
+  local refresh_calls = 0
+  local commands = {}
+  local keymaps = {}
+
+  local mock_modules = {
+    orgmode = {
+      capture = {},
+      setup = function(opts)
+        captured_setup = opts
+      end,
+      action = function() end,
+    },
+    ["org_legion.todo_triggers"] = {
+      setup = function()
+        return true
+      end,
+    },
+    org_punch = {
+      setup = function() end,
+      punch_in = function() end,
+      punch_out = function() end,
+      clock_out_keep_running = function() end,
+      clock_in_current_task = function() end,
+      clock_out_current_task = function() end,
+    },
+    org_capture_legion = {
+      setup = function() end,
+      capture_prompt = function() end,
+    },
+    org_refile_picker = {
+      setup = function() end,
+    },
+    org_legion = {
+      setup = function() end,
+      refresh_all = function()
+        refresh_calls = refresh_calls + 1
+        return { fail = 0 }
+      end,
+    },
+  }
+
+  local original_loaded = {}
+  for name, module in pairs(mock_modules) do
+    original_loaded[name] = package.loaded[name]
+    package.loaded[name] = module
+  end
+  original_loaded["plugins.orgmode"] = package.loaded["plugins.orgmode"]
+  package.loaded["plugins.orgmode"] = nil
+
+  local original_keymap_set = vim.keymap.set
+  local original_cmd = vim.cmd
+  vim.keymap.set = function(mode, lhs, rhs, opts)
+    table.insert(keymaps, {
+      mode = mode,
+      lhs = lhs,
+      rhs = rhs,
+      opts = opts,
+    })
+  end
+  vim.cmd = function(command)
+    table.insert(commands, command)
+  end
+
+  local ok, result = xpcall(function()
+    local spec = require("plugins.orgmode")
+    assert_true(type(spec) == "table" and type(spec[1]) == "table", "orgmode plugin spec should be loadable")
+    assert_true(type(spec[1].config) == "function", "orgmode plugin config should be a function")
+    spec[1].config()
+  end, debug.traceback)
+
+  vim.keymap.set = original_keymap_set
+  vim.cmd = original_cmd
+  for name, original in pairs(original_loaded) do
+    package.loaded[name] = original
+  end
+  for name, _ in pairs(mock_modules) do
+    if original_loaded[name] == nil then
+      package.loaded[name] = nil
+    end
+  end
+
+  if not ok then
+    error(result, 0)
+  end
+
+  return {
+    setup = captured_setup,
+    keymaps = keymaps,
+    commands = commands,
+    refresh_calls = function()
+      return refresh_calls
+    end,
+    invoke_keymap = function(keymap)
+      local original_legion = package.loaded.org_legion
+      local original_cmd_for_invoke = vim.cmd
+      package.loaded.org_legion = {
+        refresh_all = function()
+          refresh_calls = refresh_calls + 1
+          return { fail = 0 }
+        end,
+      }
+      vim.cmd = function(command)
+        table.insert(commands, command)
+      end
+
+      local ok_invoke, invoke_err = pcall(keymap.rhs)
+
+      vim.cmd = original_cmd_for_invoke
+      package.loaded.org_legion = original_legion
+
+      if not ok_invoke then
+        error(invoke_err, 0)
+      end
+    end,
+  }
+end
+
+local function find_keymap(keymaps, lhs)
+  for _, keymap in ipairs(keymaps or {}) do
+    if keymap.lhs == lhs then
+      return keymap
+    end
+  end
+  return nil
 end
 
 local function run_org_action(action)
@@ -296,6 +439,47 @@ local function test_punch_in_requires_id()
 
   assert_true(ok == false, "punch_in should fail when organization_task_id is empty")
   assert_true(punch.state.keep_clock_running == false, "keep_clock_running should rollback to false on failure")
+end
+
+local function test_agenda_block_matches_norang_baseline()
+  local captured = capture_orgmode_plugin_setup()
+  local setup = captured.setup
+  assert_true(type(setup) == "table", "orgmode.setup should be called")
+  local command = setup.org_agenda_custom_commands and setup.org_agenda_custom_commands.b
+  assert_true(type(command) == "table", "block agenda command should exist")
+  assert_equal(command.description, "Block agenda (Norang-style)", "block agenda description should name Norang style")
+  assert_equal(
+    table.concat(setup.org_tags_exclude_from_inheritance or {}, ","),
+    "PROJECT,STUCK,PROJECT_TASK,ARCHIVE_CANDIDATE",
+    "virtual and legacy materialized tags should not leak through tag inheritance"
+  )
+
+  local expected = {
+    { type = "agenda", match = nil, header = nil },
+    { type = "tags_todo", match = "REFILE", header = "Tasks to Refile" },
+    { type = "tags_todo", match = "PROJECT+STUCK", header = "Stuck Projects" },
+    { type = "tags_todo", match = "PROJECT-STUCK", header = "Projects" },
+    { type = "tags_todo", match = '+TODO="NEXT"+PROJECT_TASK-REFILE', header = "Project Next Tasks" },
+    { type = "tags_todo", match = '+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', header = "Project Subtasks" },
+    { type = "tags_todo", match = '+TODO="TODO"-PROJECT-PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', header = "Standalone Tasks" },
+    { type = "tags_todo", match = '+TODO="WAITING"-REFILE|+TODO="HOLD"-REFILE', header = "Waiting and Postponed Tasks" },
+    { type = "tags", match = "ARCHIVE_CANDIDATE", header = "Tasks to Archive" },
+  }
+
+  assert_equal(#command.types, #expected, "block agenda section count should match Norang baseline")
+  for idx, want in ipairs(expected) do
+    local got = command.types[idx]
+    assert_true(type(got) == "table", ("block agenda section %d should exist"):format(idx))
+    assert_equal(got.type, want.type, ("section %d type mismatch"):format(idx))
+    assert_equal(got.match, want.match, ("section %d matcher mismatch"):format(idx))
+    assert_equal(got.org_agenda_overriding_header, want.header, ("section %d header mismatch"):format(idx))
+  end
+
+  local f12 = find_keymap(captured.keymaps, "<F12>")
+  assert_true(f12 and type(f12.rhs) == "function", "F12 block agenda keymap should refresh before opening")
+  captured.invoke_keymap(f12)
+  assert_equal(captured.refresh_calls(), 1, "F12 should refresh virtual agenda index before agenda")
+  assert_equal(captured.commands[1], "Org agenda b", "F12 should open block agenda after refresh")
 end
 
 local function test_punch_in_clocks_default_task()
@@ -670,23 +854,69 @@ local function test_clock_in_preserves_view_state()
   punch.punch_out()
 end
 
-local function test_legion_refresh_marks_stuck_project()
+local function test_legion_refresh_indexes_stuck_project()
   local path = write_temp_org({
     "* TODO Dist Systems",
     "** DONE Read paper",
   })
 
+  setup_orgmode({ path })
   setup_legion({ path })
   local legion = require("org_legion")
   local result = legion.refresh_file(path)
 
   assert_true(result.ok == true, "refresh_file should succeed")
-  assert_true(read_line(path, 1):match(":PROJECT:STUCK:") ~= nil, "project should receive :PROJECT:STUCK: tags")
+  assert_true(result.changed == false, "refresh_file should not mutate org text")
+  assert_true(read_line(path, 1):match("PROJECT") == nil, "PROJECT should not be materialized into org text")
+  assert_true(read_line(path, 1):match("STUCK") == nil, "STUCK should not be materialized into org text")
+
+  local tags = legion.get_virtual_tags_for_line(path, 1)
+  assert_true(has_tag_in_list(tags, "PROJECT"), "project should be indexed with virtual PROJECT tag")
+  assert_true(has_tag_in_list(tags, "STUCK"), "project should be indexed with virtual STUCK tag")
+
+  local headline = get_org_headline_at(path, 1)
+  assert_true(legion.match_headline(headline, "PROJECT+STUCK", { todo_only = true }) == true, "virtual PROJECT+STUCK query should match")
+end
+
+local function test_legion_refresh_indexes_project_tasks()
+  local path = write_temp_org({
+    "* Tasks",
+    "** TODO 验收 facility assets",
+    "*** NEXT 设备参数 Mock",
+    "*** TODO 给出验收标准",
+  })
+
+  setup_orgmode({ path })
+  setup_legion({ path })
+  local legion = require("org_legion")
+  local result = legion.refresh_file(path)
+
+  assert_true(result.ok == true, "refresh_file should succeed")
+  assert_true(read_line(path, 2):match("PROJECT") == nil, "project tags should not be materialized")
+  assert_true(read_line(path, 3):match("PROJECT_TASK") == nil, "NEXT child should not receive materialized PROJECT_TASK tag")
+  assert_true(read_line(path, 4):match("PROJECT_TASK") == nil, "TODO child should not receive materialized PROJECT_TASK tag")
+
+  assert_true(has_tag_in_list(legion.get_virtual_tags_for_line(path, 2), "PROJECT"), "project parent should be indexed as PROJECT")
+  assert_true(
+    not has_tag_in_list(legion.get_virtual_tags_for_line(path, 2), "PROJECT_TASK"),
+    "project parent should not be indexed as PROJECT_TASK"
+  )
+  assert_true(has_tag_in_list(legion.get_virtual_tags_for_line(path, 3), "PROJECT_TASK"), "NEXT child should be indexed as PROJECT_TASK")
+  assert_true(has_tag_in_list(legion.get_virtual_tags_for_line(path, 4), "PROJECT_TASK"), "TODO child should be indexed as PROJECT_TASK")
+
+  assert_true(
+    legion.match_headline(get_org_headline_at(path, 3), '+TODO="NEXT"+PROJECT_TASK-REFILE', { todo_only = true }) == true,
+    "project NEXT virtual query should match NEXT child"
+  )
+  assert_true(
+    legion.match_headline(get_org_headline_at(path, 4), '+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', { todo_only = true }) == true,
+    "project subtask virtual query should match TODO child"
+  )
 end
 
 local function test_legion_cleanup_apply_removes_derived_tags()
   local path = write_temp_org({
-    "* TODO Dist Systems :PROJECT:STUCK:ARCHIVE_CANDIDATE:",
+    "* TODO Dist Systems :PROJECT:STUCK:PROJECT_TASK:ARCHIVE_CANDIDATE:",
   })
 
   setup_legion({ path })
@@ -698,6 +928,7 @@ local function test_legion_cleanup_apply_removes_derived_tags()
   local line = vim.fn.getline(1)
   assert_true(line:match("PROJECT") == nil, "cleanup should remove PROJECT tag")
   assert_true(line:match("STUCK") == nil, "cleanup should remove STUCK tag")
+  assert_true(line:match("PROJECT_TASK") == nil, "cleanup should remove PROJECT_TASK tag")
   assert_true(line:match("ARCHIVE_CANDIDATE") == nil, "cleanup should remove ARCHIVE_CANDIDATE tag")
 end
 
@@ -1246,12 +1477,33 @@ local function test_legion_e2e_integrated_flow()
     expected = "Dist Systems headline exists",
     actual = "Dist Systems headline missing",
   })
-  assert_parity((read_line(workflow_path, dist_line) or ""):match(":PROJECT:STUCK:") ~= nil, {
+  assert_parity((read_line(workflow_path, dist_line) or ""):match("PROJECT") == nil and (read_line(workflow_path, dist_line) or ""):match("STUCK") == nil, {
     id = "NP-011",
     phase = "refresh",
     case_name = case_name,
-    expected = "Dist Systems marked with PROJECT:STUCK",
+    expected = "Dist Systems keeps virtual PROJECT/STUCK out of org text",
     actual = "line=" .. tostring(read_line(workflow_path, dist_line)),
+  })
+  assert_parity(has_tag_in_list(legion.get_virtual_tags_for_line(workflow_path, dist_line), "PROJECT"), {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "Dist Systems indexed with virtual PROJECT",
+    actual = "tags=" .. table.concat(legion.get_virtual_tags_for_line(workflow_path, dist_line), ","),
+  })
+  assert_parity(has_tag_in_list(legion.get_virtual_tags_for_line(workflow_path, dist_line), "STUCK"), {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "Dist Systems indexed with virtual STUCK",
+    actual = "tags=" .. table.concat(legion.get_virtual_tags_for_line(workflow_path, dist_line), ","),
+  })
+  assert_parity(legion.match_headline(get_org_headline_at(workflow_path, dist_line), "PROJECT+STUCK", { todo_only = true }) == true, {
+    id = "NP-011",
+    phase = "refresh",
+    case_name = case_name,
+    expected = "Dist Systems matches virtual PROJECT+STUCK query",
+    actual = "query did not match",
   })
 
   local cleanup_result = legion.cleanup_derived_tags({ apply = true })
@@ -1296,6 +1548,7 @@ local function test_legion_e2e_integrated_flow()
 end
 
 local CASES = {
+  agenda_block_matches_norang_baseline = test_agenda_block_matches_norang_baseline,
   punch_in_requires_id = test_punch_in_requires_id,
   punch_in_clocks_default_task = test_punch_in_clocks_default_task,
   punch_in_prefers_current_buffer_when_id_is_duplicated = test_punch_in_prefers_current_buffer_when_id_is_duplicated,
@@ -1310,7 +1563,8 @@ local CASES = {
   punch_in_switch_removes_previous_zero_duration_clock = test_punch_in_switch_removes_previous_zero_duration_clock,
   clock_out_in_punch_mode_returns_to_parent = test_clock_out_in_punch_mode_returns_to_parent,
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
-  legion_refresh_marks_stuck_project = test_legion_refresh_marks_stuck_project,
+  legion_refresh_indexes_stuck_project = test_legion_refresh_indexes_stuck_project,
+  legion_refresh_indexes_project_tasks = test_legion_refresh_indexes_project_tasks,
   legion_cleanup_apply_removes_derived_tags = test_legion_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
