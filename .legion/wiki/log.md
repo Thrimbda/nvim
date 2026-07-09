@@ -1,5 +1,10 @@
 # Legion Wiki Log
 
+## 2026-07-09
+
+- Added wiki summary for `org-refile-fuzzy-prompt`.
+- Added orgmode refile input pattern: keep refile destination on orgmode native input completion unless a replacement UI proves candidate visibility and preserves upstream refile semantics.
+
 ## 2026-06-11
 
 - Added wiki summary for `tabiew-parquet-auto-open`.
