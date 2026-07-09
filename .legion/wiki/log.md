@@ -4,6 +4,8 @@
 
 - Added wiki summary for `org-refile-fuzzy-prompt`.
 - Added orgmode refile input pattern: keep refile destination on orgmode native input completion unless a replacement UI proves candidate visibility and preserves upstream refile semantics.
+- Updated `org-refile-fuzzy-prompt` after follow-up failure: native input completion was insufficient for visible fuzzy candidates; current solution is a `vim.ui.select` / Snacks picker patch that preserves orgmode destination shape.
+- Replaced the orgmode refile pattern with current picker guidance: patch destination selection, keep refile move semantics, and verify file/headline/cancel behavior.
 
 ## 2026-06-11
 

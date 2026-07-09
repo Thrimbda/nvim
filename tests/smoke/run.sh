@@ -16,7 +16,7 @@ if [[ ! -d "$ORGMODE_RTP" ]]; then
 	fi
 fi
 
-RTP_SETUP_LUA="local function safe_path(name) local p=vim.fn.getenv(name); if type(p)~='string' or p=='' then error(name .. ' is empty') end; if p:find('[|\\r\\n\\t]') then error(name .. ' contains forbidden characters') end; if vim.fn.isdirectory(p)~=1 then error(name .. ' is not a directory: ' .. p) end; return p end; vim.opt.rtp:append(safe_path('ORGMODE_RTP')); vim.opt.rtp:append(safe_path('SMOKE_ROOT_DIR'))"
+RTP_SETUP_LUA="local function safe_path(name) local p=vim.fn.getenv(name); if type(p)~='string' or p=='' then error(name .. ' is empty') end; if p:find('[|\\r\\n\\t]') then error(name .. ' contains forbidden characters') end; if vim.fn.isdirectory(p)~=1 then error(name .. ' is not a directory: ' .. p) end; return p end; vim.opt.rtp:prepend(safe_path('SMOKE_ROOT_DIR')); vim.opt.rtp:append(safe_path('ORGMODE_RTP'))"
 
 CASES=(
 	punch_in_requires_id
@@ -37,6 +37,8 @@ CASES=(
 	legion_cleanup_apply_removes_derived_tags
 	capture_clock_handoff_resumes_previous
 	capture_pre_refile_injects_clock_line
+	refile_picker_builds_file_and_headline_candidates
+	refile_picker_selects_and_cancels_destination
 	todo_state_tag_triggers_legion
 	legion_e2e_integrated_flow
 )

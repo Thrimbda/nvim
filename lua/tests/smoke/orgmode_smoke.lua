@@ -776,6 +776,76 @@ local function test_capture_pre_refile_injects_clock_line()
   capture.finish_capture_clock_handoff()
 end
 
+local function test_refile_picker_builds_file_and_headline_candidates()
+  local picker = require("org_refile_picker")
+  local headline = {
+    get_title = function()
+      return "Target project"
+    end,
+  }
+  local file = {
+    get_opened_unfinished_headlines = function()
+      return { headline }
+    end,
+  }
+
+  local items = picker.build_items({
+    ["ntnl.org/"] = file,
+  })
+
+  assert_true(#items == 2, "refile picker should include file and headline candidates")
+  assert_true(items[1].label == "ntnl.org/", "first candidate should be file root")
+  assert_true(items[1].file == file, "file candidate should keep OrgFile object")
+  assert_true(items[2].label == "ntnl.org/Target project", "headline candidate should include title")
+  assert_true(items[2].headline == headline, "headline candidate should keep OrgHeadline object")
+end
+
+local function test_refile_picker_selects_and_cancels_destination()
+  local picker = require("org_refile_picker")
+  local headline = {
+    get_title = function()
+      return "Target project"
+    end,
+  }
+  local file = {
+    get_opened_unfinished_headlines = function()
+      return { headline }
+    end,
+  }
+  local capture = {
+    _get_autocompletion_files = function()
+      return {
+        ["ntnl.org/"] = file,
+      }
+    end,
+    get_destination = function()
+      error("fallback should not be used")
+    end,
+  }
+
+  assert_true(picker.setup(capture) == true, "refile picker setup should patch capture")
+
+  local old_select = vim.ui.select
+  local prompt = nil
+  vim.ui.select = function(items, opts, on_choice)
+    prompt = opts.prompt
+    on_choice(items[2], 2)
+  end
+
+  local destination = capture:get_destination():wait(2000)
+  assert_true(prompt == "Refile subtree to:", "picker should use refile prompt")
+  assert_true(destination.file == file, "selected destination should keep file")
+  assert_true(destination.headline == headline, "selected destination should keep headline")
+
+  vim.ui.select = function(_, _, on_choice)
+    on_choice(nil, nil)
+  end
+  local canceled = capture:get_destination():wait(2000)
+  vim.ui.select = old_select
+
+  assert_true(canceled == false, "canceling picker should cancel refile")
+end
+
 local function test_todo_state_tag_triggers_legion()
   local path = write_temp_org({
     "* TODO Trigger task :WAITING:HOLD:CANCELLED:",
@@ -1244,6 +1314,8 @@ local CASES = {
   legion_cleanup_apply_removes_derived_tags = test_legion_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
+  refile_picker_builds_file_and_headline_candidates = test_refile_picker_builds_file_and_headline_candidates,
+  refile_picker_selects_and_cancels_destination = test_refile_picker_selects_and_cancels_destination,
   todo_state_tag_triggers_legion = test_todo_state_tag_triggers_legion,
   legion_e2e_integrated_flow = test_legion_e2e_integrated_flow,
 }

@@ -1,4 +1,4 @@
-# Review Change: org-refile-fuzzy-prompt
+# Review Change: Org refile fuzzy picker
 
 ## Decision
 
@@ -8,29 +8,28 @@ PASS。
 
 无。
 
-## Scope Review
+## Findings
 
-- In scope: `lua/plugins/orgmode.lua` 删除 `ui.input.use_vim_ui = true` 覆盖，符合 design-lite 的最小方案。
-- In scope: `skills/legion-workflow/references/orgmode-legion-workflow.md` 更新 refile 输入说明，避免继续传播 Snacks input 可显示候选的错误假设。
-- In scope: `.legion/tasks/org-refile-fuzzy-prompt/**` 记录 task contract、design-lite、验证和审查证据。
-- 未发现实现层 scope 外变更；未新增依赖；未改 agenda/capture/punch 逻辑。
-
-## Correctness Review
-
-- 变更使用 orgmode.nvim 默认 `ui.input.use_vim_ui = false` 路径，契合 `Capture:get_destination()` 现有 completion 设计。
-- 验证证据覆盖了配置覆盖消失、本地 orgmode 默认值、worktree spec-level setup opts、`Capture.autocomplete_refile()` fuzzy 行为，以及完整 smoke suite。
-- 保留的限制是未做交互式像素截图验证；考虑到本次修复本质是恢复 orgmode 原生 input completion 路径，当前证据足以支撑交付。
-
-## Maintainability Review
-
-- 删除本地覆盖比引入自定义 picker 更容易维护，也降低未来跟随 orgmode.nvim 上游 refile 行为的偏离风险。
-- 文档同步修正了历史错误说明，降低后续维护者再次恢复 `vim.ui.input` 覆盖的概率。
-
-## Security Lens
-
-未触发安全视角。变更不涉及 auth、permission、identity、session、token、信任边界、密钥、加密、webhook、用户可控输入进入高权限路径、数据暴露、隐私或租户隔离。
+- 实现覆盖的是 orgmode refile destination 的共同入口 `orgmode.capture.get_destination()`，因此 `<Leader>or`、agenda refile 与 capture refile 的目标选择都会进入同一个 picker 路径。
+- 新模块只替换 destination 选择 UI，返回仍是 orgmode 原生 `_refile_from_capture_buffer()` / `_refile_from_org_file()` 期望的 `{ file, headline? }` 或取消时 `false`，没有重写移动语义。
+- 候选构建包含文件 root destination 与未完成 headline destination，满足本次修正后的“可见候选列表”验收。
+- `vim.ui.select` 在当前 Snacks 配置中默认由 Snacks picker 接管，能够提供可见列表与 fuzzy 过滤；若 select 不可用或候选构建失败，代码会 fallback 到 orgmode 原始 `get_destination()`。
+- 新增 smoke 覆盖候选构建、选择 headline、取消 refile；完整 smoke suite 通过，未发现 capture clock handoff、pre-refile hook、punch/clock 或 Legion integrated flow 回归。
 
 ## Residual Risk
 
-- 用户实际 TUI 的候选弹窗仍取决于 Neovim 原生命令行/input completion 设置，但本次已恢复 orgmode 默认且验证 fuzzy completion 函数存在。
-- smoke runner 使用 unpinned 本地 orgmode runtime，因为仓库没有 `.tests/deps/orgmode`；这与当前仓库既有 runner 约束一致，已在 test report 中记录。
+- 真实 TUI 弹窗未在 headless 环境截图验证；当前证据证明代码会调用 `vim.ui.select`，视觉呈现依赖 Snacks picker 接管。
+- patch 依赖 orgmode.nvim 内部 `_get_autocompletion_files()` 和 headline API。模块保留 fallback，并用 smoke case 覆盖当前 return shape。
+
+## Verification Reviewed
+
+- `refile_picker_builds_file_and_headline_candidates`: PASS。
+- `refile_picker_selects_and_cancels_destination`: PASS。
+- worktree spec-level patch 断言：PASS，输出 `picker_patched true`。
+- `ALLOW_UNPINNED_ORGMODE=1 bash tests/smoke/run.sh`: PASS，22 个 case 全部通过。
+- `git diff --check`: PASS。
+- `stylua --check ...`: 未运行成功，当前机器没有 `stylua`。
+
+## Outcome
+
+可以进入 reporter handoff、wiki 写回和 PR lifecycle。
