@@ -2,6 +2,8 @@
 
 ## 2026-07-09
 
+- Added wiki summary for `org-agenda-archive-parity-fix`.
+- Updated orgmode agenda parity pattern with Norang archive semantics: `-REFILE/` plus internal done-state and month-prefix filtering, not a stale-days approximation.
 - Added wiki summary for `org-agenda-norang-parity-fix`.
 - Added orgmode agenda parity pattern: split project parent and project child context into virtual agenda tags, inject them through search adapter, and refresh before virtual-tag agenda views.
 - Added wiki summary for `org-refile-fuzzy-prompt`.

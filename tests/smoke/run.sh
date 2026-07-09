@@ -36,6 +36,7 @@ CASES=(
 	clock_out_in_punch_mode_returns_to_default
 	legion_refresh_indexes_stuck_project
 	legion_refresh_indexes_project_tasks
+	legion_archive_candidates_match_norang_month_boundary
 	legion_cleanup_apply_removes_derived_tags
 	capture_clock_handoff_resumes_previous
 	capture_pre_refile_injects_clock_line

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>org-agenda-archive-parity-fix | Walkthrough</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: oklch(96% 0.014 94);
+      --surface: oklch(98% 0.01 96);
+      --ink: oklch(24% 0.02 252);
+      --muted: oklch(47% 0.026 252);
+      --line: oklch(83% 0.018 112);
+      --accent: oklch(44% 0.13 154);
+      --accent-soft: oklch(90% 0.055 151);
+      --warn-soft: oklch(91% 0.062 78);
+      --code: oklch(93% 0.018 255);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+
+    main {
+      width: min(1160px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 46px 0 68px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 780;
+      letter-spacing: 0;
+      margin: 0 0 10px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 1.12rem;
+      letter-spacing: 0;
+      margin-bottom: 14px;
+    }
+
+    p, li { max-width: 74ch; }
+
+    code {
+      background: var(--code);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.08rem 0.32rem;
+      font-size: 0.92em;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.04rem;
+      margin-bottom: 0;
+    }
+
+    .status, section {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .status {
+      padding: 20px;
+    }
+
+    .status h2 {
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--line);
+      padding: 10px 0;
+    }
+
+    .status-row:first-of-type { border-top: 0; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      padding: 0.08rem 0.58rem;
+      font-size: 0.86rem;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .pill.warn { background: var(--warn-soft); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    nav {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    nav a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.92rem;
+    }
+
+    section {
+      padding: 24px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      padding: 11px 10px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 760;
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+      margin-bottom: 0;
+    }
+
+    .note {
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      main { width: min(100vw - 24px, 720px); padding-top: 28px; }
+      .hero, .layout, .two-col { grid-template-columns: 1fr; }
+      nav { position: static; }
+      table { display: block; overflow-x: auto; }
+    }
+
+    @media print {
+      body { background: var(--surface); }
+      main { width: auto; padding: 0; }
+      nav { display: none; }
+      section, .status { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div>
+        <p class="kicker">Legion implementation walkthrough</p>
+        <h1>Norang archive parity fix</h1>
+        <p class="lede">本任务修复 PR #11 后遗留的 archive section 语义差异，让 <code>Tasks to Archive</code> 按 Emacs Norang 的月份规则和 <code>-REFILE/</code> 查询工作。</p>
+      </div>
+      <aside class="status" aria-label="交付状态">
+        <h2>交付状态</h2>
+        <div class="status-row"><span>Profile</span><span class="pill">implementation</span></div>
+        <div class="status-row"><span>Review</span><span class="pill">PASS</span></div>
+        <div class="status-row"><span>PR</span><span class="pill warn">待创建</span></div>
+        <div class="status-row"><span>Render</span><span class="pill">artifact-only</span></div>
+      </aside>
+    </header>
+
+    <div class="layout">
+      <nav aria-label="Walkthrough navigation">
+        <a href="#summary">Reviewer Summary</a>
+        <a href="#scope">Scope</a>
+        <a href="#evidence">Evidence Map</a>
+        <a href="#path">Delivery Path</a>
+        <a href="#render">Render Handoff</a>
+        <a href="#verification">Verification</a>
+        <a href="#final">Final State</a>
+      </nav>
+
+      <div>
+        <section id="summary">
+          <h2>Reviewer Summary</h2>
+          <ul>
+            <li>Archive candidate 判定从 day-count stale 近似改为 Norang 的本月和上月时间戳过滤。</li>
+            <li><code>b</code> agenda 的 archive block 改为 <code>-REFILE/</code>，不再裸查 <code>ARCHIVE_CANDIDATE</code>。</li>
+            <li>新增 smoke 覆盖 old DONE、this-month DONE、last-month DONE、open TODO、REFILE DONE。</li>
+          </ul>
+        </section>
+
+        <section id="scope">
+          <h2>Scope</h2>
+          <div class="two-col">
+            <div>
+              <h3>In Scope</h3>
+              <ul>
+                <li><code>lua/org_legion/rules.lua</code></li>
+                <li><code>lua/org_legion/virtual_tags.lua</code></li>
+                <li><code>lua/plugins/orgmode.lua</code></li>
+                <li><code>lua/tests/smoke/orgmode_smoke.lua</code></li>
+                <li><code>tests/smoke/run.sh</code></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Out of Scope</h3>
+              <ul>
+                <li>不重做其他 agenda sections。</li>
+                <li>不实现批量 archive 操作。</li>
+                <li>不自动删除用户文件里已有的物化 <code>ARCHIVE_CANDIDATE</code> 标签。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="evidence">
+          <h2>Evidence Map</h2>
+          <table>
+            <thead><tr><th>Claim</th><th>Evidence</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Archive 规则改为 Norang 月份语义</td><td><code>docs/rfc.md</code>, <code>lua/org_legion/rules.lua</code></td><td>PASS</td></tr>
+              <tr><td>Archive block 不再裸查实现标签</td><td><code>lua/plugins/orgmode.lua</code>, <code>agenda_block_matches_norang_baseline</code></td><td>PASS</td></tr>
+              <tr><td>当前月和上月时间戳会阻止 archive</td><td><code>legion_archive_candidates_match_norang_month_boundary</code></td><td>PASS</td></tr>
+              <tr><td>派生标签不写回 org text</td><td><code>docs/test-report.md</code></td><td>PASS</td></tr>
+              <tr><td>变更审查无阻塞项</td><td><code>docs/review-change.md</code></td><td>PASS</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="path">
+          <h2>Delivery Path</h2>
+          <ol>
+            <li>创建 task contract 和 design-lite。</li>
+            <li>在 worktree 内实现 archive 判定和 matcher 调整。</li>
+            <li>补充 smoke case 并加入 runner。</li>
+            <li>完成 verification 和 review-change。</li>
+            <li>下一步创建 PR、跟进 checks、尝试 auto-merge、合并后清理。</li>
+          </ol>
+        </section>
+
+        <section id="render">
+          <h2>Render Handoff</h2>
+          <p>本 HTML 是 PR-backed walkthrough artifact。当前仓库没有为 Legion report 配置稳定 Pages preview，本次采用 artifact-only/local render handoff，不在 bugfix PR 中扩展 CI 或 Pages 基础设施。</p>
+        </section>
+
+        <section id="decisions">
+          <h2>What Changed / What Was Decided</h2>
+          <ul>
+            <li><code>ARCHIVE_CANDIDATE</code> 保留为内部虚拟标签。</li>
+            <li><code>-REFILE/</code> 精确查询由 org_legion adapter 解释为 Norang archive block 查询。</li>
+            <li>本月和上月的任意 <code>YYYY-MM-</code> 前缀会使 done subtree 保留在主 org 文件中。</li>
+          </ul>
+        </section>
+
+        <section id="verification">
+          <h2>Verification / Review Status</h2>
+          <ul>
+            <li><code>ALLOW_UNPINNED_ORGMODE=1 bash tests/smoke/run.sh</code>: PASS。</li>
+            <li><code>git diff --check</code>: PASS。</li>
+            <li><code>stylua</code>: unavailable, skipped。</li>
+            <li><code>review-change</code>: PASS，无 security trigger。</li>
+          </ul>
+        </section>
+
+        <section id="risks">
+          <h2>Risks and Limits</h2>
+          <ul>
+            <li>如果用户文件中已有真实 <code>ARCHIVE_CANDIDATE</code> 标签，它仍是普通标签；本修复保证它不再导致最近 DONE 进入 archive section。</li>
+            <li>通用 <code>-REFILE/</code> tags search 现在在 org_legion adapter 中具有 Norang archive 含义。若未来需要独立通用搜索，应扩展 orgmode.nvim custom command context。</li>
+          </ul>
+        </section>
+
+        <section id="checklist">
+          <h2>Reviewer Checklist</h2>
+          <ul>
+            <li>确认 archive matcher 与 Norang baseline 一致。</li>
+            <li>确认月份边界行为符合预期。</li>
+            <li>确认虚拟标签仍不写回 org 文件。</li>
+          </ul>
+        </section>
+
+        <section id="final">
+          <h2>Final State / Next Stage</h2>
+          <p>实现、验证和 review-change 已完成。PR lifecycle 仍需创建 PR、跟进 checks、尝试 auto-merge、合并后删除 worktree 并刷新主工作区。</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -463,7 +463,7 @@ local function test_agenda_block_matches_norang_baseline()
     { type = "tags_todo", match = '+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', header = "Project Subtasks" },
     { type = "tags_todo", match = '+TODO="TODO"-PROJECT-PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', header = "Standalone Tasks" },
     { type = "tags_todo", match = '+TODO="WAITING"-REFILE|+TODO="HOLD"-REFILE', header = "Waiting and Postponed Tasks" },
-    { type = "tags", match = "ARCHIVE_CANDIDATE", header = "Tasks to Archive" },
+    { type = "tags", match = "-REFILE/", header = "Tasks to Archive" },
   }
 
   assert_equal(#command.types, #expected, "block agenda section count should match Norang baseline")
@@ -912,6 +912,71 @@ local function test_legion_refresh_indexes_project_tasks()
     legion.match_headline(get_org_headline_at(path, 4), '+TODO="TODO"+PROJECT_TASK-REFILE-ARCHIVE_CANDIDATE', { todo_only = true }) == true,
     "project subtask virtual query should match TODO child"
   )
+end
+
+local function test_legion_archive_candidates_match_norang_month_boundary()
+  local function month_string(delta)
+    local t = os.date("*t")
+    local year = t.year
+    local month = t.month + delta
+    while month < 1 do
+      month = month + 12
+      year = year - 1
+    end
+    while month > 12 do
+      month = month - 12
+      year = year + 1
+    end
+    return ("%04d-%02d"):format(year, month)
+  end
+
+  local this_month = month_string(0)
+  local last_month = month_string(-1)
+  local old_month = month_string(-2)
+  local path = write_temp_org({
+    "* DONE Old finished",
+    "CLOSED: [" .. old_month .. "-05 Sun]",
+    "* DONE Current note",
+    "- Note [" .. this_month .. "-02 Thu]",
+    "* DONE Last month clock",
+    ":LOGBOOK:",
+    "CLOCK: [" .. last_month .. "-03 Wed 10:00]--[" .. last_month .. "-03 Wed 10:20] =>  0:20",
+    ":END:",
+    "* TODO Open old task",
+    "CLOSED: [" .. old_month .. "-05 Sun]",
+    "* DONE Refile old :REFILE:",
+    "CLOSED: [" .. old_month .. "-05 Sun]",
+    "* DONE No timestamp",
+  })
+
+  setup_orgmode({ path })
+  setup_legion({ path })
+  local legion = require("org_legion")
+  local result = legion.refresh_file(path)
+  assert_true(result.ok == true, "refresh_file should succeed")
+
+  local function has_archive_tag(line_nr)
+    return has_tag_in_list(legion.get_virtual_tags_for_line(path, line_nr), "ARCHIVE_CANDIDATE")
+  end
+
+  local function matches_archive_query(line_nr)
+    return legion.match_headline(get_org_headline_at(path, line_nr), "-REFILE/") == true
+  end
+
+  assert_true(has_archive_tag(1), "old DONE task should be a virtual archive candidate")
+  assert_true(not has_archive_tag(3), "DONE task with this-month timestamp should not be an archive candidate")
+  assert_true(not has_archive_tag(5), "DONE task with last-month timestamp should not be an archive candidate")
+  assert_true(not has_archive_tag(9), "open TODO task should not be an archive candidate")
+  assert_true(has_archive_tag(11), "old REFILE DONE task can be internally archivable before agenda tag filtering")
+  assert_true(has_archive_tag(13), "DONE task with no subtree timestamps should be an archive candidate")
+
+  assert_true(matches_archive_query(1), "old DONE task should match Norang archive agenda query")
+  assert_true(not matches_archive_query(3), "this-month DONE task should be skipped by Norang archive query")
+  assert_true(not matches_archive_query(5), "last-month DONE task should be skipped by Norang archive query")
+  assert_true(not matches_archive_query(9), "open TODO task should be skipped by Norang archive query")
+  assert_true(not matches_archive_query(11), "REFILE DONE task should be excluded by -REFILE/ archive query")
+  assert_true(matches_archive_query(13), "DONE task with no timestamps should match Norang archive agenda query")
+  assert_true(read_line(path, 1):match("ARCHIVE_CANDIDATE") == nil, "archive candidate tag should not be materialized")
 end
 
 local function test_legion_cleanup_apply_removes_derived_tags()
@@ -1565,6 +1630,7 @@ local CASES = {
   clock_out_in_punch_mode_returns_to_default = test_clock_out_in_punch_mode_returns_to_default,
   legion_refresh_indexes_stuck_project = test_legion_refresh_indexes_stuck_project,
   legion_refresh_indexes_project_tasks = test_legion_refresh_indexes_project_tasks,
+  legion_archive_candidates_match_norang_month_boundary = test_legion_archive_candidates_match_norang_month_boundary,
   legion_cleanup_apply_removes_derived_tags = test_legion_cleanup_apply_removes_derived_tags,
   capture_clock_handoff_resumes_previous = test_capture_clock_handoff_resumes_previous,
   capture_pre_refile_injects_clock_line = test_capture_pre_refile_injects_clock_line,
